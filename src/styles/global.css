@@ -1,0 +1,129 @@
+/* src/styles/global.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Сброс ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Базовые стили ── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0E0E0B;
+  color: #E8E6DC;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── Выделение текста ── */
+::selection {
+  background: #D4A85340;
+}
+
+/* ── Скроллбар ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0E0E0B;
+}
+::-webkit-scrollbar-thumb {
+  background: #2A2A22;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D4A85380;
+}
+
+/* ── Типографика статей (TipTap / react-markdown) ── */
+.prose {
+  color: #E8E6DC;
+  max-width: 72ch;
+  line-height: 1.8;
+}
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: 'Playfair Display', serif;
+  color: #F0EEE4;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose h1 { font-size: 2rem; }
+.prose h2 { font-size: 1.5rem; }
+.prose h3 { font-size: 1.2rem; }
+.prose p  { margin-bottom: 1rem; }
+.prose a  { color: #D4A853; text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { color: #E8C070; }
+.prose ul, .prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.prose li { margin-bottom: 0.35rem; }
+.prose blockquote {
+  border-left: 3px solid #D4A853;
+  padding-left: 1rem;
+  color: #8A8A7A;
+  font-style: italic;
+  margin: 1.5rem 0;
+}
+.prose code {
+  background: #1E1E18;
+  color: #D4A853;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+.prose pre {
+  background: #111110;
+  border: 1px solid #2A2A22;
+  border-radius: 6px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+.prose pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 0.875rem;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+.prose th, .prose td {
+  border: 1px solid #2A2A22;
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
+.prose th {
+  background: #161612;
+  color: #F0EEE4;
+  font-weight: 500;
+}
+.prose img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+}
+.prose hr {
+  border: none;
+  border-top: 1px solid #2A2A22;
+  margin: 2rem 0;
+}
