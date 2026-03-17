@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // ============================================================
 //  КОНФИГУРАЦИЯ — меняй здесь, не трогая остальной код
