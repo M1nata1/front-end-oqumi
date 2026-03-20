@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/authStore";
 import StudyCloud from "./StudyCloud";
 import {
   BRAND, API, REDIRECT, COPY, COLORS, FONTS, RIGHT_SCENE,
+  sanitizeField, isValidEmail, isValidUsername,
 } from "./auth.config";
 
 // ============================================================
@@ -90,6 +91,18 @@ export default function Auth() {
     );
   };
 
+  // Круговая анимация на правой панели при успехе
+  const pulseSuccess = () => {
+    const el = document.querySelector(".cloud");
+    el?.classList.remove("good");
+    void (el as HTMLDivElement | null)?.offsetHeight;
+    el?.classList.add("good");
+    window.setTimeout(
+      () => el?.classList.remove("good"),
+      RIGHT_SCENE.motion.successDuration * 1000 + 100,
+    );
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     clearMsgs();
@@ -97,19 +110,24 @@ export default function Auth() {
     if (mode === "forgot") { setOk(COPY.okForgot); pulseError(); return; }
 
     if (mode === "login"    && (!email.trim() || !password))                                          { setError(COPY.errEmpty); pulseError(); return; }
+    if (mode === "login"    && !isValidEmail(email))                                                  { setError(COPY.errEmailFormat); pulseError(); return; }
     if (mode === "register" && (!regEmail.trim() || !username.trim() || !phone.trim() || !regPass))   { setError(COPY.errEmpty); pulseError(); return; }
-    if (mode === "register" && phone.length !== 11) { setError(COPY.errPhone); pulseError(); return; }
+    if (mode === "register" && !isValidEmail(regEmail))                                               { setError(COPY.errEmailFormat); pulseError(); return; }
+    if (mode === "register" && !isValidUsername(username))                                            { setError(COPY.errUsername); pulseError(); return; }
+    if (mode === "register" && phone.length !== 11)                                                   { setError(COPY.errPhone); pulseError(); return; }
 
     setLoading(true);
     try {
       if (mode === "login") {
         const data = await loginRequest(email.trim(), password);
         setAuth({ id: "", name: email.trim(), role: "student" }, data.access, data.refresh);
+        pulseSuccess();
         navigate(REDIRECT.student, { replace: true });
         return;
       }
       if (mode === "register") {
         await registerRequest(regEmail.trim(), username.trim(), regPass, phone.trim());
+        pulseSuccess();
         setOk(COPY.okRegister);
         setMode("login");
         setEmail(regEmail.trim());
@@ -198,7 +216,7 @@ export default function Auth() {
                   <>
                     <Field label={COPY.login.labelEmail}>
                       <input className="inp" type="email" placeholder="user@example.com" autoComplete="email"
-                             value={email} onChange={e => setEmail(e.target.value)} />
+                             value={email} onChange={e => setEmail(sanitizeField(e.target.value))} />
                     </Field>
                     <Field label={COPY.login.labelPass}>
                       <PassInput value={password} onChange={setPassword} show={showPass} toggle={() => setShowPass(p => !p)} />
@@ -216,11 +234,11 @@ export default function Auth() {
                   <>
                     <Field label={COPY.register.labelEmail}>
                       <input className="inp" type="email" placeholder="user@example.com" autoComplete="email"
-                             value={regEmail} onChange={e => setRegEmail(e.target.value)} />
+                             value={regEmail} onChange={e => setRegEmail(sanitizeField(e.target.value))} />
                     </Field>
                     <Field label={COPY.register.labelUsername}>
                       <input className="inp" type="text" placeholder="newuser"
-                             value={username} onChange={e => setUsername(e.target.value)} />
+                             value={username} onChange={e => setUsername(sanitizeField(e.target.value))} />
                     </Field>
                     <Field label={COPY.register.labelPhone}>
                       <input className="inp" type="tel" placeholder="87771234567"
