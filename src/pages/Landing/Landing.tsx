@@ -244,7 +244,9 @@ export default function Landing() {
         }}>
           <div
               className="logo-link"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              onClick={() => {
+                if (window.scrollY > 8) window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               title="В начало"
           >
             {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
@@ -401,7 +403,13 @@ export default function Landing() {
 
         {/* FOOTER */}
         <footer style={{ borderTop: `1px solid ${COLORS.border}`, padding: "1.4rem 2.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
-          <div style={{ fontFamily: FONTS.display, fontSize: "1rem", fontWeight: 800 }}>
+          <div
+              className="logo-link"
+              onClick={() => {
+                if (window.scrollY > 8) window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              title="В начало"
+          >
             {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
           </div>
           <p style={{ fontSize: ".72rem", color: COLORS.textGhost }}>
