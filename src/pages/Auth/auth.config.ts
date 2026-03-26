@@ -12,10 +12,10 @@ export const BRAND = {
 // --- API ---
 // baseUrl без /api — пути уже содержат полный роут
 export const API = {
-  baseUrl:  "http://localhost:8000",      // URL
-  login:    "/users/auth/login/",         // POST { email, password } → { access, refresh }
-  register: "/users/auth/register/",      // POST { email, username, password, phone_number }
-  refresh:  "/users/auth/token/refresh/", // POST { refresh } → { access }
+  baseUrl:  "http://127.0.0.1:8000",
+  login:    "/api/users/auth/login/",         // POST { email, password } → { access, refresh }
+  register: "/api/users/auth/register/",      // POST { email, username, password, phone_number }
+  refresh:  "/api/users/auth/token/refresh/", // POST { refresh } → { access }
 };
 
 export const REDIRECT = {

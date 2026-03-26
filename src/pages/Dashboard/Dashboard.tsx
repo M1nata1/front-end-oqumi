@@ -2,8 +2,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
-import DashboardNav      from "./DashboardNav";
-import SubscriptionBadge from "./SubscriptionBadge";
+import DashboardNav from "./DashboardNav";
 import { COLORS, FONTS, COPY } from "./dashboard.config";
 
 export default function Dashboard() {
@@ -36,8 +35,6 @@ export default function Dashboard() {
         <p style={{ fontSize: ".9rem", color: COLORS.textMuted, marginBottom: "2rem" }}>
           {COPY.subtitle}
         </p>
-
-        <SubscriptionBadge />
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           {COPY.cards.map(c => (

@@ -54,6 +54,12 @@ export const COPY = {
     },
   ],
 
+  userMenu: [
+    { key: "profile",      href: "/profile",      label: "Профиль"           },
+    { key: "subscription", href: "/subscription", label: "Оформить подписку" },
+    { key: "logout",       href: null,            label: "Выйти"             },
+  ] as { key: string; href: string | null; label: string }[],
+
   // Плашка подписки
   subscription: {
     active:   "Подписка активна",

@@ -3,6 +3,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
+import { decodeJwt } from "@/api/auth";
 import StudyCloud from "./StudyCloud";
 import {
   BRAND, API, REDIRECT, COPY, COLORS, FONTS, RIGHT_SCENE,
@@ -14,7 +15,13 @@ import {
 // ============================================================
 
 interface LoginResponse { access: string; refresh: string; }
-interface ApiError { status?: number; error?: string; detail?: string; message?: string; }
+interface ApiError {
+  status?: number;
+  error?: string;
+  detail?: string;
+  message?: string;
+  [field: string]: unknown; // field-level errors: { email: ["..."], phone_number: ["..."] }
+}
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
@@ -75,7 +82,15 @@ export default function Auth() {
   const mapError = (e: ApiError) => {
     if (e.status === 429) return COPY.errLimit;
     if (e.status === 401) return COPY.errInvalid;
-    return e.detail || e.message || COPY.errServer;
+    if (e.detail) return String(e.detail);
+    if (e.message) return String(e.message);
+    // Field-level errors: { email: ["msg"], phone_number: ["msg"] }
+    for (const key of Object.keys(e)) {
+      if (key === "status" || key === "error") continue;
+      const val = e[key];
+      if (Array.isArray(val) && val.length > 0) return String(val[0]);
+    }
+    return COPY.errServer;
   };
 
   // Shake-анимация на правой панели при ошибке
@@ -119,8 +134,10 @@ export default function Auth() {
     setLoading(true);
     try {
       if (mode === "login") {
-        const data = await loginRequest(email.trim(), password);
-        setAuth({ id: "", name: email.trim(), role: "student" }, data.access, data.refresh);
+        const data     = await loginRequest(email.trim(), password);
+        const payload  = decodeJwt(data.access);
+        const username = typeof payload.username === "string" ? payload.username : email.trim();
+        setAuth({ id: String(payload.user_id ?? ""), name: username, role: "student" }, data.access, data.refresh);
         pulseSuccess();
         navigate(REDIRECT.student, { replace: true });
         return;

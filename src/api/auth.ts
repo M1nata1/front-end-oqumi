@@ -57,6 +57,20 @@ async function post<T>(endpoint: string, body: object): Promise<T> {
   return data as T;
 }
 
+// ============================================================
+//  УТИЛИТЫ
+// ============================================================
+
+/** Декодирует payload JWT без проверки подписи (только для отображения данных) */
+export function decodeJwt(token: string): Record<string, unknown> {
+  try {
+    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(base64)) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
 export const authApi = {
   login:    (body: LoginRequest)    => post<AuthTokenResponse>(AUTH_ENDPOINTS.login,    body),
   register: (body: RegisterRequest) => post<AuthTokenResponse>(AUTH_ENDPOINTS.register, body),

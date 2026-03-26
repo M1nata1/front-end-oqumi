@@ -8,7 +8,8 @@ import Landing    from "@/pages/Landing/Landing";
 import Auth       from "@/pages/Auth/Auth";
 import FAQ        from "@/pages/FAQ/FAQ";
 import TrialExam  from "@/pages/Exam/TrialExam";
-import Dashboard  from "@/pages/Dashboard/Dashboard";
+import Dashboard     from "@/pages/Dashboard/Dashboard";
+import Subscriptions from "@/pages/Subscriptions/Subscriptions";
 
 // import Courses     from "@/pages/Courses/Courses";
 // import CoursePage  from "@/pages/Courses/CoursePage";
@@ -38,7 +39,8 @@ export default function App() {
 
         {/* ── Защищённые — неавторизованный → /auth ── */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard"    element={<Dashboard />} />
+          <Route path="/subscription" element={<Subscriptions />} />
           {/* <Route path="/courses"                         element={<Courses />} /> */}
           {/* <Route path="/courses/:courseId"               element={<CoursePage />} /> */}
           {/* <Route path="/courses/:courseId/:topicId"      element={<TopicPage />} /> */}
