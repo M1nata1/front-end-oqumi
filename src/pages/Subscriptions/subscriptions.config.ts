@@ -3,8 +3,8 @@
 export const BRAND = { name: "Bilim", accent: "Ly" };
 
 export const API_SUB = {
-  tariffs: "/api/subscription/tariffs/",
-  me:      "/api/subscription/me/",
+  tariffs: "/subscription/tariffs/",
+  me:      "/subscription/me/",
 };
 
 export const COLORS = {
