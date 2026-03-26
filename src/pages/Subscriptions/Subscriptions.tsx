@@ -47,12 +47,10 @@ export default function Subscriptions() {
         .logo-link{display:inline-flex;align-items:center;font-family:${FONTS.display};font-size:1.28rem;font-weight:800;letter-spacing:-.01em;color:${COLORS.textBody};cursor:pointer;width:fit-content;transition:opacity .18s,transform .18s}
         .logo-link:hover{opacity:.72;transform:translateY(-1px)}
 
-        .back-btn{background:transparent;border:1px solid ${COLORS.border};border-radius:8px;padding:.45rem 1rem;font-family:${FONTS.body};font-size:.82rem;font-weight:600;color:${COLORS.textMuted};cursor:pointer;transition:all .18s}
-        .back-btn:hover{border-color:${COLORS.accent};color:${COLORS.accent}}
-
-        .tariff-card{background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:16px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:all .2s}
+.tariff-card{background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:16px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:all .2s}
         .tariff-card:hover{border-color:${COLORS.borderHover};transform:translateY(-3px);background:${COLORS.bgCardHover}}
         .tariff-card.active-card{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04)}
+        .tariff-card.trial-card{border-color:rgba(58,142,255,0.25);background:rgba(58,142,255,0.04)}
 
         .connect-btn{width:100%;background:${COLORS.accent};color:#fff;border:none;border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:not-allowed;opacity:.55;margin-top:auto}
         .current-btn{width:100%;background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.25);border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:default;margin-top:auto}
@@ -73,9 +71,6 @@ export default function Subscriptions() {
           style={{ fontFamily: FONTS.display, color: COLORS.textBody }}>
           {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
         </div>
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          ← {COPY.back}
-        </button>
       </nav>
 
       <main style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
@@ -139,19 +134,11 @@ export default function Subscriptions() {
           <div className="tariff-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
             {tariffs.map(t => {
               const isCurrent = mySub?.is_active && mySub.tariff === t.id;
+              const cardClass  = isCurrent ? "tariff-card active-card"
+                               : t.is_trial ? "tariff-card trial-card"
+                               : "tariff-card";
               return (
-                <div key={t.id} className={`tariff-card${isCurrent ? " active-card" : ""}`}>
-                  {t.is_trial && (
-                    <span style={{
-                      alignSelf: "flex-start", fontSize: ".65rem", fontWeight: 800,
-                      letterSpacing: ".1em", textTransform: "uppercase",
-                      background: COLORS.accentSoft, color: COLORS.accent,
-                      border: `1px solid rgba(255,58,58,0.2)`,
-                      borderRadius: "5px", padding: ".2rem .55rem",
-                    }}>
-                      {COPY.trial}
-                    </span>
-                  )}
+                <div key={t.id} className={cardClass}>
 
                   <div>
                     <div style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".35rem" }}>
