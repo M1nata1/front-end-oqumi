@@ -10,6 +10,7 @@ export default function LandingCourses({ onCTA }: Props) {
   return (
     <section
       id="courses"
+      className="courses-section"
       style={{ maxWidth: "1080px", margin: "0 auto", padding: "4rem 2.5rem", scrollMarginTop: "80px" }}
     >
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "1.75rem", flexWrap: "wrap", gap: "1rem" }}>
@@ -21,7 +22,7 @@ export default function LandingCourses({ onCTA }: Props) {
           <p style={{ fontSize: ".82rem", color: COLORS.textFaint, maxWidth: "280px", lineHeight: 1.65 }}>{COURSES_SECTION.description}</p>
         )}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: ".6rem" }}>
+      <div className="courses-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: ".6rem" }}>
         {SUBJECTS.map(s => (
           <div key={s.name} className="chip" onClick={onCTA}>
             <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: s.color, flexShrink: 0 }} />

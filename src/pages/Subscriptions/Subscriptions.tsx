@@ -55,7 +55,7 @@ export default function Subscriptions() {
         .connect-btn{width:100%;background:${COLORS.accent};color:#fff;border:none;border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:not-allowed;opacity:.55;margin-top:auto}
         .current-btn{width:100%;background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.25);border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:default;margin-top:auto}
 
-        @media(max-width:720px){.tariff-grid{grid-template-columns:1fr !important}}
+        /* responsive — см. src/styles/responsive.css */
       `}</style>
 
       {/* ── Навигация ── */}
@@ -73,7 +73,7 @@ export default function Subscriptions() {
         </div>
       </nav>
 
-      <main style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main className="sub-main" style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
         {/* Заголовок */}
         <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>

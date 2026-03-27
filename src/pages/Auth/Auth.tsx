@@ -190,7 +190,7 @@ export default function Auth() {
       `}</style>
 
         {/* ── LEFT: форма ── */}
-        <div style={{ background: COLORS.bgLeft, borderRight: "1px solid rgba(255,255,255,0.06)", padding: "2.25rem", display: "flex", flexDirection: "column" }}>
+        <div className="auth-left" style={{ background: COLORS.bgLeft, borderRight: "1px solid rgba(255,255,255,0.06)", padding: "2.25rem", display: "flex", flexDirection: "column" }}>
 
           {/* Шапка */}
           <div style={{ marginBottom: "1.75rem" }}>

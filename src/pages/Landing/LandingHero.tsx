@@ -12,7 +12,7 @@ export default function LandingHero({ left, onCTA, onCourses }: Props) {
   const pct = Math.round((EXAM_DEMO.progressCurrent / EXAM_DEMO.progressTotal) * 100);
 
   return (
-    <section style={{
+    <section className="hero-grid" style={{
       padding: "5.5rem 2.5rem 3rem", maxWidth: "1080px", margin: "0 auto",
       display: "grid", gridTemplateColumns: "1fr minmax(0,420px)", gap: "4rem",
       alignItems: "center", minHeight: "88vh",
@@ -46,7 +46,7 @@ export default function LandingHero({ left, onCTA, onCourses }: Props) {
       </div>
 
       {/* Right — демо-карточка экзамена */}
-      <div className="bob">
+      <div className="bob hero-demo">
         <div style={{ background: COLORS.bgCard, border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "1.4rem", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: "-40px", right: "-40px", width: "180px", height: "180px", background: "rgba(255,58,58,0.07)", borderRadius: "50%", filter: "blur(50px)", pointerEvents: "none" }} />
           <p className="section-label">{EXAM_DEMO.label}</p>

@@ -7,7 +7,7 @@ interface Props {
 
 export default function TrialExamIntro({ onStart }: Props) {
   return (
-    <div style={{ maxWidth: "700px", margin: "0 auto", padding: "4rem 2rem" }}>
+    <div className="exam-intro-main" style={{ maxWidth: "700px", margin: "0 auto", padding: "4rem 2rem" }}>
       <span className="section-label">{COPY.pageLabel}</span>
       <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,4vw,2.6rem)", fontWeight: 800, color: COLORS.textPrimary, letterSpacing: "-.025em", marginBottom: ".5rem" }}>
         {COPY.pageTitle}
@@ -17,7 +17,7 @@ export default function TrialExamIntro({ onStart }: Props) {
       </p>
 
       {/* Карточки предметов */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.25rem" }}>
+      <div className="exam-intro-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.25rem" }}>
         {SUBJECTS.map(s => (
           <div key={s.id} style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", padding: "1.4rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "1rem" }}>
