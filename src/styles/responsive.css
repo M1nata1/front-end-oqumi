@@ -95,6 +95,14 @@
    AUTH
 ═══════════════════════════════════════════ */
 
+/* Плавные переходы при изменении размера окна */
+.cloud {
+  transition: opacity .38s ease;
+}
+.auth-left {
+  transition: background .38s ease, backdrop-filter .38s ease;
+}
+
 /* Анимация — полноэкранный фон, форма — поверх */
 @media (max-width: 980px) {
   .cloud {

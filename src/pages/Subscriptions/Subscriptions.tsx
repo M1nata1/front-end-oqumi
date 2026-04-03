@@ -14,9 +14,11 @@ export default function Subscriptions() {
   const navigate    = useNavigate();
   const accessToken = useAuthStore(s => s.accessToken);
 
-  const [tariffs,  setTariffs]  = useState<Tariff[]>([]);
-  const [mySub,    setMySub]    = useState<MySubscription | null>(null);
-  const [loading,  setLoading]  = useState(true);
+  const [tariffs,     setTariffs]     = useState<Tariff[]>([]);
+  const [mySub,       setMySub]       = useState<MySubscription | null>(null);
+  const [loading,     setLoading]     = useState(true);
+  const [subscribing, setSubscribing] = useState<number | null>(null);
+  const [subError,    setSubError]    = useState("");
 
   useEffect(() => {
     const fetchTariffs = fetch(`${API_BASE}${API_SUB.tariffs}`)
@@ -38,6 +40,29 @@ export default function Subscriptions() {
     });
   }, [accessToken]);
 
+  const handleSubscribe = async (tariffId: number) => {
+    if (!accessToken) { navigate("/auth"); return; }
+    setSubscribing(tariffId);
+    setSubError("");
+    try {
+      const res = await fetch(`${API_BASE}${API_SUB.subscribe}`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+        body:    JSON.stringify({ tariff_id: tariffId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubError(data.detail ?? data.non_field_errors?.[0] ?? "Ошибка при оформлении подписки");
+        return;
+      }
+      setMySub(data as MySubscription);
+    } catch {
+      setSubError("Ошибка сети. Попробуй позже.");
+    } finally {
+      setSubscribing(null);
+    }
+  };
+
   return (
     <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, minHeight: "100vh" }}>
       <link href={FONTS.googleUrl} rel="stylesheet" />
@@ -52,7 +77,9 @@ export default function Subscriptions() {
         .tariff-card.active-card{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04)}
         .tariff-card.trial-card{border-color:rgba(58,142,255,0.25);background:rgba(58,142,255,0.04)}
 
-        .connect-btn{width:100%;background:${COLORS.accent};color:#fff;border:none;border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:not-allowed;opacity:.55;margin-top:auto}
+        .connect-btn{width:100%;background:${COLORS.accent};color:#fff;border:none;border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:pointer;transition:all .18s;margin-top:auto}
+        .connect-btn:hover:not(:disabled){background:#FF5555;transform:translateY(-1px)}
+        .connect-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
         .current-btn{width:100%;background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.25);border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:default;margin-top:auto}
 
         /* responsive — см. src/styles/responsive.css */
@@ -129,6 +156,12 @@ export default function Subscriptions() {
           )}
         </section>
 
+        {subError && (
+          <div style={{ background: "rgba(255,58,58,0.08)", border: "1px solid rgba(255,58,58,0.2)", borderRadius: "10px", padding: ".85rem 1.1rem", fontSize: ".84rem", color: "#FF6B6B", marginBottom: "1.5rem" }}>
+            {subError}
+          </div>
+        )}
+
         {/* ── Тарифы ── */}
         {!loading && (
           <div className="tariff-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
@@ -161,7 +194,13 @@ export default function Subscriptions() {
                   {isCurrent ? (
                     <div className="current-btn">{COPY.btnCurrent}</div>
                   ) : (
-                    <button className="connect-btn" disabled>{COPY.btnConnect}</button>
+                    <button
+                      className="connect-btn"
+                      disabled={subscribing === t.id || !!mySub?.is_active}
+                      onClick={() => handleSubscribe(t.id)}
+                    >
+                      {subscribing === t.id ? "Оформляем..." : COPY.btnConnect}
+                    </button>
                   )}
                 </div>
               );

@@ -3,8 +3,9 @@
 export const BRAND = { name: "Bilim", accent: "Ly" };
 
 export const API_SUB = {
-  tariffs: "/subscription/tariffs/",
-  me:      "/subscription/me/",
+  tariffs:   "/subscription/tariffs/",
+  me:        "/subscription/me/",
+  subscribe: "/subscription/",          // POST { tariff_id } → MySubscription
 };
 
 export const COLORS = {

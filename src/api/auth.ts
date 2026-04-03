@@ -3,7 +3,14 @@
 //  API КОНФИГУРАЦИЯ — меняй baseUrl когда переходишь на прод
 // ============================================================
 
-export const API_BASE = "http://127.0.0.1:8000/api";
+export const API_BASE   = "http://127.0.0.1:8000/api";
+export const MEDIA_BASE = "http://127.0.0.1:8000";
+
+/** Преобразует относительный путь /media/... в абсолютный URL */
+export function mediaUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+  return path.startsWith("http") ? path : `${MEDIA_BASE}${path}`;
+}
 
 export const AUTH_ENDPOINTS = {
   login:   "/users/auth/login/",           // POST { email, password } → { access, refresh }
