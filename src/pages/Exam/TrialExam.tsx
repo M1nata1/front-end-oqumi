@@ -135,7 +135,7 @@ export default function TrialExam() {
       )}
 
       {phase === "exam" && (
-        <div style={{
+        <div className="exam-grid" style={{
           maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem",
           display: "grid", gridTemplateColumns: "1fr 216px", gap: "1.25rem", alignItems: "start",
         }}>
@@ -148,13 +148,15 @@ export default function TrialExam() {
             onNext={goNext}
             onPrev={goPrev}
           />
-          <TrialExamSidebar
-            answers={answers}
-            activeSubject={activeSubject}
-            current={current}
-            onSwitchSubject={switchSubject}
-            onGoTo={goTo}
-          />
+          <div className="exam-sidebar-wrap">
+            <TrialExamSidebar
+              answers={answers}
+              activeSubject={activeSubject}
+              current={current}
+              onSwitchSubject={switchSubject}
+              onGoTo={goTo}
+            />
+          </div>
         </div>
       )}
 

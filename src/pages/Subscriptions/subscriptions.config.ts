@@ -3,8 +3,9 @@
 export const BRAND = { name: "Bilim", accent: "Ly" };
 
 export const API_SUB = {
-  tariffs: "/api/subscription/tariffs/",
-  me:      "/api/subscription/me/",
+  tariffs:   "/subscription/tariffs/",
+  me:        "/subscription/me/",
+  subscribe: "/subscription/",          // POST { tariff_id } → MySubscription
 };
 
 export const COLORS = {
@@ -41,8 +42,6 @@ export const COPY = {
   free:            "Бесплатно",
   btnConnect:      "Подключить",
   btnCurrent:      "Текущий тариф",
-  trial:           "Пробный",
-  back:            "Назад",
 };
 
 // ── Типы ────────────────────────────────────────────────────
@@ -77,6 +76,5 @@ export function formatDate(iso: string): string {
 
 export function formatCost(cost: string): string {
   const num = parseFloat(cost);
-  if (num === 0) return COPY.free;
   return `${num.toLocaleString("ru-RU")} ₸`;
 }

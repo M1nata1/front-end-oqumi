@@ -8,7 +8,7 @@ type Props = {
 
 export default function LandingFooter({ onAction }: Props) {
   return (
-    <footer style={{ borderTop: `1px solid ${COLORS.border}`, padding: "1.4rem 2.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+    <footer className="landing-footer" style={{ borderTop: `1px solid ${COLORS.border}`, padding: "1.4rem 2.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
       <div
         className="logo-link"
         onClick={() => { if (window.scrollY > 8) window.scrollTo({ top: 0, behavior: "smooth" }); }}

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "math",
+    "title": "Математика",
+    "description": "Алгебра, геометрия, теория вероятностей и математический анализ",
+    "color": "#FF3A3A",
+    "kind": "mandatory",
+    "modules": []
+  },
+  {
+    "id": "reading",
+    "title": "Грамотность чтения",
+    "description": "Анализ текста, понимание и интерпретация письменных источников",
+    "color": "#FF8C3A",
+    "kind": "mandatory",
+    "modules": []
+  },
+  {
+    "id": "history-kz",
+    "title": "История Казахстана",
+    "description": "История государства с древних времён до наших дней",
+    "color": "#22C55E",
+    "kind": "mandatory",
+    "modules": []
+  },
+  {
+    "id": "it",
+    "title": "Информационные технологии",
+    "description": "Основы IT: базы данных, алгоритмы, архитектура систем",
+    "color": "#3A8EFF",
+    "kind": "profile",
+    "modules": [
+      {
+        "id": "databases",
+        "title": "База данных",
+        "lessons": [
+          {
+            "id": "relational-db",
+            "title": "Реляционные и нереляционные БД",
+            "duration": "15 мин",
+            "hasQuiz": true
+          }
+        ]
+      },
+      {
+        "id": "algorithms",
+        "title": "Алгоритмы",
+        "lessons": []
+      }
+    ]
+  },
+  {
+    "id": "physics",
+    "title": "Физика",
+    "description": "Механика, термодинамика, электродинамика и квантовая физика",
+    "color": "#A78BFA",
+    "kind": "profile",
+    "modules": []
+  },
+  {
+    "id": "chemistry",
+    "title": "Химия",
+    "description": "Органическая и неорганическая химия, реакции и строение веществ",
+    "color": "#34D399",
+    "kind": "profile",
+    "modules": []
+  }
+]

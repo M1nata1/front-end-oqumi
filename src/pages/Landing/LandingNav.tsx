@@ -11,7 +11,7 @@ type Props = {
 
 export default function LandingNav({ scrolled, isAuth, onAction, onCTA }: Props) {
   return (
-    <nav style={{
+    <nav className="landing-nav" style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
       padding: ".85rem 2.5rem",
       background: scrolled ? `${COLORS.bgPage}EC` : "transparent",
@@ -28,11 +28,13 @@ export default function LandingNav({ scrolled, isAuth, onAction, onCTA }: Props)
         {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
       </div>
       <div style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
-        {NAV_LINKS.map(l => (
-          <span key={l.label} className="nav-link" onClick={() => onAction(l.action)}>
-            {l.label}
-          </span>
-        ))}
+        <div className="landing-nav-links" style={{ display: "contents" }}>
+          {NAV_LINKS.map(l => (
+            <span key={l.label} className="nav-link" onClick={() => onAction(l.action)}>
+              {l.label}
+            </span>
+          ))}
+        </div>
         <button
           className="btn-red"
           style={{ padding: ".45rem 1.2rem", fontSize: ".8rem", fontFamily: FONTS.body }}

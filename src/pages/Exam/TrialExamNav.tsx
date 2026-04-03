@@ -17,7 +17,7 @@ export default function TrialExamNav({ phase, timeLeft, answers, activeSubject, 
   const answered = answers.filter(a => a !== null).length;
 
   return (
-    <nav style={{
+    <nav className="exam-nav" style={{
       padding: ".7rem 1.75rem",
       background: `${COLORS.bgPage}F2`,
       backdropFilter: "blur(18px)",
@@ -49,7 +49,7 @@ export default function TrialExamNav({ phase, timeLeft, answers, activeSubject, 
             <div style={{ width: "1px", height: "36px", background: COLORS.border }} />
 
             {/* Счётчики по предметам */}
-            <div style={{ display: "flex", gap: "1.25rem" }}>
+            <div className="exam-nav-subjects" style={{ display: "flex", gap: "1.25rem" }}>
               {SUBJECTS.map(s => {
                 const start = SUBJECT_START[s.id];
                 const cnt   = answers.slice(start, start + s.count).filter(a => a !== null).length;

@@ -10,6 +10,7 @@ export default function LandingExamCta({ onStart }: Props) {
   return (
     <section
       id="exam-cta"
+      className="exam-cta-section"
       style={{ maxWidth: "1080px", margin: "0 auto", padding: "5rem 2.5rem", scrollMarginTop: "80px" }}
     >
       <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "16px", padding: "2.5rem 3rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "2rem" }}>

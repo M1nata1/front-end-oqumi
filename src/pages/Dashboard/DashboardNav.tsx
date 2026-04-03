@@ -47,7 +47,7 @@ export default function DashboardNav() {
         {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+      <div className="dash-nav-links" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
         <span className="nav-link" onClick={() => navigate("/courses")}>{COPY.navCourses}</span>
         <span className="nav-link" onClick={() => navigate("/exam")}>{COPY.navExam}</span>
       </div>

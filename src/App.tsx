@@ -10,6 +10,10 @@ import FAQ        from "@/pages/FAQ/FAQ";
 import TrialExam  from "@/pages/Exam/TrialExam";
 import Dashboard     from "@/pages/Dashboard/Dashboard";
 import Subscriptions from "@/pages/Subscriptions/Subscriptions";
+import Courses       from "@/pages/Courses/Courses";
+import CategoryPage  from "@/pages/Courses/CategoryPage";
+import CoursePage    from "@/pages/Courses/CoursePage";
+import TopicPage     from "@/pages/Topic/TopicPage";
 
 // import Courses     from "@/pages/Courses/Courses";
 // import CoursePage  from "@/pages/Courses/CoursePage";
@@ -39,11 +43,12 @@ export default function App() {
 
         {/* ── Защищённые — неавторизованный → /auth ── */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard"    element={<Dashboard />} />
-          <Route path="/subscription" element={<Subscriptions />} />
-          {/* <Route path="/courses"                         element={<Courses />} /> */}
-          {/* <Route path="/courses/:courseId"               element={<CoursePage />} /> */}
-          {/* <Route path="/courses/:courseId/:topicId"      element={<TopicPage />} /> */}
+          <Route path="/dashboard"                    element={<Dashboard />} />
+          <Route path="/subscription"               element={<Subscriptions />} />
+          <Route path="/courses"                             element={<Courses />} />
+          <Route path="/courses/c/:categoryCode"           element={<CategoryPage />} />
+          <Route path="/courses/:courseId"                 element={<CoursePage />} />
+          <Route path="/courses/:courseId/:topicId"        element={<TopicPage />} />
           {/* <Route path="/courses/:courseId/:topicId/quiz" element={<QuizPage />} /> */}
           {/* <Route path="/exam"                            element={<ExamPage />} /> */}
           {/* <Route path="/exam/result"                     element={<ExamResult />} /> */}

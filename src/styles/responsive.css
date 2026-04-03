@@ -1,0 +1,153 @@
+/* src/styles/responsive.css
+   ─────────────────────────────────────────────
+   Breakpoints:
+     md  ≤ 768px  — планшет / половина экрана
+     sm  ≤ 480px  — мобильный
+   ─────────────────────────────────────────────
+   !important нужен для override inline style={}
+   ───────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════
+   LANDING
+═══════════════════════════════════════════ */
+
+/* Nav — скрыть ссылки, оставить кнопку */
+@media (max-width: 768px) {
+  .landing-nav       { padding: .85rem 1.25rem !important; }
+  .landing-nav-links { display: none !important; }
+}
+
+/* Hero — одна колонка, скрыть демо-карточку */
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+    padding: 5.5rem 1.25rem 3rem !important;
+    gap: 2rem !important;
+  }
+  .hero-demo { display: none !important; }
+}
+
+/* Предметы — 2 колонки на планшете */
+@media (max-width: 768px) {
+  .courses-section { padding: 3rem 1.25rem !important; }
+  .courses-grid    { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 480px) {
+  .courses-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Как это работает — 2 колонки → 1 */
+@media (max-width: 768px) {
+  .steps-section { padding: 3rem 1.25rem !important; }
+  .steps-grid    { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 480px) {
+  .steps-grid { grid-template-columns: 1fr !important; }
+}
+
+/* CTA секция — уменьшить padding */
+@media (max-width: 768px) {
+  .exam-cta-section { padding: 2.5rem 1.25rem !important; }
+}
+
+/* Футер */
+@media (max-width: 480px) {
+  .landing-footer { padding: 1.25rem !important; flex-direction: column !important; align-items: flex-start !important; }
+}
+
+
+/* ═══════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .dash-nav-links { display: none !important; }
+  .dash-main      { padding: 2.5rem 1.25rem !important; }
+  .dash-cards     { grid-template-columns: 1fr !important; }
+}
+
+
+/* ═══════════════════════════════════════════
+   SUBSCRIPTIONS
+═══════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .tariff-grid { grid-template-columns: 1fr 1fr !important; }
+  .sub-main    { padding: 2.5rem 1.5rem !important; }
+}
+@media (max-width: 520px) {
+  .tariff-grid { grid-template-columns: 1fr !important; }
+  .sub-main    { padding: 2rem 1.25rem !important; }
+}
+
+
+/* ═══════════════════════════════════════════
+   FAQ
+═══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .faq-main { padding: 2.5rem 1.25rem !important; }
+}
+
+
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+
+/* Плавные переходы при изменении размера окна */
+.cloud {
+  transition: opacity .38s ease;
+}
+.auth-left {
+  transition: background .38s ease, backdrop-filter .38s ease;
+}
+
+/* Анимация — полноэкранный фон, форма — поверх */
+@media (max-width: 980px) {
+  .cloud {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+  .auth-left {
+    position: relative !important;
+    z-index: 1 !important;
+    background: rgba(10, 10, 14, 0.84) !important;
+    backdrop-filter: blur(3px) !important;
+    border-right: none !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-left { padding: 1.5rem !important; }
+}
+
+
+/* ═══════════════════════════════════════════
+   EXAM
+═══════════════════════════════════════════ */
+
+/* Sidebar скрывается — вся ширина отдаётся вопросу */
+@media (max-width: 768px) {
+  .exam-grid {
+    grid-template-columns: 1fr !important;
+    padding: 1rem !important;
+  }
+  .exam-sidebar-wrap { display: none !important; }
+}
+
+/* Exam nav — уменьшить padding, таймер не обрезать */
+@media (max-width: 768px) {
+  .exam-nav { padding: .75rem 1rem !important; }
+  .exam-nav-subjects { display: none !important; }
+}
+@media (max-width: 480px) {
+  .exam-intro-main { padding: 1.25rem !important; }
+  .exam-intro-grid { grid-template-columns: 1fr !important; }
+}

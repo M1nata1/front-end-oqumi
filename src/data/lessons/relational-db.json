@@ -1,0 +1,255 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [{ "type": "text", "text": "Введение" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "База данных — это организованная коллекция структурированных данных. Существует два принципиально разных подхода к организации хранения: " },
+        { "type": "text", "text": "реляционные (SQL)", "marks": [{ "type": "bold" }] },
+        { "type": "text", "text": " и " },
+        { "type": "text", "text": "нереляционные (NoSQL)", "marks": [{ "type": "bold" }] },
+        { "type": "text", "text": " базы данных. Каждый из них имеет свои сильные стороны и подходит для разных задач." }
+      ]
+    },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [{ "type": "text", "text": "Реляционные базы данных (SQL)" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "Реляционная база данных хранит данные в виде " },
+        { "type": "text", "text": "таблиц (отношений)", "marks": [{ "type": "italic" }] },
+        { "type": "text", "text": " с заранее определённой схемой. Таблицы связаны между собой через ключи, что позволяет строить сложные запросы к нескольким таблицам одновременно." }
+      ]
+    },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [{ "type": "text", "text": "Ключевые понятия" }]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Первичный ключ (Primary Key)", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — уникальный идентификатор каждой строки в таблице" }
+          ]}]
+        },
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Внешний ключ (Foreign Key)", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — поле, ссылающееся на первичный ключ другой таблицы" }
+          ]}]
+        },
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Индекс", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — структура данных для ускорения поиска по столбцу" }
+          ]}]
+        },
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Транзакция", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — набор операций, выполняемых как единое целое" }
+          ]}]
+        }
+      ]
+    },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [{ "type": "text", "text": "Пример SQL-запроса" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "Допустим, у нас есть две таблицы: " },
+        { "type": "text", "text": "users", "marks": [{ "type": "code" }] },
+        { "type": "text", "text": " и " },
+        { "type": "text", "text": "orders", "marks": [{ "type": "code" }] },
+        { "type": "text", "text": ". Найдём всех пользователей, чьи заказы превышают 10 000 тенге:" }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": "sql" },
+      "content": [{ "type": "text", "text": "SELECT\n  u.id,\n  u.name,\n  SUM(o.total) AS total_spent\nFROM users u\nJOIN orders o ON u.id = o.user_id\nWHERE o.status = 'paid'\nGROUP BY u.id, u.name\nHAVING SUM(o.total) > 10000\nORDER BY total_spent DESC;" }]
+    },
+
+    {
+      "type": "blockquote",
+      "content": [{ "type": "paragraph", "content": [
+        { "type": "text", "text": "ACID: ", "marks": [{ "type": "bold" }] },
+        { "type": "text", "text": "Atomicity (атомарность), Consistency (согласованность), Isolation (изолированность), Durability (долговечность) — четыре ключевых свойства, гарантирующих надёжность транзакций в реляционных СУБД." }
+      ]}]
+    },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [{ "type": "text", "text": "Популярные реляционные СУБД" }]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [
+          { "type": "text", "text": "PostgreSQL", "marks": [{ "type": "bold" }] },
+          { "type": "text", "text": " — мощная open-source СУБД с поддержкой JSON, полнотекстового поиска и расширений" }
+        ]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [
+          { "type": "text", "text": "MySQL / MariaDB", "marks": [{ "type": "bold" }] },
+          { "type": "text", "text": " — широко используется в веб-разработке" }
+        ]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [
+          { "type": "text", "text": "SQLite", "marks": [{ "type": "bold" }] },
+          { "type": "text", "text": " — встраиваемая БД, хранится в одном файле, идеальна для мобильных приложений" }
+        ]}]}
+      ]
+    },
+
+    { "type": "horizontalRule" },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [{ "type": "text", "text": "Нереляционные базы данных (NoSQL)" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "NoSQL-базы данных появились как ответ на ограничения реляционных систем при работе с " },
+        { "type": "text", "text": "большими объёмами неструктурированных данных", "marks": [{ "type": "italic" }] },
+        { "type": "text", "text": " и высокими нагрузками. Они жертвуют частью ACID-гарантий ради масштабируемости и гибкости схемы." }
+      ]
+    },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [{ "type": "text", "text": "Типы NoSQL баз данных" }]
+    },
+    {
+      "type": "orderedList",
+      "content": [
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Документоориентированные", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — данные хранятся в документах (JSON/BSON). Пример: " },
+            { "type": "text", "text": "MongoDB", "marks": [{ "type": "italic" }] }
+          ]}]
+        },
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Ключ-значение (Key-Value)", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — простейшая модель, очень быстрый доступ. Пример: " },
+            { "type": "text", "text": "Redis, DynamoDB", "marks": [{ "type": "italic" }] }
+          ]}]
+        },
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Колоночные (Wide-Column)", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — данные хранятся по столбцам, эффективны для аналитики. Пример: " },
+            { "type": "text", "text": "Apache Cassandra, HBase", "marks": [{ "type": "italic" }] }
+          ]}]
+        },
+        {
+          "type": "listItem",
+          "content": [{ "type": "paragraph", "content": [
+            { "type": "text", "text": "Графовые", "marks": [{ "type": "bold" }] },
+            { "type": "text", "text": " — хранят узлы и рёбра, идеальны для социальных сетей. Пример: " },
+            { "type": "text", "text": "Neo4j", "marks": [{ "type": "italic" }] }
+          ]}]
+        }
+      ]
+    },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [{ "type": "text", "text": "Пример документа MongoDB" }]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": "javascript" },
+      "content": [{ "type": "text", "text": "// Пользователь в MongoDB — один документ содержит все данные\ndb.users.insertOne({\n  _id: ObjectId(\"64a1f3...\"),\n  name: \"Айгерим Бекова\",\n  email: \"aigеrim@example.com\",\n  orders: [\n    { product: \"Учебник Python\", total: 3500, status: \"paid\" },\n    { product: \"Курс SQL\",       total: 7200, status: \"paid\" }\n  ],\n  tags: [\"студент\", \"it\"],\n  createdAt: ISODate(\"2024-01-15\")\n});" }]
+    },
+
+    {
+      "type": "blockquote",
+      "content": [{ "type": "paragraph", "content": [
+        { "type": "text", "text": "BASE vs ACID: ", "marks": [{ "type": "bold" }] },
+        { "type": "text", "text": "NoSQL системы часто следуют принципам BASE — Basically Available, Soft state, Eventually consistent. Данные в конечном счёте станут согласованными, но не гарантированно сразу." }
+      ]}]
+    },
+
+    { "type": "horizontalRule" },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [{ "type": "text", "text": "SQL против NoSQL: когда что выбрать" }]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [{ "type": "text", "text": "Выбирайте реляционную БД, если:" }]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Данные имеют чёткую структуру и связи между сущностями" }]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Важна целостность данных и сложные транзакции (финансы, бухгалтерия)" }]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Необходимы сложные JOIN-запросы и агрегации" }]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Команда хорошо знакома с SQL" }]}]}
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [{ "type": "text", "text": "Выбирайте NoSQL, если:" }]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Схема данных часто меняется или заранее неизвестна" }]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Нужна горизонтальная масштабируемость на сотни серверов" }]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Работаете с неструктурированными данными: логи, метрики, контент" }]}]},
+        { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Критична скорость чтения/записи при высоких нагрузках" }]}]}
+      ]
+    },
+
+    { "type": "horizontalRule" },
+
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [{ "type": "text", "text": "Итог" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "Реляционные и нереляционные базы данных — это не конкуренты, а " },
+        { "type": "text", "text": "взаимодополняющие инструменты", "marks": [{ "type": "bold" }] },
+        { "type": "text", "text": ". Большинство современных приложений используют оба типа: например, PostgreSQL для основных бизнес-данных и Redis для кэша сессий. Выбор зависит от конкретной задачи." }
+      ]
+    }
+  ]
+}

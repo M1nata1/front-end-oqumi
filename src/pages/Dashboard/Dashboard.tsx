@@ -24,7 +24,7 @@ export default function Dashboard() {
 
       <DashboardNav />
 
-      <main style={{ maxWidth: "900px", margin: "0 auto", padding: "4rem 2.5rem" }}>
+      <main className="dash-main" style={{ maxWidth: "900px", margin: "0 auto", padding: "4rem 2.5rem" }}>
 
         <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
           {COPY.greeting}
@@ -36,7 +36,7 @@ export default function Dashboard() {
           {COPY.subtitle}
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <div className="dash-cards" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           {COPY.cards.map(c => (
             <div key={c.key} className="nav-card" onClick={() => navigate(c.href)}>
               <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".75rem" }}>

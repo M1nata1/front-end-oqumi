@@ -14,9 +14,11 @@ export default function Subscriptions() {
   const navigate    = useNavigate();
   const accessToken = useAuthStore(s => s.accessToken);
 
-  const [tariffs,  setTariffs]  = useState<Tariff[]>([]);
-  const [mySub,    setMySub]    = useState<MySubscription | null>(null);
-  const [loading,  setLoading]  = useState(true);
+  const [tariffs,     setTariffs]     = useState<Tariff[]>([]);
+  const [mySub,       setMySub]       = useState<MySubscription | null>(null);
+  const [loading,     setLoading]     = useState(true);
+  const [subscribing, setSubscribing] = useState<number | null>(null);
+  const [subError,    setSubError]    = useState("");
 
   useEffect(() => {
     const fetchTariffs = fetch(`${API_BASE}${API_SUB.tariffs}`)
@@ -38,6 +40,29 @@ export default function Subscriptions() {
     });
   }, [accessToken]);
 
+  const handleSubscribe = async (tariffId: number) => {
+    if (!accessToken) { navigate("/auth"); return; }
+    setSubscribing(tariffId);
+    setSubError("");
+    try {
+      const res = await fetch(`${API_BASE}${API_SUB.subscribe}`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+        body:    JSON.stringify({ tariff_id: tariffId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubError(data.detail ?? data.non_field_errors?.[0] ?? "Ошибка при оформлении подписки");
+        return;
+      }
+      setMySub(data as MySubscription);
+    } catch {
+      setSubError("Ошибка сети. Попробуй позже.");
+    } finally {
+      setSubscribing(null);
+    }
+  };
+
   return (
     <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, minHeight: "100vh" }}>
       <link href={FONTS.googleUrl} rel="stylesheet" />
@@ -47,17 +72,17 @@ export default function Subscriptions() {
         .logo-link{display:inline-flex;align-items:center;font-family:${FONTS.display};font-size:1.28rem;font-weight:800;letter-spacing:-.01em;color:${COLORS.textBody};cursor:pointer;width:fit-content;transition:opacity .18s,transform .18s}
         .logo-link:hover{opacity:.72;transform:translateY(-1px)}
 
-        .back-btn{background:transparent;border:1px solid ${COLORS.border};border-radius:8px;padding:.45rem 1rem;font-family:${FONTS.body};font-size:.82rem;font-weight:600;color:${COLORS.textMuted};cursor:pointer;transition:all .18s}
-        .back-btn:hover{border-color:${COLORS.accent};color:${COLORS.accent}}
-
-        .tariff-card{background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:16px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:all .2s}
+.tariff-card{background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:16px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:all .2s}
         .tariff-card:hover{border-color:${COLORS.borderHover};transform:translateY(-3px);background:${COLORS.bgCardHover}}
         .tariff-card.active-card{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04)}
+        .tariff-card.trial-card{border-color:rgba(58,142,255,0.25);background:rgba(58,142,255,0.04)}
 
-        .connect-btn{width:100%;background:${COLORS.accent};color:#fff;border:none;border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:not-allowed;opacity:.55;margin-top:auto}
+        .connect-btn{width:100%;background:${COLORS.accent};color:#fff;border:none;border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:pointer;transition:all .18s;margin-top:auto}
+        .connect-btn:hover:not(:disabled){background:#FF5555;transform:translateY(-1px)}
+        .connect-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
         .current-btn{width:100%;background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.25);border-radius:9px;padding:.75rem;font-family:${FONTS.body};font-weight:700;font-size:.875rem;cursor:default;margin-top:auto}
 
-        @media(max-width:720px){.tariff-grid{grid-template-columns:1fr !important}}
+        /* responsive — см. src/styles/responsive.css */
       `}</style>
 
       {/* ── Навигация ── */}
@@ -73,12 +98,9 @@ export default function Subscriptions() {
           style={{ fontFamily: FONTS.display, color: COLORS.textBody }}>
           {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
         </div>
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          ← {COPY.back}
-        </button>
       </nav>
 
-      <main style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main className="sub-main" style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
         {/* Заголовок */}
         <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
@@ -134,24 +156,22 @@ export default function Subscriptions() {
           )}
         </section>
 
+        {subError && (
+          <div style={{ background: "rgba(255,58,58,0.08)", border: "1px solid rgba(255,58,58,0.2)", borderRadius: "10px", padding: ".85rem 1.1rem", fontSize: ".84rem", color: "#FF6B6B", marginBottom: "1.5rem" }}>
+            {subError}
+          </div>
+        )}
+
         {/* ── Тарифы ── */}
         {!loading && (
           <div className="tariff-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
             {tariffs.map(t => {
               const isCurrent = mySub?.is_active && mySub.tariff === t.id;
+              const cardClass  = isCurrent ? "tariff-card active-card"
+                               : t.is_trial ? "tariff-card trial-card"
+                               : "tariff-card";
               return (
-                <div key={t.id} className={`tariff-card${isCurrent ? " active-card" : ""}`}>
-                  {t.is_trial && (
-                    <span style={{
-                      alignSelf: "flex-start", fontSize: ".65rem", fontWeight: 800,
-                      letterSpacing: ".1em", textTransform: "uppercase",
-                      background: COLORS.accentSoft, color: COLORS.accent,
-                      border: `1px solid rgba(255,58,58,0.2)`,
-                      borderRadius: "5px", padding: ".2rem .55rem",
-                    }}>
-                      {COPY.trial}
-                    </span>
-                  )}
+                <div key={t.id} className={cardClass}>
 
                   <div>
                     <div style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".35rem" }}>
@@ -174,7 +194,13 @@ export default function Subscriptions() {
                   {isCurrent ? (
                     <div className="current-btn">{COPY.btnCurrent}</div>
                   ) : (
-                    <button className="connect-btn" disabled>{COPY.btnConnect}</button>
+                    <button
+                      className="connect-btn"
+                      disabled={subscribing === t.id || !!mySub?.is_active}
+                      onClick={() => handleSubscribe(t.id)}
+                    >
+                      {subscribing === t.id ? "Оформляем..." : COPY.btnConnect}
+                    </button>
                   )}
                 </div>
               );
