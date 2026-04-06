@@ -1,6 +1,6 @@
 // src/pages/Topic/TopicPage.tsx
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -127,6 +127,10 @@ export default function TopicPage() {
   const [content, setContent]     = useState<unknown>(null);
   const [quiz,    setQuiz]        = useState<QuizQuestion[]>([]);
   const [answers, setAnswers]     = useState<Record<number, number[]>>({});
+
+  // Флаг: подавляем scroll listener пока идёт программный скролл
+  const suppressScroll  = useRef(false);
+  const suppressTimer   = useRef<ReturnType<typeof setTimeout>>();
   const [checked, setChecked]     = useState(false);
 
   // TOC
@@ -189,30 +193,55 @@ export default function TopicPage() {
     else         setTocItems([]);
   }, [content]);
 
-  // ── TOC: ставим id на DOM-заголовки после рендера TipTap ────
+  // ── TOC: ID-инъекция ─────────────────────────────────────────
   useEffect(() => {
-    if (!tocItems.length) return;
-    const container = document.querySelector(".tiptap-content");
-    if (!container) return;
-    const els = container.querySelectorAll("h1,h2,h3,h4");
-    els.forEach((el, i) => { if (tocItems[i]) el.id = tocItems[i].id; });
-  }, [tocItems, content]);
+    if (!editor || !tocItems.length) return;
 
-  // ── TOC: подсвечиваем активный заголовок ────────────────────
+    const inject = () => {
+      const pm = document.querySelector(".tiptap-content .ProseMirror");
+      if (!pm) return;
+      const els = pm.querySelectorAll("h1,h2,h3,h4");
+      els.forEach((el, i) => { if (tocItems[i]) el.id = tocItems[i].id; });
+    };
+
+    const raf = requestAnimationFrame(inject);
+    editor.on("update", inject);
+    return () => { cancelAnimationFrame(raf); editor.off("update", inject); };
+  }, [editor, tocItems]);
+
+  // ── TOC: активный заголовок по скроллу ───────────────────────
+  // Квери DOM напрямую — не зависит от того, проставлены ли id.
+  // Suppress-флаг не даёт listener перезаписать click-активацию во время smooth scroll.
   useEffect(() => {
     if (!tocItems.length) return;
-    const observer = new IntersectionObserver(
-      entries => {
-        const visible = entries.filter(e => e.isIntersecting);
-        if (visible.length) setActiveId(visible[0].target.id);
-      },
-      { rootMargin: "-64px 0px -70% 0px" },
-    );
-    tocItems.forEach(item => {
-      const el = document.getElementById(item.id);
-      if (el) observer.observe(el);
+    const OFFSET = 90;
+
+    const onScroll = () => {
+      if (suppressScroll.current) return;
+
+      const pm = document.querySelector(".tiptap-content .ProseMirror");
+      if (!pm) return;
+      const headings = Array.from(pm.querySelectorAll("h1,h2,h3,h4"));
+      if (!headings.length) return;
+
+      let activeIdx = 0;
+      headings.forEach((el, i) => {
+        if (el.getBoundingClientRect().top <= OFFSET) activeIdx = i;
+      });
+
+      if (tocItems[activeIdx]) setActiveId(tocItems[activeIdx].id);
+    };
+
+    // Запускаем после инъекции ID (следующий кадр)
+    const raf = requestAnimationFrame(() => {
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
     });
-    return () => observer.disconnect();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [tocItems]);
 
   // ── Навигация prev/next ───────────────────────────────────────
@@ -281,7 +310,8 @@ export default function TopicPage() {
 
         .tiptap-content h1,.tiptap-content h2,.tiptap-content h3,.tiptap-content h4{
           font-family:${FONTS.display};font-weight:800;color:${COLORS.textPrimary};
-          letter-spacing:-.02em;margin-top:2rem;margin-bottom:.75rem
+          letter-spacing:-.02em;margin-top:2rem;margin-bottom:.75rem;
+          scroll-margin-top:80px
         }
         .tiptap-content h1{font-size:1.9rem}
         .tiptap-content h2{font-size:1.4rem;padding-bottom:.5rem;border-bottom:1px solid ${COLORS.border}}
@@ -620,8 +650,19 @@ export default function TopicPage() {
                   className={`toc-item${activeId === item.id ? " active" : ""}`}
                   style={{ paddingLeft: `${(item.level - 1) * 10 + 8}px` }}
                   onClick={() => {
+                    setActiveId(item.id);
+
+                    // Подавляем scroll listener пока идёт smooth scroll
+                    suppressScroll.current = true;
+                    clearTimeout(suppressTimer.current);
+                    suppressTimer.current = setTimeout(() => {
+                      suppressScroll.current = false;
+                    }, 900);
+
                     const el = document.getElementById(item.id);
-                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    if (!el) return;
+                    const top = el.getBoundingClientRect().top + window.scrollY - 72;
+                    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
                   }}
                 >
                   {item.text}
