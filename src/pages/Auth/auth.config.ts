@@ -3,6 +3,8 @@
 //  ВСЯ КОНФИГУРАЦИЯ СТРАНИЦЫ АВТОРИЗАЦИИ
 // ============================================================
 
+import { API_BASE } from "@api/auth.ts";
+
 export const BRAND = {
   name:   "Bilim",
   accent: "Ly",
@@ -10,12 +12,12 @@ export const BRAND = {
 };
 
 // --- API ---
-// baseUrl без /api — пути уже содержат полный роут
+// baseUrl = API_BASE (уже содержит /api), пути — без /api префикса
 export const API = {
-  baseUrl:  "http://127.0.0.1:8000",
-  login:    "/api/users/auth/login/",         // POST { email, password } → { access, refresh }
-  register: "/api/users/auth/register/",      // POST { email, username, password, phone_number }
-  refresh:  "/api/users/auth/token/refresh/", // POST { refresh } → { access }
+  baseUrl:  API_BASE,
+  login:    "/users/auth/login/",         // POST { email, password } → { access, refresh }
+  register: "/users/auth/register/",      // POST { email, username, password, phone_number }
+  refresh:  "/users/auth/token/refresh/", // POST { refresh } → { access }
 };
 
 export const REDIRECT = {

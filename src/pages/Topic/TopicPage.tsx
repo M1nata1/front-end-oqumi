@@ -1,6 +1,6 @@
 // src/pages/Topic/TopicPage.tsx
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -15,7 +15,7 @@ const LESSON_CONTENT: Record<string, () => Promise<{ default: unknown }>> = {
   "relational-db": () => import("@/data/lessons/relational-db.json"),
 };
 
-const LESSON_QUIZ: Record<string, () => Promise<{ default: QuizQuestion[] }>> = {
+const LESSON_QUIZ: Record<string, () => Promise<{ default: unknown[] }>> = {
   "relational-db": () => import("@/data/quizzes/relational-db.json"),
 };
 
@@ -58,6 +58,42 @@ function fixMediaUrls(node: unknown): unknown {
 
 const lowlight = createLowlight(common);
 
+// ── TOC — извлечение заголовков из TipTap JSON ──────────────
+interface TocItem { id: string; level: number; text: string }
+
+function extractText(nodes: unknown[]): string {
+  if (!Array.isArray(nodes)) return "";
+  return nodes.map(n => {
+    if (!n || typeof n !== "object") return "";
+    const node = n as Record<string, unknown>;
+    if (node.type === "text") return String(node.text ?? "");
+    return extractText(node.content as unknown[]);
+  }).join("");
+}
+
+function extractHeadings(content: unknown): TocItem[] {
+  const items: TocItem[] = [];
+  const seen: Record<string, number> = {};
+
+  function walk(node: unknown) {
+    if (!node || typeof node !== "object") return;
+    const n = node as Record<string, unknown>;
+    if (n.type === "heading") {
+      const level = (n.attrs as Record<string, unknown>)?.level as number ?? 2;
+      const text  = extractText(n.content as unknown[]);
+      if (!text) return;
+      const base = text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+      const slug = seen[base] ? `${base}-${seen[base]++}` : base;
+      if (!seen[base]) seen[base] = 1;
+      items.push({ id: slug, level, text });
+    }
+    if (Array.isArray(n.content)) n.content.forEach(walk);
+  }
+
+  walk(content);
+  return items;
+}
+
 // ── Стили ────────────────────────────────────────────────────
 const COLORS = {
   bgPage: "#0D0D11", bgCard: "#13131A", bgSidebar: "#0A0A0E",
@@ -91,7 +127,15 @@ export default function TopicPage() {
   const [content, setContent]     = useState<unknown>(null);
   const [quiz,    setQuiz]        = useState<QuizQuestion[]>([]);
   const [answers, setAnswers]     = useState<Record<number, number[]>>({});
+
+  // Флаг: подавляем scroll listener пока идёт программный скролл
+  const suppressScroll  = useRef(false);
+  const suppressTimer   = useRef<ReturnType<typeof setTimeout>>();
   const [checked, setChecked]     = useState(false);
+
+  // TOC
+  const [tocItems,  setTocItems]  = useState<TocItem[]>([]);
+  const [activeId,  setActiveId]  = useState<string>("");
 
   // API-режим
   const [apiLessons, setApiLessons] = useState<ApiLesson[] | null>(null);
@@ -124,7 +168,7 @@ export default function TopicPage() {
     else setContent(null);
 
     const quizLoader = LESSON_QUIZ[topicId ?? ""];
-    if (quizLoader) quizLoader().then(m => { setQuiz(m.default); setAnswers({}); setChecked(false); });
+    if (quizLoader) quizLoader().then(m => { setQuiz(m.default as QuizQuestion[]); setAnswers({}); setChecked(false); });
     else { setQuiz([]); setAnswers({}); setChecked(false); }
   }, [topicId, useApi, apiLesson]);
 
@@ -142,6 +186,63 @@ export default function TopicPage() {
   useEffect(() => {
     if (editor && content) editor.commands.setContent(content as object);
   }, [editor, content]);
+
+  // ── TOC: извлекаем заголовки из JSON ────────────────────────
+  useEffect(() => {
+    if (content) setTocItems(extractHeadings(content));
+    else         setTocItems([]);
+  }, [content]);
+
+  // ── TOC: ID-инъекция ─────────────────────────────────────────
+  useEffect(() => {
+    if (!editor || !tocItems.length) return;
+
+    const inject = () => {
+      const pm = document.querySelector(".tiptap-content .ProseMirror");
+      if (!pm) return;
+      const els = pm.querySelectorAll("h1,h2,h3,h4");
+      els.forEach((el, i) => { if (tocItems[i]) el.id = tocItems[i].id; });
+    };
+
+    const raf = requestAnimationFrame(inject);
+    editor.on("update", inject);
+    return () => { cancelAnimationFrame(raf); editor.off("update", inject); };
+  }, [editor, tocItems]);
+
+  // ── TOC: активный заголовок по скроллу ───────────────────────
+  // Квери DOM напрямую — не зависит от того, проставлены ли id.
+  // Suppress-флаг не даёт listener перезаписать click-активацию во время smooth scroll.
+  useEffect(() => {
+    if (!tocItems.length) return;
+    const OFFSET = 90;
+
+    const onScroll = () => {
+      if (suppressScroll.current) return;
+
+      const pm = document.querySelector(".tiptap-content .ProseMirror");
+      if (!pm) return;
+      const headings = Array.from(pm.querySelectorAll("h1,h2,h3,h4"));
+      if (!headings.length) return;
+
+      let activeIdx = 0;
+      headings.forEach((el, i) => {
+        if (el.getBoundingClientRect().top <= OFFSET) activeIdx = i;
+      });
+
+      if (tocItems[activeIdx]) setActiveId(tocItems[activeIdx].id);
+    };
+
+    // Запускаем после инъекции ID (следующий кадр)
+    const raf = requestAnimationFrame(() => {
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [tocItems]);
 
   // ── Навигация prev/next ───────────────────────────────────────
   const allLessons = useMemo(
@@ -163,7 +264,7 @@ export default function TopicPage() {
         *{box-sizing:border-box;margin:0;padding:0}
 
         /* ── Сайдбар ── */
-        .topic-layout{display:grid;grid-template-columns:248px 1fr;min-height:calc(100vh - 57px);align-items:start}
+        .topic-layout{display:grid;grid-template-columns:248px 1fr 220px;min-height:calc(100vh - 57px);align-items:start}
         .topic-sidebar{
           position:sticky;top:57px;height:calc(100vh - 57px);
           overflow-y:auto;background:${COLORS.bgSidebar};
@@ -180,14 +281,37 @@ export default function TopicPage() {
         .sidebar-lesson.active{color:${COLORS.accent};border-left-color:${COLORS.accent};background:rgba(255,58,58,0.05)}
 
         /* ── Основной контент ── */
-        .topic-main{padding:2.5rem 3rem;max-width:760px}
+        .topic-main{padding:2.5rem 2.5rem;max-width:100%}
+
+        /* ── TOC (содержание справа) ── */
+        .topic-toc{
+          position:sticky;top:57px;height:calc(100vh - 57px);
+          overflow-y:auto;padding:2rem 1.25rem 2rem 0.75rem;
+          border-left:1px solid ${COLORS.border};
+        }
+        .toc-title{
+          font-size:.6rem;font-weight:800;letter-spacing:.12em;
+          text-transform:uppercase;color:${COLORS.textFaint};
+          margin-bottom:.75rem;padding-left:.5rem;
+        }
+        .toc-item{
+          display:block;padding:.3rem .5rem;border-radius:5px;
+          font-size:.75rem;font-weight:600;line-height:1.4;
+          color:${COLORS.textFaint};cursor:pointer;
+          transition:color .14s,background .14s;
+          border-left:2px solid transparent;
+          text-decoration:none;
+        }
+        .toc-item:hover{color:${COLORS.textBody};background:rgba(255,255,255,0.03)}
+        .toc-item.active{color:${COLORS.accent};border-left-color:${COLORS.accent};background:rgba(255,58,58,0.05)}
 
         /* ── TipTap типографика ── */
         .tiptap-content{color:${COLORS.textBody};font-size:.95rem;line-height:1.85}
 
         .tiptap-content h1,.tiptap-content h2,.tiptap-content h3,.tiptap-content h4{
           font-family:${FONTS.display};font-weight:800;color:${COLORS.textPrimary};
-          letter-spacing:-.02em;margin-top:2rem;margin-bottom:.75rem
+          letter-spacing:-.02em;margin-top:2rem;margin-bottom:.75rem;
+          scroll-margin-top:80px
         }
         .tiptap-content h1{font-size:1.9rem}
         .tiptap-content h2{font-size:1.4rem;padding-bottom:.5rem;border-bottom:1px solid ${COLORS.border}}
@@ -296,10 +420,14 @@ export default function TopicPage() {
         .lesson-nav-btn:hover:not(:disabled){border-color:${COLORS.borderHover};color:${COLORS.textBody}}
         .lesson-nav-btn:disabled{opacity:.3;cursor:not-allowed}
 
+        @media(max-width:1100px){
+          .topic-layout{grid-template-columns:248px 1fr !important}
+          .topic-toc{display:none !important}
+        }
         @media(max-width:900px){
           .topic-layout{grid-template-columns:1fr !important}
           .topic-sidebar{display:none !important}
-          .topic-main{padding:2rem 1.25rem !important;max-width:100% !important}
+          .topic-main{padding:2rem 1.25rem !important}
         }
       `}</style>
 
@@ -510,6 +638,40 @@ export default function TopicPage() {
             </div>
           </article>
         </div>
+
+        {/* ── TOC — содержание темы ── */}
+        <aside className="topic-toc">
+          {tocItems.length > 0 && (
+            <>
+              <div className="toc-title">Содержание</div>
+              {tocItems.map(item => (
+                <div
+                  key={item.id}
+                  className={`toc-item${activeId === item.id ? " active" : ""}`}
+                  style={{ paddingLeft: `${(item.level - 1) * 10 + 8}px` }}
+                  onClick={() => {
+                    setActiveId(item.id);
+
+                    // Подавляем scroll listener пока идёт smooth scroll
+                    suppressScroll.current = true;
+                    clearTimeout(suppressTimer.current);
+                    suppressTimer.current = setTimeout(() => {
+                      suppressScroll.current = false;
+                    }, 900);
+
+                    const el = document.getElementById(item.id);
+                    if (!el) return;
+                    const top = el.getBoundingClientRect().top + window.scrollY - 72;
+                    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+                  }}
+                >
+                  {item.text}
+                </div>
+              ))}
+            </>
+          )}
+        </aside>
+
       </div>
     </div>
   );
