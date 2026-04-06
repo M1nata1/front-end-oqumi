@@ -3,6 +3,8 @@
 //  ВСЯ КОНФИГУРАЦИЯ СТРАНИЦЫ АВТОРИЗАЦИИ
 // ============================================================
 
+import {MEDIA_BASE} from "@api/auth.ts";
+
 export const BRAND = {
   name:   "Bilim",
   accent: "Ly",
@@ -12,7 +14,7 @@ export const BRAND = {
 // --- API ---
 // baseUrl без /api — пути уже содержат полный роут
 export const API = {
-  baseUrl:  "http://127.0.0.1:8000",
+  baseUrl:  MEDIA_BASE,
   login:    "/api/users/auth/login/",         // POST { email, password } → { access, refresh }
   register: "/api/users/auth/register/",      // POST { email, username, password, phone_number }
   refresh:  "/api/users/auth/token/refresh/", // POST { refresh } → { access }
