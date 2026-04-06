@@ -3,7 +3,7 @@
 //  ВСЯ КОНФИГУРАЦИЯ СТРАНИЦЫ АВТОРИЗАЦИИ
 // ============================================================
 
-import {MEDIA_BASE} from "@api/auth.ts";
+import { API_BASE } from "@api/auth.ts";
 
 export const BRAND = {
   name:   "Bilim",
@@ -12,12 +12,12 @@ export const BRAND = {
 };
 
 // --- API ---
-// baseUrl без /api — пути уже содержат полный роут
+// baseUrl = API_BASE (уже содержит /api), пути — без /api префикса
 export const API = {
-  baseUrl:  MEDIA_BASE,
-  login:    "/api/users/auth/login/",         // POST { email, password } → { access, refresh }
-  register: "/api/users/auth/register/",      // POST { email, username, password, phone_number }
-  refresh:  "/api/users/auth/token/refresh/", // POST { refresh } → { access }
+  baseUrl:  API_BASE,
+  login:    "/users/auth/login/",         // POST { email, password } → { access, refresh }
+  register: "/users/auth/register/",      // POST { email, username, password, phone_number }
+  refresh:  "/users/auth/token/refresh/", // POST { refresh } → { access }
 };
 
 export const REDIRECT = {
