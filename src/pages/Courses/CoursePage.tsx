@@ -60,6 +60,7 @@ export default function CoursePage() {
 
   const [course,     setCourse]     = useState<ApiCourseDetail | null>(null);
   const [apiLessons, setApiLessons] = useState<ApiLesson[] | null>(null);
+  const [courseQuiz, setCourseQuiz] = useState<{ id: number; title: string } | null>(null);
   const [forbidden,  setForbidden]  = useState(false);
   const [loading,    setLoading]    = useState(true);
 
@@ -68,6 +69,7 @@ export default function CoursePage() {
     setForbidden(false);
     setCourse(null);
     setApiLessons(null);
+    setCourseQuiz(null);
 
     // Детали курса — необязательны, используем как источник заголовка/картинки
     const fetchCourse = fetch(`${API_BASE}/courses/${courseId}/`)
@@ -86,7 +88,12 @@ export default function CoursePage() {
       .then(data => { if (data) setApiLessons(data as ApiLesson[]); })
       .catch(() => {});
 
-    Promise.all([fetchCourse, fetchLessons]).finally(() => setLoading(false));
+    const fetchQuiz = fetch(`${API_BASE}/courses/${courseId}/quiz/`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.id) setCourseQuiz({ id: data.id as number, title: data.title as string }); })
+      .catch(() => {});
+
+    Promise.all([fetchCourse, fetchLessons, fetchQuiz]).finally(() => setLoading(false));
   }, [courseId]);
 
   // Если уроки загрузились — страница рабочая, course_name берём из первого урока
@@ -216,6 +223,38 @@ export default function CoursePage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Квиз курса */}
+        {!loading && courseQuiz && (
+          <div style={{
+            marginTop: "1.25rem",
+            background: "rgba(255,58,58,0.05)",
+            border: `1px solid rgba(255,58,58,0.2)`,
+            borderRadius: "14px",
+            padding: "1.25rem 1.5rem",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap",
+          }}>
+            <div>
+              <p style={{ fontSize: ".65rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".3rem" }}>
+                Квиз по курсу
+              </p>
+              <p style={{ fontSize: ".9rem", fontWeight: 700, color: COLORS.textPrimary }}>
+                {courseQuiz.title}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate(`/exam/${courseQuiz.id}`)}
+              style={{
+                background: COLORS.accent, color: "#fff", border: "none",
+                borderRadius: "8px", padding: ".55rem 1.25rem",
+                fontFamily: FONTS.body, fontWeight: 700, fontSize: ".82rem", cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              Пройти →
+            </button>
           </div>
         )}
 

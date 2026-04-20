@@ -8,6 +8,8 @@ import Landing    from "@/pages/Landing/Landing";
 import Auth       from "@/pages/Auth/Auth";
 import FAQ        from "@/pages/FAQ/FAQ";
 import TrialExam  from "@/pages/Exam/TrialExam";
+import ExamPage   from "@/pages/Exam/ExamPage";
+import QuizPage   from "@/pages/Exam/QuizPage";
 import Dashboard     from "@/pages/Dashboard/Dashboard";
 import Subscriptions from "@/pages/Subscriptions/Subscriptions";
 import Courses       from "@/pages/Courses/Courses";
@@ -49,9 +51,8 @@ export default function App() {
           <Route path="/courses/c/:categoryCode"           element={<CategoryPage />} />
           <Route path="/courses/:courseId"                 element={<CoursePage />} />
           <Route path="/courses/:courseId/:topicId"        element={<TopicPage />} />
-          {/* <Route path="/courses/:courseId/:topicId/quiz" element={<QuizPage />} /> */}
-          {/* <Route path="/exam"                            element={<ExamPage />} /> */}
-          {/* <Route path="/exam/result"                     element={<ExamResult />} /> */}
+          <Route path="/exam"                              element={<ExamPage />} />
+          <Route path="/exam/:quizId"                      element={<QuizPage />} />
         </Route>
 
         {/* ── Только admin ── */}

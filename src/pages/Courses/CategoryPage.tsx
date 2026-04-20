@@ -78,7 +78,7 @@ export default function CategoryPage() {
 
       <DashboardNav />
 
-      <main style={{ maxWidth: "780px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
         {/* Breadcrumb */}
         <div style={{ display: "flex", alignItems: "center", gap: ".5rem", fontSize: ".75rem", color: COLORS.textFaint, marginBottom: "1.5rem" }}>
