@@ -1,14 +1,30 @@
 // src/pages/Dashboard/DashboardNav.tsx
 
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { BRAND, COLORS, FONTS, COPY } from "./dashboard.config";
 
+const NAV_LINKS = [
+  { label: COPY.navCourses, href: "/courses", match: "/courses" },
+  { label: COPY.navExam,    href: "/exam",    match: "/exam"    },
+];
+
 export default function DashboardNav() {
   const navigate  = useNavigate();
+  const location  = useLocation();
   const user      = useAuthStore(s => s.user);
   const clearAuth = useAuthStore(s => s.clearAuth);
+
+  const isActive = (match: string) => {
+    if (match === "/exam") {
+      // /exam/trial is a public page without nav context — exclude
+      return location.pathname === "/exam" || (
+        location.pathname.startsWith("/exam/") && location.pathname !== "/exam/trial"
+      );
+    }
+    return location.pathname === match || location.pathname.startsWith(match + "/");
+  };
 
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -43,13 +59,44 @@ export default function DashboardNav() {
       display: "flex", alignItems: "center", justifyContent: "space-between",
       position: "sticky", top: 0, zIndex: 100,
     }}>
-      <div className="logo-link" style={{ fontFamily: FONTS.display, color: COLORS.textBody }}>
+      <div
+        onClick={() => navigate("/dashboard")}
+        style={{ fontFamily: FONTS.display, fontSize: "1.28rem", fontWeight: 800, letterSpacing: "-.01em", color: COLORS.textBody, cursor: "pointer", transition: "opacity .18s", display: "inline-flex", alignItems: "center" }}
+        onMouseEnter={e => (e.currentTarget.style.opacity = ".72")}
+        onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+      >
         {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
       </div>
 
-      <div className="dash-nav-links" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-        <span className="nav-link" onClick={() => navigate("/courses")}>{COPY.navCourses}</span>
-        <span className="nav-link" onClick={() => navigate("/exam")}>{COPY.navExam}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+        {location.pathname !== "/dashboard" && NAV_LINKS.map(link => {
+          const active = isActive(link.match);
+          return (
+            <span
+              key={link.href}
+              onClick={() => navigate(link.href)}
+              style={{
+                fontSize: ".82rem", fontWeight: 700,
+                color: active ? COLORS.accent : COLORS.textMuted,
+                cursor: "pointer",
+                transition: "color .18s",
+                position: "relative",
+                paddingBottom: "2px",
+              }}
+              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = COLORS.textBody; }}
+              onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = COLORS.textMuted; }}
+            >
+              {link.label}
+              {active && (
+                <span style={{
+                  position: "absolute", bottom: "-4px", left: 0, right: 0,
+                  height: "2px", borderRadius: "99px",
+                  background: COLORS.accent,
+                }} />
+              )}
+            </span>
+          );
+        })}
       </div>
 
       {/* Дропдаун пользователя */}

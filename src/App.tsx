@@ -16,6 +16,7 @@ import Courses       from "@/pages/Courses/Courses";
 import CategoryPage  from "@/pages/Courses/CategoryPage";
 import CoursePage    from "@/pages/Courses/CoursePage";
 import TopicPage     from "@/pages/Topic/TopicPage";
+import ProfilePage   from "@/pages/Profile/ProfilePage";
 
 // import Courses     from "@/pages/Courses/Courses";
 // import CoursePage  from "@/pages/Courses/CoursePage";
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/courses/:courseId/:topicId"        element={<TopicPage />} />
           <Route path="/exam"                              element={<ExamPage />} />
           <Route path="/exam/:quizId"                      element={<QuizPage />} />
+          <Route path="/profile"                           element={<ProfilePage />} />
         </Route>
 
         {/* ── Только admin ── */}

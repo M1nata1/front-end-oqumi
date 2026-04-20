@@ -1,56 +1,34 @@
 // src/pages/Exam/ExamPage.tsx
-// Хаб раздела "Экзамен" — статистика и история квизов студента
+// Хаб раздела "Экзамен"
 // Route: /exam (protected)
 
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/authStore";
-import { API_BASE } from "@/api/auth";
 import DashboardNav from "@/pages/Dashboard/DashboardNav";
 import { COLORS, FONTS } from "@/pages/Dashboard/dashboard.config";
 
-interface UserStats {
-  total_score: number;
-  total_quizzes_passed: number;
-}
-
-interface QuizSummary {
-  id: number;
-  title: string;
-  description: string;
-  is_free: boolean;
-  questions: { id: number }[];
-}
-
-function pluralQuestions(n: number): string {
-  if (n % 10 === 1 && n % 100 !== 11) return "вопрос";
-  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return "вопроса";
-  return "вопросов";
-}
+const CARDS = [
+  {
+    key:   "trial",
+    href:  "/exam/trial",
+    label: "Пробный КТ",
+    title: "Полноформатный экзамен",
+    desc:  "80 вопросов · ТГО + Английский · 2 ч 5 мин. Точный формат реального КТ с таймером.",
+    cta:   "Начать →",
+    accent: true,
+  },
+  {
+    key:   "quizzes",
+    href:  "/courses",
+    label: "Квизы",
+    title: "Тесты по темам",
+    desc:  "Короткие проверочные тесты по каждому уроку. Переходи в курсы чтобы их найти.",
+    cta:   "К курсам →",
+    accent: false,
+  },
+];
 
 export default function ExamPage() {
-  const navigate     = useNavigate();
-  const accessToken  = useAuthStore(s => s.accessToken);
-
-  const [stats,   setStats]   = useState<UserStats | null>(null);
-  const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const headers = { Authorization: `Bearer ${accessToken}` };
-
-    const s = fetch(`${API_BASE}/statistics/me/`, { headers })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setStats(d as UserStats); })
-      .catch(() => {});
-
-    const q = fetch(`${API_BASE}/statistics/my-quizzes/`, { headers })
-      .then(r => r.ok ? r.json() : [])
-      .then(d => setQuizzes(Array.isArray(d) ? (d as QuizSummary[]) : []))
-      .catch(() => setQuizzes([]));
-
-    Promise.all([s, q]).finally(() => setLoading(false));
-  }, [accessToken]);
+  const navigate = useNavigate();
 
   return (
     <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, minHeight: "100vh" }}>
@@ -59,17 +37,20 @@ export default function ExamPage() {
         *{box-sizing:border-box;margin:0;padding:0}
         .nav-link{font-size:.82rem;font-weight:600;color:${COLORS.textMuted};cursor:pointer;transition:color .18s}
         .nav-link:hover{color:${COLORS.accent}}
-        .quiz-row{
-          background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:12px;
-          padding:1.1rem 1.25rem;cursor:pointer;transition:all .18s;
-          display:flex;align-items:center;justify-content:space-between;gap:1rem;
+        .exam-card{
+          background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:16px;
+          padding:2rem;cursor:pointer;transition:all .22s;
         }
-        .quiz-row:hover{border-color:${COLORS.borderHover};transform:translateY(-1px);background:${COLORS.bgCardHover}}
-        .quiz-row .arrow{color:${COLORS.textFaint};transition:transform .15s,color .15s;flex-shrink:0}
-        .quiz-row:hover .arrow{transform:translateX(3px);color:${COLORS.accent}}
-        .stat-card{background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:14px;padding:1.5rem}
-        .btn-red{background:${COLORS.accent};color:#fff;border:none;padding:.6rem 1.5rem;border-radius:8px;font-family:${FONTS.body};font-weight:700;font-size:.85rem;cursor:pointer;transition:all .18s}
+        .exam-card:hover{border-color:${COLORS.borderHover};transform:translateY(-3px);background:#161620}
+        .btn-red{background:${COLORS.accent};color:#fff;border:none;padding:.65rem 1.5rem;border-radius:8px;font-family:${FONTS.body};font-weight:700;font-size:.85rem;cursor:pointer;transition:all .18s;display:inline-block}
         .btn-red:hover{background:${COLORS.accentHover};transform:translateY(-1px)}
+        .btn-ghost{background:transparent;color:${COLORS.textMuted};border:1px solid rgba(255,255,255,.1);padding:.65rem 1.5rem;border-radius:8px;font-family:${FONTS.body};font-weight:600;font-size:.85rem;cursor:pointer;transition:all .18s;display:inline-block}
+        .btn-ghost:hover{border-color:${COLORS.accent};color:${COLORS.accent}}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        .fu1{animation:fadeUp .5s ease both .05s}
+        .fu2{animation:fadeUp .5s ease both .18s}
+        .fu3{animation:fadeUp .5s ease both .32s}
       `}</style>
 
       <DashboardNav />
@@ -77,109 +58,59 @@ export default function ExamPage() {
       <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
         {/* Header */}
-        <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
-          Экзамен
-        </p>
-        <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.6rem,3vw,2.2rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".4rem" }}>
-          Мои квизы
-        </h1>
-        <p style={{ fontSize: ".9rem", color: COLORS.textMuted, marginBottom: "2.5rem" }}>
-          История пройденных тестов и статистика
-        </p>
+        <div className="fu1">
+          <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
+            Экзамен
+          </p>
+          <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.7rem,3vw,2.4rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".5rem" }}>
+            Подготовка к КТ
+          </h1>
+          <p style={{ fontSize: ".9rem", color: COLORS.textMuted, marginBottom: "2.5rem" }}>
+            Пробный экзамен в реальном формате и тематические квизы по урокам
+          </p>
+        </div>
 
-        {/* Stats */}
-        {stats && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "2.5rem" }}>
-            <div className="stat-card">
-              <p style={{ fontSize: ".65rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".6rem" }}>
-                Всего баллов
+        {/* Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginBottom: "3rem" }}>
+          {CARDS.map((card, i) => (
+            <div
+              key={card.key}
+              className="exam-card"
+              style={{ animationName: "fadeUp", animationDuration: ".5s", animationFillMode: "both", animationDelay: `${0.18 + i * 0.14}s` }}
+              onClick={() => navigate(card.href)}
+            >
+              <p style={{ fontSize: ".62rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".75rem" }}>
+                {card.label}
               </p>
-              <p style={{ fontFamily: FONTS.display, fontSize: "2.4rem", fontWeight: 800, color: COLORS.textPrimary, lineHeight: 1 }}>
-                {stats.total_score}
+              <h2 style={{ fontFamily: FONTS.display, fontSize: "1.2rem", fontWeight: 800, color: COLORS.textPrimary, marginBottom: ".6rem" }}>
+                {card.title}
+              </h2>
+              <p style={{ fontSize: ".82rem", color: COLORS.textFaint, lineHeight: 1.65, marginBottom: "1.5rem" }}>
+                {card.desc}
               </p>
+              <span className={card.accent ? "btn-red" : "btn-ghost"}>
+                {card.cta}
+              </span>
             </div>
-            <div className="stat-card">
-              <p style={{ fontSize: ".65rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".6rem" }}>
-                Квизов пройдено
-              </p>
-              <p style={{ fontFamily: FONTS.display, fontSize: "2.4rem", fontWeight: 800, color: COLORS.accent, lineHeight: 1 }}>
-                {stats.total_quizzes_passed}
-              </p>
-            </div>
-          </div>
-        )}
+          ))}
+        </div>
 
-        {/* Quiz list */}
-        <p style={{ fontSize: ".65rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: "1rem" }}>
-          Пройденные тесты
-        </p>
-
-        {loading && (
-          <p style={{ color: COLORS.textFaint, fontSize: ".85rem" }}>Загрузка...</p>
-        )}
-
-        {!loading && quizzes.length === 0 && (
-          <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", padding: "3rem 2rem", textAlign: "center", marginBottom: "2rem" }}>
-            <p style={{ fontFamily: FONTS.display, fontSize: "1rem", fontWeight: 700, color: COLORS.textPrimary, marginBottom: ".5rem" }}>
-              Ещё нет пройденных квизов
-            </p>
-            <p style={{ fontSize: ".85rem", color: COLORS.textMuted, marginBottom: "1.75rem" }}>
-              Перейди в курсы — там к каждой теме прикреплён тест
-            </p>
-            <button className="btn-red" onClick={() => navigate("/courses")}>
-              К курсам →
-            </button>
-          </div>
-        )}
-
-        {quizzes.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: ".65rem", marginBottom: "2.5rem" }}>
-            {quizzes.map(quiz => (
-              <div key={quiz.id} className="quiz-row" onClick={() => navigate(`/exam/${quiz.id}`)}>
-                <div>
-                  <p style={{ fontFamily: FONTS.display, fontSize: ".95rem", fontWeight: 700, color: COLORS.textPrimary, marginBottom: ".2rem" }}>
-                    {quiz.title}
-                  </p>
-                  {quiz.description && (
-                    <p style={{ fontSize: ".78rem", color: COLORS.textMuted, marginBottom: ".3rem" }}>
-                      {quiz.description}
-                    </p>
-                  )}
-                  <p style={{ fontSize: ".7rem", color: COLORS.textFaint }}>
-                    {quiz.questions.length} {pluralQuestions(quiz.questions.length)}
-                    {!quiz.is_free && (
-                      <span style={{ marginLeft: ".5rem", color: COLORS.accent }}>• Подписка</span>
-                    )}
-                  </p>
-                </div>
-                <span className="arrow">→</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Trial exam banner */}
-        <div style={{
-          background: COLORS.accentSoft,
-          border: `1px solid ${COLORS.accentBorder}`,
-          borderRadius: "14px",
-          padding: "1.5rem",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "1rem",
-          flexWrap: "wrap",
+        {/* Stats hint */}
+        <div className="fu3" style={{
+          background: "rgba(255,255,255,0.03)",
+          border: `1px solid ${COLORS.border}`,
+          borderRadius: "12px",
+          padding: "1.1rem 1.5rem",
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap",
         }}>
-          <div>
-            <p style={{ fontFamily: FONTS.display, fontSize: ".95rem", fontWeight: 700, color: COLORS.textPrimary, marginBottom: ".25rem" }}>
-              Пробный КТ
-            </p>
-            <p style={{ fontSize: ".8rem", color: COLORS.textMuted }}>
-              80 вопросов · ТГО + Английский · 2ч 5мин
-            </p>
-          </div>
-          <button className="btn-red" onClick={() => navigate("/exam/trial")}>
-            Начать →
+          <p style={{ fontSize: ".82rem", color: COLORS.textMuted }}>
+            Твоя статистика и история пройденных квизов — в профиле
+          </p>
+          <button
+            onClick={() => navigate("/profile")}
+            style={{ background: "transparent", color: COLORS.accent, border: `1px solid rgba(255,58,58,.25)`, borderRadius: "7px", padding: ".4rem 1rem", fontFamily: FONTS.body, fontWeight: 700, fontSize: ".8rem", cursor: "pointer" }}
+          >
+            Профиль →
           </button>
         </div>
 

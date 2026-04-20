@@ -106,7 +106,8 @@ function extractHeadings(content: unknown): TocItem[] {
       const level = (n.attrs as Record<string, unknown>)?.level as number ?? 2;
       const text  = extractText(n.content as unknown[]);
       if (!text) return;
-      const base = text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+      const raw  = text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+      const base = raw || `h-${items.length}`;
       const slug = seen[base] ? `${base}-${seen[base]++}` : base;
       if (!seen[base]) seen[base] = 1;
       items.push({ id: slug, level, text });
