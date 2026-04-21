@@ -129,39 +129,42 @@ export default function DashboardNav() {
         </button>
 
         {/* Выпадающее меню */}
-        {open && (
-          <div style={{
-            position: "absolute", top: "calc(100% + 8px)", right: 0,
-            background: COLORS.bgCard, border: `1px solid ${COLORS.border}`,
-            borderRadius: "12px", minWidth: "180px",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
-            overflow: "hidden", zIndex: 200,
-          }}>
-            {COPY.userMenu.map((item, i) => (
-              <button
-                key={item.key}
-                onClick={() => {
-                  setOpen(false);
-                  if (item.key === "logout") { handleLogout(); return; }
-                  navigate(item.href!);
-                }}
-                style={{
-                  width: "100%", background: "none", border: "none",
-                  borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none",
-                  padding: ".75rem 1rem",
-                  cursor: "pointer", transition: "background .14s",
-                  fontFamily: FONTS.body, fontSize: ".84rem", fontWeight: 600,
-                  color: item.key === "logout" ? "#FF6B6B" : COLORS.textBody,
-                  textAlign: "left",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = item.key === "logout" ? "rgba(255,58,58,0.08)" : "rgba(255,255,255,0.04)")}
-                onMouseLeave={e => (e.currentTarget.style.background = "none")}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        )}
+        <div style={{
+          position: "absolute", top: "calc(100% + 8px)", right: 0,
+          background: COLORS.bgCard, border: `1px solid ${COLORS.border}`,
+          borderRadius: "12px", minWidth: "180px",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
+          overflow: "hidden", zIndex: 200,
+          opacity: open ? 1 : 0,
+          transform: open ? "translateY(0) scale(1)" : "translateY(-6px) scale(0.97)",
+          pointerEvents: open ? "auto" : "none",
+          transition: "opacity .18s cubic-bezier(0.16,1,0.3,1), transform .18s cubic-bezier(0.16,1,0.3,1)",
+          transformOrigin: "top right",
+        }}>
+          {COPY.userMenu.map((item, i) => (
+            <button
+              key={item.key}
+              onClick={() => {
+                setOpen(false);
+                if (item.key === "logout") { handleLogout(); return; }
+                navigate(item.href!);
+              }}
+              style={{
+                width: "100%", background: "none", border: "none",
+                borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none",
+                padding: ".75rem 1rem",
+                cursor: "pointer", transition: "background .14s",
+                fontFamily: FONTS.body, fontSize: ".84rem", fontWeight: 600,
+                color: item.key === "logout" ? "#FF6B6B" : COLORS.textBody,
+                textAlign: "left",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = item.key === "logout" ? "rgba(255,58,58,0.08)" : "rgba(255,255,255,0.04)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "none")}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
     </nav>
   );

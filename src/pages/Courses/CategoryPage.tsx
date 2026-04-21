@@ -129,6 +129,10 @@ export default function CategoryPage() {
         .toggle-btn{background:none;border:none;cursor:pointer;color:${COLORS.textFaint};padding:.25rem .4rem;border-radius:6px;transition:color .15s,background .15s;display:flex;align-items:center;font-size:.75rem}
         .toggle-btn:hover{color:${COLORS.textBody};background:rgba(255,255,255,0.06)}
 
+        .expand-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s cubic-bezier(0.16,1,0.3,1)}
+        .expand-wrap.open{grid-template-rows:1fr}
+        .expand-inner{overflow:hidden}
+
         @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
         .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:8px}
       `}</style>
@@ -191,7 +195,7 @@ export default function CategoryPage() {
                   <div style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between",
                     padding: "1.1rem 1.25rem",
-                    borderBottom: isOpen ? `1px solid ${COLORS.border}` : "none",
+                    borderBottom: `1px solid ${COLORS.border}`,
                     gap: "1rem",
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -227,50 +231,52 @@ export default function CategoryPage() {
                   </div>
 
                   {/* Список уроков */}
-                  {isOpen && (
-                    <div style={{ padding: ".5rem" }}>
-                      {isLoading ? (
-                        <div style={{ padding: ".5rem .5rem .25rem" }}>
-                          {[0,1,2].map(i => (
-                            <div key={i} className="skel" style={{ height: "38px", marginBottom: ".4rem" }} />
-                          ))}
-                        </div>
-                      ) : lessons.length === 0 ? (
-                        <div style={{ padding: ".75rem 1rem", fontSize: ".82rem", color: COLORS.textFaint, fontStyle: "italic" }}>
-                          Уроки скоро появятся
-                        </div>
-                      ) : (
-                        lessons.map((lesson, i) => (
-                          <div
-                            key={lesson.id}
-                            className="lesson-row"
-                            onClick={() => navigate(`/courses/${mod.slug}/${lesson.id}`, {
-                              state: {
-                                courseName:   mod.name,
-                                categoryName: category.name,
-                                categoryCode: category.code,
-                              },
-                            })}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
-                              <span style={{ fontSize: ".65rem", fontWeight: 800, color: COLORS.textFaint, width: "20px", flexShrink: 0, textAlign: "right" }}>
-                                {String(i + 1).padStart(2, "0")}
-                              </span>
-                              <span style={{ fontSize: ".85rem", fontWeight: 600, color: COLORS.textBody }}>
-                                {lesson.title}
-                              </span>
-                              {lesson.auto_test && (
-                                <span style={{ fontSize: ".62rem", color: COLORS.textFaint, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>
-                                  тест
-                                </span>
-                              )}
-                            </div>
-                            <span className="lesson-arrow">→</span>
+                  <div className={`expand-wrap${isOpen ? " open" : ""}`}>
+                    <div className="expand-inner">
+                      <div style={{ padding: ".5rem" }}>
+                        {isLoading ? (
+                          <div style={{ padding: ".5rem .5rem .25rem" }}>
+                            {[0,1,2].map(i => (
+                              <div key={i} className="skel" style={{ height: "38px", marginBottom: ".4rem" }} />
+                            ))}
                           </div>
-                        ))
-                      )}
+                        ) : lessons.length === 0 ? (
+                          <div style={{ padding: ".75rem 1rem", fontSize: ".82rem", color: COLORS.textFaint, fontStyle: "italic" }}>
+                            Уроки скоро появятся
+                          </div>
+                        ) : (
+                          lessons.map((lesson, i) => (
+                            <div
+                              key={lesson.id}
+                              className="lesson-row"
+                              onClick={() => navigate(`/courses/${mod.slug}/${lesson.id}`, {
+                                state: {
+                                  courseName:   mod.name,
+                                  categoryName: category.name,
+                                  categoryCode: category.code,
+                                },
+                              })}
+                            >
+                              <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
+                                <span style={{ fontSize: ".65rem", fontWeight: 800, color: COLORS.textFaint, width: "20px", flexShrink: 0, textAlign: "right" }}>
+                                  {String(i + 1).padStart(2, "0")}
+                                </span>
+                                <span style={{ fontSize: ".85rem", fontWeight: 600, color: COLORS.textBody }}>
+                                  {lesson.title}
+                                </span>
+                                {lesson.auto_test && (
+                                  <span style={{ fontSize: ".62rem", color: COLORS.textFaint, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>
+                                    тест
+                                  </span>
+                                )}
+                              </div>
+                              <span className="lesson-arrow">→</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
