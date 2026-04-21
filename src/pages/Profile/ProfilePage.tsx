@@ -197,6 +197,8 @@ export default function ProfilePage() {
   const totalScore   = stats?.total_score ?? 0;
   const totalPassed  = stats?.total_quizzes_passed ?? 0;
   const avgScore     = totalPassed > 0 ? Math.round(totalScore / totalPassed) : 0;
+  const quizzes: never[] = [];
+  const maxBarQ      = 0;
 
   return (
     <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, minHeight: "100vh" }}>

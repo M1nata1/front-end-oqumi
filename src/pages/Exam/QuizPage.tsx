@@ -239,21 +239,22 @@ export default function QuizPage() {
     return (
       <Shell>
         <main style={{ maxWidth: "900px", margin: "0 auto", padding: "5.5rem 2rem", textAlign: "center" }}>
-          <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".75rem" }}>
+          <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".75rem" }}>
             Квиз
           </p>
           {quiz.image && (
             <img
               src={mediaUrl(quiz.image) ?? ""}
               alt=""
+              className="fade-up-2"
               style={{ width: "72px", height: "72px", borderRadius: "16px", objectFit: "cover", marginBottom: "1.25rem" }}
             />
           )}
-          <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.6rem,3vw,2.2rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".75rem" }}>
+          <h1 className="fade-up-2" style={{ fontFamily: FONTS.display, fontSize: "clamp(1.6rem,3vw,2.2rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".75rem" }}>
             {quiz.title}
           </h1>
           {quiz.description && (
-            <p style={{ fontSize: ".9rem", color: COLORS.textMuted, lineHeight: 1.65, marginBottom: "1.5rem" }}>
+            <p className="fade-up-3" style={{ fontSize: ".9rem", color: COLORS.textMuted, lineHeight: 1.65, marginBottom: "1.5rem" }}>
               {quiz.description}
             </p>
           )}
@@ -298,15 +299,15 @@ export default function QuizPage() {
       <Shell>
         <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
-          <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
+          <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
             Результат
           </p>
-          <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.5rem,3vw,2rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: "1.75rem" }}>
+          <h1 className="fade-up-2" style={{ fontFamily: FONTS.display, fontSize: "clamp(1.5rem,3vw,2rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: "1.75rem" }}>
             {quiz.title}
           </h1>
 
           {/* Score banner */}
-          <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", padding: "1.75rem 2rem", marginBottom: "2rem", display: "flex", alignItems: "center", gap: "2rem", flexWrap: "wrap" }}>
+          <div className="fade-up-3" style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", padding: "1.75rem 2rem", marginBottom: "2rem", display: "flex", alignItems: "center", gap: "2rem", flexWrap: "wrap" }}>
             <div>
               <p style={{ fontSize: ".65rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".4rem" }}>Баллы</p>
               <p style={{ fontFamily: FONTS.display, fontSize: "2.6rem", fontWeight: 800, color: COLORS.accent, lineHeight: 1 }}>
@@ -418,7 +419,7 @@ export default function QuizPage() {
       }}>
 
         {/* Question card */}
-        <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", padding: "1.75rem" }}>
+        <div className="fade-up-1" style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", padding: "1.75rem" }}>
           <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
             Вопрос {current + 1} / {quiz.questions.length}
           </p>
@@ -480,7 +481,7 @@ export default function QuizPage() {
         </div>
 
         {/* Sidebar */}
-        <div style={{
+        <div className="fade-up-2" style={{
           background: COLORS.bgCard,
           border:     `1px solid ${COLORS.border}`,
           borderRadius: "14px",

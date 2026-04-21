@@ -49,9 +49,17 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div style={{ background: COLORS.bgPage, minHeight: "100vh" }}>
+      <div style={{ background: COLORS.bgPage, minHeight: "100vh", fontFamily: FONTS.body }}>
+        <style>{`@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}.skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:10px}`}</style>
         <DashboardNav />
-        <div style={{ padding: "3rem 2rem", color: COLORS.textFaint, fontSize: ".85rem" }}>Загрузка...</div>
+        <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+          <div className="skel" style={{ height: "14px", width: "80px", marginBottom: "1rem" }} />
+          <div className="skel" style={{ height: "36px", width: "280px", marginBottom: ".75rem" }} />
+          <div className="skel" style={{ height: "16px", width: "220px", marginBottom: "2.5rem" }} />
+          <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+            {[0,1,2,3].map(i => <div key={i} className="skel" style={{ height: "68px" }} />)}
+          </div>
+        </main>
       </div>
     );
   }
@@ -74,6 +82,8 @@ export default function CategoryPage() {
         .module-card:hover{border-color:${COLORS.borderHover};transform:translateY(-2px);background:${COLORS.bgCardHover}}
         .module-arrow{color:${COLORS.textFaint};transition:transform .18s,color .18s;font-size:1rem;flex-shrink:0}
         .module-card:hover .module-arrow{transform:translateX(4px);color:${COLORS.accent}}
+        @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+        .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:10px}
       `}</style>
 
       <DashboardNav />

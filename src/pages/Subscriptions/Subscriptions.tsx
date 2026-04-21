@@ -1,11 +1,12 @@
 // src/pages/Subscriptions/Subscriptions.tsx
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { API_BASE } from "@/api/auth";
+import DashboardNav from "@/pages/Dashboard/DashboardNav";
 import {
-  BRAND, COLORS, FONTS, COPY,
+  COLORS, FONTS, COPY,
   API_SUB, formatDate, formatCost,
 } from "./subscriptions.config";
 import type { Tariff, MySubscription } from "./subscriptions.config";
@@ -19,8 +20,12 @@ export default function Subscriptions() {
   const [loading,     setLoading]     = useState(true);
   const [subscribing, setSubscribing] = useState<number | null>(null);
   const [subError,    setSubError]    = useState("");
+  const fetched = useRef(false);
 
   useEffect(() => {
+    if (fetched.current) return;
+    fetched.current = true;
+
     const fetchTariffs = fetch(`${API_BASE}${API_SUB.tariffs}`)
       .then(r => r.ok ? r.json() : [])
       .catch(() => []);
@@ -38,7 +43,7 @@ export default function Subscriptions() {
       setMySub(s);
       setLoading(false);
     });
-  }, [accessToken]);
+  }, []);
 
   const handleSubscribe = async (tariffId: number) => {
     if (!accessToken) { navigate("/auth"); return; }
@@ -69,10 +74,7 @@ export default function Subscriptions() {
       <style>{`
         *{box-sizing:border-box;margin:0;padding:0}
 
-        .logo-link{display:inline-flex;align-items:center;font-family:${FONTS.display};font-size:1.28rem;font-weight:800;letter-spacing:-.01em;color:${COLORS.textBody};cursor:pointer;width:fit-content;transition:opacity .18s,transform .18s}
-        .logo-link:hover{opacity:.72;transform:translateY(-1px)}
-
-.tariff-card{background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:16px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:all .2s}
+        .tariff-card{background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:16px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem;transition:all .2s}
         .tariff-card:hover{border-color:${COLORS.borderHover};transform:translateY(-3px);background:${COLORS.bgCardHover}}
         .tariff-card.active-card{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.04)}
         .tariff-card.trial-card{border-color:rgba(58,142,255,0.25);background:rgba(58,142,255,0.04)}
@@ -85,36 +87,23 @@ export default function Subscriptions() {
         /* responsive — см. src/styles/responsive.css */
       `}</style>
 
-      {/* ── Навигация ── */}
-      <nav style={{
-        padding: ".9rem 2.5rem",
-        background: `${COLORS.bgPage}EC`,
-        backdropFilter: "blur(14px)",
-        borderBottom: `1px solid ${COLORS.border}`,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        position: "sticky", top: 0, zIndex: 100,
-      }}>
-        <div className="logo-link" onClick={() => navigate("/courses")}
-          style={{ fontFamily: FONTS.display, color: COLORS.textBody }}>
-          {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
-        </div>
-      </nav>
+      <DashboardNav />
 
       <main className="sub-main" style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
         {/* Заголовок */}
-        <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
+        <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
           {COPY.pageLabel}
         </p>
-        <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,3.5vw,2.4rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".5rem" }}>
+        <h1 className="fade-up-2" style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,3.5vw,2.4rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".5rem" }}>
           {COPY.pageTitle}
         </h1>
-        <p style={{ fontSize: ".9rem", color: COLORS.textMuted, marginBottom: "2.5rem" }}>
+        <p className="fade-up-3" style={{ fontSize: ".9rem", color: COLORS.textMuted, marginBottom: "2.5rem" }}>
           {COPY.pageSubtitle}
         </p>
 
         {/* ── Текущая подписка ── */}
-        <section style={{ marginBottom: "2.5rem" }}>
+        <section className="fade-up-4" style={{ marginBottom: "2.5rem" }}>
           <h2 style={{ fontFamily: FONTS.display, fontSize: "1rem", fontWeight: 700, color: COLORS.textPrimary, marginBottom: "1rem" }}>
             {COPY.currentTitle}
           </h2>

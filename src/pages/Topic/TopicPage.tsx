@@ -499,6 +499,9 @@ export default function TopicPage() {
           .topic-sidebar{display:none !important}
           .topic-main{padding:2rem 1.25rem !important}
         }
+
+        @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+        .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:6px}
       `}</style>
 
       <DashboardNav />
@@ -559,7 +562,7 @@ export default function TopicPage() {
         <div>
           <article className="topic-main">
             {/* Заголовок урока */}
-            <div style={{ marginBottom: "2rem" }}>
+            <div className="fade-up-1" style={{ marginBottom: "2rem" }}>
               {moduleLabel && (
                 <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".4rem" }}>
                   {moduleLabel}
@@ -575,13 +578,25 @@ export default function TopicPage() {
 
             {/* Статья */}
             {(apiLoading && useApi) ? (
-              <div style={{ color: COLORS.textFaint, fontSize: ".9rem" }}>Загрузка...</div>
+              <div className="fade-up-2" style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+                <div className="skel" style={{ height: "18px", width: "75%" }} />
+                <div className="skel" style={{ height: "14px", width: "90%" }} />
+                <div className="skel" style={{ height: "14px", width: "60%" }} />
+                <div className="skel" style={{ height: "14px", width: "82%" }} />
+                <div className="skel" style={{ height: "14px", width: "70%", marginTop: ".5rem" }} />
+                <div className="skel" style={{ height: "14px", width: "88%" }} />
+                <div className="skel" style={{ height: "14px", width: "55%" }} />
+              </div>
             ) : content ? (
-              <div className="tiptap-content">
+              <div className="tiptap-content fade-up-2">
                 <EditorContent editor={editor} />
               </div>
             ) : (
-              <div style={{ color: COLORS.textFaint, fontSize: ".9rem" }}>Загрузка...</div>
+              <div className="fade-up-2" style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+                <div className="skel" style={{ height: "18px", width: "75%" }} />
+                <div className="skel" style={{ height: "14px", width: "90%" }} />
+                <div className="skel" style={{ height: "14px", width: "60%" }} />
+              </div>
             )}
 
             {/* ── Тест (только для slug-уроков с локальным квизом) ── */}
@@ -702,7 +717,7 @@ export default function TopicPage() {
 
             {/* ── Квиз урока из API ── */}
             {apiQuiz && apiQuiz.questions.length > 0 && (
-              <div style={{ marginTop: "3rem", paddingTop: "2.5rem", borderTop: `1px solid ${COLORS.border}` }}>
+              <div className="fade-up-3" style={{ marginTop: "3rem", paddingTop: "2.5rem", borderTop: `1px solid ${COLORS.border}` }}>
                 <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
                   Тест по теме
                 </p>
@@ -824,7 +839,7 @@ export default function TopicPage() {
             )}
 
             {/* Навигация: пред / след */}
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "3rem", paddingTop: "2rem", borderTop: `1px solid ${COLORS.border}` }}>
+            <div className="fade-up-4" style={{ display: "flex", justifyContent: "space-between", marginTop: "3rem", paddingTop: "2rem", borderTop: `1px solid ${COLORS.border}` }}>
               <button
                 className="lesson-nav-btn"
                 disabled={currentIdx <= 0}

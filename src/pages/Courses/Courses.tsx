@@ -63,23 +63,29 @@ export default function Courses() {
         .course-card:hover{border-color:${COLORS.borderHover};transform:translateY(-2px);background:${COLORS.bgCardHover}}
         .course-arrow{color:${COLORS.textFaint};transition:transform .18s,color .18s;font-size:1rem;flex-shrink:0}
         .course-card:hover .course-arrow{transform:translateX(4px);color:${COLORS.accent}}
+        @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+        .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:10px}
       `}</style>
 
       <DashboardNav />
 
       <main className="dash-main" style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
-        <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
+        <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
           Обучение
         </p>
-        <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,3.5vw,2.4rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".5rem" }}>
+        <h1 className="fade-up-2" style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,3.5vw,2.4rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: ".5rem" }}>
           Все курсы
         </h1>
-        <p style={{ fontSize: ".9rem", color: COLORS.textMuted, marginBottom: "2.5rem" }}>
+        <p className="fade-up-3" style={{ fontSize: ".9rem", color: COLORS.textMuted, marginBottom: "2.5rem" }}>
           Выбери курс и начни изучение
         </p>
 
         {loading && (
-          <div style={{ color: COLORS.textFaint, fontSize: ".85rem" }}>Загрузка...</div>
+          <div className="fade-up-4" style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+            {[0,1,2,3].map(i => (
+              <div key={i} className="skel" style={{ height: "68px" }} />
+            ))}
+          </div>
         )}
 
         {!loading && categories.length === 0 && (
