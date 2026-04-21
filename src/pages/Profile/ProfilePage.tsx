@@ -3,7 +3,6 @@
 // Route: /profile (protected)
 
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { API_BASE } from "@/api/auth";
 import DashboardNav from "@/pages/Dashboard/DashboardNav";
@@ -25,13 +24,6 @@ interface AttemptItem {
   is_correct?: boolean;
 }
 
-interface QuizSummary {
-  id:          number;
-  title:       string;
-  description: string;
-  is_free:     boolean;
-  questions:   { id: number }[];
-}
 
 // ─── Animated counter hook ────────────────────────────────────
 
@@ -186,32 +178,25 @@ function StatCard({
 // ─── Main component ───────────────────────────────────────────
 
 export default function ProfilePage() {
-  const navigate    = useNavigate();
   const user        = useAuthStore(s => s.user);
   const accessToken = useAuthStore(s => s.accessToken);
 
   const [stats,   setStats]   = useState<UserStats | null>(null);
-  const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const h = { Authorization: `Bearer ${accessToken}` };
-    const s = fetch(`${API_BASE}/statistics/me/`, { headers: h })
+    fetch(`${API_BASE}/statistics/me/`, { headers: h })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setStats(d as UserStats); })
-      .catch(() => {});
-    const q = fetch(`${API_BASE}/statistics/my-quizzes/`, { headers: h })
-      .then(r => r.ok ? r.json() : [])
-      .then(d => setQuizzes(Array.isArray(d) ? (d as QuizSummary[]) : []))
-      .catch(() => setQuizzes([]));
-    Promise.all([s, q]).finally(() => setLoading(false));
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [accessToken]);
 
   const initial      = (user?.name ?? "?")[0].toUpperCase();
   const totalScore   = stats?.total_score ?? 0;
   const totalPassed  = stats?.total_quizzes_passed ?? 0;
   const avgScore     = totalPassed > 0 ? Math.round(totalScore / totalPassed) : 0;
-  const maxBarQ      = Math.max(...quizzes.map(q => q.questions.length), 1);
 
   return (
     <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, minHeight: "100vh" }}>
@@ -345,65 +330,6 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* ── Quiz history ── */}
-        <div className="fade-up-4">
-          <p style={{ fontSize: ".62rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: "1rem" }}>
-            Пройденные квизы
-          </p>
-
-          {loading && (
-            <div style={{ display: "flex", flexDirection: "column", gap: ".6rem" }}>
-              {[0,1,2].map(i => (
-                <div key={i} className="skeleton" style={{ height: "58px", borderRadius: "10px" }} />
-              ))}
-            </div>
-          )}
-
-          {!loading && quizzes.length === 0 && (
-            <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", padding: "2.5rem", textAlign: "center" }}>
-              <p style={{ fontFamily: FONTS.display, fontSize: ".95rem", fontWeight: 700, color: COLORS.textPrimary, marginBottom: ".5rem" }}>
-                Ещё нет пройденных квизов
-              </p>
-              <p style={{ fontSize: ".82rem", color: COLORS.textMuted, marginBottom: "1.5rem" }}>
-                Перейди в курсы и пройди тест по теме
-              </p>
-              <button
-                onClick={() => navigate("/courses")}
-                style={{ background: COLORS.accent, color: "#fff", border: "none", borderRadius: "8px", padding: ".6rem 1.5rem", fontFamily: FONTS.body, fontWeight: 700, fontSize: ".85rem", cursor: "pointer" }}
-              >
-                К курсам →
-              </button>
-            </div>
-          )}
-
-          {!loading && quizzes.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: ".6rem" }}>
-              {quizzes.map((quiz, i) => (
-                <div
-                  key={quiz.id}
-                  className="quiz-row"
-                  style={{
-                    opacity: 0,
-                    animation: `fadeUp .45s ease both ${500 + i * 60}ms`,
-                    animationFillMode: "forwards",
-                  }}
-                  onClick={() => navigate(`/exam/${quiz.id}`)}
-                >
-                  <div>
-                    <p style={{ fontFamily: FONTS.display, fontSize: ".88rem", fontWeight: 700, color: COLORS.textPrimary, marginBottom: ".15rem" }}>
-                      {quiz.title}
-                    </p>
-                    <p style={{ fontSize: ".72rem", color: COLORS.textFaint }}>
-                      {quiz.questions.length} вопр.
-                      {!quiz.is_free && <span style={{ marginLeft: ".4rem", color: COLORS.accent }}>· Подписка</span>}
-                    </p>
-                  </div>
-                  <span className="arr">→</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
       </main>
     </div>

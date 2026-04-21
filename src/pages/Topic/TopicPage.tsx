@@ -43,7 +43,7 @@ interface ApiQuizData {
 interface ApiCheckResult {
   question_id:        number;
   is_correct:         boolean;
-  correct_answer_ids: number[];
+  correct_answer: number[];
   score:              number;
   explanation:        string | null;
 }
@@ -143,8 +143,10 @@ export default function TopicPage() {
   const location = useLocation();
 
   // Контекст от CoursePage (название модуля для хлебных крошек)
-  const locState   = (location.state as { courseName?: string } | null);
+  const locState        = (location.state as { courseName?: string; categoryName?: string; categoryCode?: string } | null);
   const stateCourseName = locState?.courseName;
+  const stateCategoryName = locState?.categoryName;
+  const stateCategoryCode = locState?.categoryCode;
 
   const useApi = isNumericId(topicId);
 
@@ -507,18 +509,29 @@ export default function TopicPage() {
         <aside className="topic-sidebar">
           {/* Breadcrumb */}
           <div style={{ padding: ".25rem 1.25rem 1rem", borderBottom: `1px solid ${COLORS.border}`, marginBottom: ".5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: ".4rem", fontSize: ".72rem", color: COLORS.textFaint }}>
+            <div style={{ display: "flex", alignItems: "center", gap: ".4rem", fontSize: ".72rem", color: COLORS.textFaint, flexWrap: "wrap" }}>
               <span style={{ cursor: "pointer", transition: "color .15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = COLORS.accent)}
                 onMouseLeave={e => (e.currentTarget.style.color = COLORS.textFaint)}
                 onClick={() => navigate("/courses")}>
                 Курсы
               </span>
+              {stateCategoryName && (
+                <>
+                  <span>/</span>
+                  <span style={{ cursor: "pointer", transition: "color .15s" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = COLORS.accent)}
+                    onMouseLeave={e => (e.currentTarget.style.color = COLORS.textFaint)}
+                    onClick={() => stateCategoryCode ? navigate(`/courses/c/${stateCategoryCode}`) : navigate("/courses")}>
+                    {stateCategoryName}
+                  </span>
+                </>
+              )}
               <span>/</span>
               <span style={{ cursor: "pointer", transition: "color .15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = COLORS.accent)}
                 onMouseLeave={e => (e.currentTarget.style.color = COLORS.textFaint)}
-                onClick={() => navigate(`/courses/${courseId}`)}>
+                onClick={() => navigate(`/courses/${courseId}`, { state: { categoryName: stateCategoryName, categoryCode: stateCategoryCode } })}>
                 {moduleLabel || courseId}
               </span>
             </div>
@@ -532,7 +545,7 @@ export default function TopicPage() {
             <div
               key={l.id}
               className={`sidebar-lesson${String(l.id) === topicId ? " active" : ""}`}
-              onClick={() => navigate(`/courses/${courseId}/${l.id}`, { state: locState })}
+              onClick={() => navigate(`/courses/${courseId}/${l.id}`, { state: { courseName: stateCourseName, categoryName: stateCategoryName, categoryCode: stateCategoryCode } })}
             >
               <span style={{ fontSize: ".6rem", fontWeight: 800, width: "16px", flexShrink: 0, textAlign: "right" }}>
                 {String(i + 1).padStart(2, "0")}
@@ -719,7 +732,7 @@ export default function TopicPage() {
                       let cls = "quiz-opt";
                       if (isDone) {
                         cls += " quiz-opt--disabled";
-                        const isCorrect  = result?.correct_answer_ids?.includes(oi) ?? false;
+                        const isCorrect  = result?.correct_answer?.includes(oi) ?? false;
                         const isSelected = selected.includes(oi);
                         if (isSelected && isCorrect)       cls += " quiz-opt--correct";
                         else if (isSelected && !isCorrect) cls += " quiz-opt--wrong";
@@ -749,7 +762,7 @@ export default function TopicPage() {
                           {q.options.map((opt, oi) => (
                             <button key={oi} className={getOptClass(oi)} onClick={() => toggleOpt(oi)}>
                               <span className="quiz-marker">
-                                {isDone && (result?.correct_answer_ids?.includes(oi) ? "✓" : selected.includes(oi) ? "✗" : "")}
+                                {isDone && (result?.correct_answer?.includes(oi) ? "✓" : selected.includes(oi) ? "✗" : "")}
                               </span>
                               {opt}
                             </button>

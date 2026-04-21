@@ -19,9 +19,9 @@ interface QuizOption {
 interface QuizQuestion {
   id:      number;
   type:    "single" | "multiple" | "ordering";
-  content: string;
+  content: string | { text: string };
   image:   string | null;
-  options: QuizOption[];
+  options: (QuizOption | string)[];
   score:   number;
 }
 
@@ -34,12 +34,21 @@ interface QuizDetail {
   questions:   QuizQuestion[];
 }
 
+function qText(content: string | { text: string }): string {
+  return typeof content === "string" ? content : (content?.text ?? "");
+}
+
+function optText(opt: QuizOption | string, idx: number): { id: number; text: string } {
+  if (typeof opt === "string") return { id: idx, text: opt };
+  return { id: opt.id ?? idx, text: opt.text };
+}
+
 interface CheckResult {
-  question_id:      number;
-  is_correct:       boolean;
-  correct_answer_ids: number[];
-  score:            number;
-  explanation:      string | null;
+  question_id:    number;
+  is_correct:     boolean;
+  correct_answer: number[];
+  score:          number;
+  explanation:    string | null;
 }
 
 type Phase = "loading" | "error" | "intro" | "exam" | "checking" | "result";
@@ -86,7 +95,9 @@ export default function QuizPage() {
       })
       .then(data => {
         if (!data) { setPhase("error"); return; }
-        setQuiz(data as QuizDetail);
+        const raw = (data?.quiz ?? data) as QuizDetail;
+        if (!raw?.questions) { setPhase("error"); return; }
+        setQuiz(raw);
         setAnswers(new Map());
         setCurrent(0);
         setResults([]);
@@ -218,9 +229,10 @@ export default function QuizPage() {
     );
   }
 
-  const q         = quiz.questions[current];
+  const q         = quiz.questions?.[current];
   const chosenIds = answers.get(current) ?? [];
   const answered  = Array.from(answers.values()).filter(a => a.length > 0).length;
+  const qOptions  = (q?.options ?? []).map((o, i) => optText(o, i));
 
   // ── Intro ────────────────────────────────────────────────
   if (phase === "intro") {
@@ -341,14 +353,19 @@ export default function QuizPage() {
                     />
                   )}
                   <p style={{ fontSize: ".88rem", color: COLORS.textPrimary, lineHeight: 1.6, marginBottom: ".85rem" }}>
-                    {question.content}
+                    {qText(question.content)}
                   </p>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: ".4rem" }}>
-                    {question.options.map((opt, oi) => {
+                    {question.options.map((rawOpt, oi) => {
+                      const opt        = optText(rawOpt, oi);
                       const letter     = String.fromCharCode(65 + oi);
                       const wasChosen  = chosen.includes(opt.id);
-                      const isCorrect  = res?.correct_answer_ids?.includes(opt.id);
+                      const correctIds = res?.correct_answer;
+                      const hasIds     = correctIds && correctIds.length > 0;
+                      const isCorrect  = hasIds
+                        ? correctIds.includes(opt.id)
+                        : (res?.is_correct && wasChosen) ?? false;
                       const cls = isCorrect
                         ? " correct"
                         : wasChosen && !isCorrect
@@ -415,7 +432,7 @@ export default function QuizPage() {
           )}
 
           <p style={{ fontSize: "1rem", fontWeight: 600, color: COLORS.textPrimary, lineHeight: 1.65, marginBottom: "1.25rem" }}>
-            {q.content}
+            {q && qText(q.content)}
           </p>
 
           <p style={{ fontSize: ".7rem", color: COLORS.textFaint, marginBottom: ".85rem" }}>
@@ -423,14 +440,14 @@ export default function QuizPage() {
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: ".6rem", marginBottom: "1.75rem" }}>
-            {q.options.map((opt, oi) => {
+            {qOptions.map((opt, oi) => {
               const letter  = String.fromCharCode(65 + oi);
               const chosen  = chosenIds.includes(opt.id);
               return (
                 <button
                   key={opt.id}
                   className={`opt${chosen ? " chosen" : ""}`}
-                  onClick={() => toggleOption(current, opt.id, q.type)}
+                  onClick={() => q && toggleOption(current, opt.id, q.type)}
                 >
                   <span style={{
                     width: "22px", height: "22px",

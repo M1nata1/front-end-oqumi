@@ -94,7 +94,7 @@ export default function Subscriptions() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         position: "sticky", top: 0, zIndex: 100,
       }}>
-        <div className="logo-link" onClick={() => navigate("/dashboard")}
+        <div className="logo-link" onClick={() => navigate("/courses")}
           style={{ fontFamily: FONTS.display, color: COLORS.textBody }}>
           {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
         </div>

@@ -10,7 +10,7 @@ import FAQ        from "@/pages/FAQ/FAQ";
 import TrialExam  from "@/pages/Exam/TrialExam";
 import ExamPage   from "@/pages/Exam/ExamPage";
 import QuizPage   from "@/pages/Exam/QuizPage";
-import Dashboard     from "@/pages/Dashboard/Dashboard";
+import { Navigate } from "react-router-dom";
 import Subscriptions from "@/pages/Subscriptions/Subscriptions";
 import Courses       from "@/pages/Courses/Courses";
 import CategoryPage  from "@/pages/Courses/CategoryPage";
@@ -46,7 +46,7 @@ export default function App() {
 
         {/* ── Защищённые — неавторизованный → /auth ── */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard"                    element={<Dashboard />} />
+          <Route path="/dashboard" element={<Navigate to="/courses" replace />} />
           <Route path="/subscription"               element={<Subscriptions />} />
           <Route path="/courses"                             element={<Courses />} />
           <Route path="/courses/c/:categoryCode"           element={<CategoryPage />} />

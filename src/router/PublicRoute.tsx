@@ -5,7 +5,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 
 // Куда редиректить уже авторизованного пользователя
-const REDIRECT_TO = "/dashboard";
+const REDIRECT_TO = "/courses";
 
 export default function PublicRoute() {
     const isAuth = useAuthStore(s => s.isAuth);

@@ -21,7 +21,7 @@ export const API = {
 };
 
 export const REDIRECT = {
-  student: "/dashboard",
+  student: "/courses",
   admin:   "/admin",
 };
 

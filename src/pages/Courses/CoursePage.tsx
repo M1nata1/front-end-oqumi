@@ -204,7 +204,7 @@ export default function CoursePage() {
                 <div
                   key={lesson.id}
                   className="lesson-row"
-                  onClick={() => navigate(`/courses/${courseId}/${lesson.id}`, { state: { courseName: courseName } })}
+                  onClick={() => navigate(`/courses/${courseId}/${lesson.id}`, { state: { courseName, categoryName, categoryCode } })}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
                     <span style={{ fontSize: ".65rem", fontWeight: 800, color: COLORS.textFaint, width: "20px", flexShrink: 0, textAlign: "right" }}>

@@ -59,7 +59,7 @@ export default function FAQ() {
       <FaqNav
         isAuth={isAuth}
         onLogoClick={() => navigate("/")}
-        onCTA={() => navigate(isAuth ? "/dashboard" : "/auth")}
+        onCTA={() => navigate(isAuth ? "/courses" : "/auth")}
       />
 
       <div className="faq-main" style={{ maxWidth: "800px", margin: "0 auto", padding: "4rem 2.5rem" }}>

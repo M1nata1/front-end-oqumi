@@ -60,7 +60,7 @@ export default function DashboardNav() {
       position: "sticky", top: 0, zIndex: 100,
     }}>
       <div
-        onClick={() => navigate("/dashboard")}
+        onClick={() => navigate("/courses")}
         style={{ fontFamily: FONTS.display, fontSize: "1.28rem", fontWeight: 800, letterSpacing: "-.01em", color: COLORS.textBody, cursor: "pointer", transition: "opacity .18s", display: "inline-flex", alignItems: "center" }}
         onMouseEnter={e => (e.currentTarget.style.opacity = ".72")}
         onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
@@ -69,7 +69,7 @@ export default function DashboardNav() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-        {location.pathname !== "/dashboard" && NAV_LINKS.map(link => {
+        {NAV_LINKS.map(link => {
           const active = isActive(link.match);
           return (
             <span
