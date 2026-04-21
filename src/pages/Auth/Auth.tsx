@@ -93,6 +93,14 @@ export default function Auth() {
     return COPY.errServer;
   };
 
+  // Ожидание ответа сервера
+  const pulseLoading = () => {
+    document.querySelector(".cloud")?.classList.add("loading");
+  };
+  const stopLoading = () => {
+    document.querySelector(".cloud")?.classList.remove("loading");
+  };
+
   // Shake-анимация на правой панели при ошибке
   const pulseError = () => {
     const el = document.querySelector(".cloud");
@@ -132,6 +140,7 @@ export default function Auth() {
     if (mode === "register" && phone.length !== 11)                                                   { setError(COPY.errPhone); pulseError(); return; }
 
     setLoading(true);
+    pulseLoading();
     try {
       if (mode === "login") {
         const data     = await loginRequest(email.trim(), password);
@@ -155,6 +164,7 @@ export default function Auth() {
       pulseError();
     } finally {
       setLoading(false);
+      stopLoading();
     }
   };
 

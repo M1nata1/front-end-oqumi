@@ -61,8 +61,21 @@ body {
   to   { opacity: 1; }
 }
 .page-enter {
-  animation: page-in .25s ease-out forwards;
+  animation: page-in .18s ease-out forwards;
 }
+
+/* ── Постепенное появление элементов ── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.fade-up   { animation: fade-up .3s cubic-bezier(0.16,1,0.3,1) both; }
+.fade-up-1 { animation: fade-up .3s cubic-bezier(0.16,1,0.3,1) both .04s; }
+.fade-up-2 { animation: fade-up .3s cubic-bezier(0.16,1,0.3,1) both .1s;  }
+.fade-up-3 { animation: fade-up .3s cubic-bezier(0.16,1,0.3,1) both .17s; }
+.fade-up-4 { animation: fade-up .3s cubic-bezier(0.16,1,0.3,1) both .24s; }
+.fade-up-5 { animation: fade-up .3s cubic-bezier(0.16,1,0.3,1) both .31s; }
+.fade-up-6 { animation: fade-up .3s cubic-bezier(0.16,1,0.3,1) both .38s; }
 
 /* ── Скроллбар ── */
 ::-webkit-scrollbar {

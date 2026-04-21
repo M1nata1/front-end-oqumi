@@ -192,6 +192,21 @@ export default function StudyCloud() {
           box-shadow:0 0 0 4px rgba(255,58,58,0.14);
         }
 
+        /* Ожидание ответа сервера: синхронный быстрый пульс */
+        @keyframes loadingFlow{
+          0%  {transform:translate(-50%,-50%) translate3d(0,0,0)                          rotate(var(--r)) scale(var(--s))}
+          25% {transform:translate(-50%,-50%) translate3d(calc(var(--fx)*.18px),calc(var(--fy)*-.18px),0) rotate(calc(var(--r) + .9deg)) scale(calc(var(--s) + 0.09))}
+          50% {transform:translate(-50%,-50%) translate3d(0,0,0)                          rotate(var(--r)) scale(calc(var(--s) + 0.04))}
+          75% {transform:translate(-50%,-50%) translate3d(calc(var(--fx)*-.18px),calc(var(--fy)*.18px),0) rotate(calc(var(--r) - .9deg)) scale(calc(var(--s) + 0.09))}
+          100%{transform:translate(-50%,-50%) translate3d(0,0,0)                          rotate(var(--r)) scale(var(--s))}
+        }
+
+        .cloud.loading .cloud-item{
+          animation:loadingFlow 1.1s cubic-bezier(.42,.05,.35,1) infinite !important;
+          filter:brightness(1.18);
+          transition:filter .3s;
+        }
+
         /* Ошибка формы: дрожание */
         @keyframes cloudshake{
           0%,100%{transform:translateX(0)}

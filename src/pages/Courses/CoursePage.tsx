@@ -60,6 +60,7 @@ export default function CoursePage() {
 
   const [course,     setCourse]     = useState<ApiCourseDetail | null>(null);
   const [apiLessons, setApiLessons] = useState<ApiLesson[] | null>(null);
+  const [courseQuiz, setCourseQuiz] = useState<{ id: number; title: string } | null>(null);
   const [forbidden,  setForbidden]  = useState(false);
   const [loading,    setLoading]    = useState(true);
 
@@ -68,6 +69,7 @@ export default function CoursePage() {
     setForbidden(false);
     setCourse(null);
     setApiLessons(null);
+    setCourseQuiz(null);
 
     // Детали курса — необязательны, используем как источник заголовка/картинки
     const fetchCourse = fetch(`${API_BASE}/courses/${courseId}/`)
@@ -84,6 +86,11 @@ export default function CoursePage() {
         return r.ok ? r.json() : null;
       })
       .then(data => { if (data) setApiLessons(data as ApiLesson[]); })
+      .catch(() => {});
+
+    fetch(`${API_BASE}/courses/${courseId}/quiz/`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.id) setCourseQuiz({ id: data.id as number, title: data.title as string }); })
       .catch(() => {});
 
     Promise.all([fetchCourse, fetchLessons]).finally(() => setLoading(false));
@@ -108,6 +115,8 @@ export default function CoursePage() {
         .lesson-row:hover{background:rgba(255,255,255,0.04)}
         .lesson-arrow{color:${COLORS.textFaint};font-size:.85rem;transition:transform .15s,color .15s;flex-shrink:0}
         .lesson-row:hover .lesson-arrow{transform:translateX(3px);color:${COLORS.accent}}
+        @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+        .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:10px}
       `}</style>
 
       <DashboardNav />
@@ -130,7 +139,7 @@ export default function CoursePage() {
       <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
         {/* Breadcrumb */}
-        <div style={{ display: "flex", alignItems: "center", gap: ".5rem", fontSize: ".75rem", color: COLORS.textFaint, marginBottom: "1.5rem", flexWrap: "wrap" }}>
+        <div className="fade-up-1" style={{ display: "flex", alignItems: "center", gap: ".5rem", fontSize: ".75rem", color: COLORS.textFaint, marginBottom: "1.5rem", flexWrap: "wrap" }}>
           <span
             style={{ cursor: "pointer", transition: "color .15s" }}
             onMouseEnter={e => (e.currentTarget.style.color = COLORS.accent)}
@@ -157,7 +166,7 @@ export default function CoursePage() {
         </div>
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2.5rem" }}>
+        <div className="fade-up-2" style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2.5rem" }}>
           {imgUrl ? (
             <img
               src={imgUrl}
@@ -183,7 +192,7 @@ export default function CoursePage() {
 
         {/* Уроки */}
         {!loading && apiLessons && apiLessons.length > 0 && (
-          <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", overflow: "hidden" }}>
+          <div className="fade-up-3" style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", overflow: "hidden" }}>
             <div style={{ padding: "1rem 1.25rem", borderBottom: `1px solid ${COLORS.border}` }}>
               <div style={{ fontFamily: FONTS.display, fontSize: ".95rem", fontWeight: 800, color: COLORS.textPrimary }}>
                 Уроки
@@ -197,7 +206,7 @@ export default function CoursePage() {
                 <div
                   key={lesson.id}
                   className="lesson-row"
-                  onClick={() => navigate(`/courses/${courseId}/${lesson.id}`, { state: { courseName: courseName } })}
+                  onClick={() => navigate(`/courses/${courseId}/${lesson.id}`, { state: { courseName, categoryName, categoryCode } })}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
                     <span style={{ fontSize: ".65rem", fontWeight: 800, color: COLORS.textFaint, width: "20px", flexShrink: 0, textAlign: "right" }}>
@@ -219,8 +228,48 @@ export default function CoursePage() {
           </div>
         )}
 
+        {/* Квиз курса */}
+        {!loading && courseQuiz && (
+          <div className="fade-up-4" style={{
+            marginTop: "1.25rem",
+            background: "rgba(255,58,58,0.05)",
+            border: `1px solid rgba(255,58,58,0.2)`,
+            borderRadius: "14px",
+            padding: "1.25rem 1.5rem",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap",
+          }}>
+            <div>
+              <p style={{ fontSize: ".65rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".3rem" }}>
+                Квиз по курсу
+              </p>
+              <p style={{ fontSize: ".9rem", fontWeight: 700, color: COLORS.textPrimary }}>
+                {courseQuiz.title}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate(`/exam/${courseQuiz.id}`)}
+              style={{
+                background: COLORS.accent, color: "#fff", border: "none",
+                borderRadius: "8px", padding: ".55rem 1.25rem",
+                fontFamily: FONTS.body, fontWeight: 700, fontSize: ".82rem", cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              Пройти →
+            </button>
+          </div>
+        )}
+
         {loading && (
-          <div style={{ color: COLORS.textFaint, fontSize: ".85rem" }}>Загрузка уроков...</div>
+          <div className="fade-up-3" style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", overflow: "hidden" }}>
+            <div style={{ padding: "1rem 1.25rem", borderBottom: `1px solid ${COLORS.border}` }}>
+              <div className="skel" style={{ height: "14px", width: "60px", marginBottom: ".4rem" }} />
+              <div className="skel" style={{ height: "11px", width: "40px" }} />
+            </div>
+            <div style={{ padding: ".75rem" }}>
+              {[0,1,2,3].map(i => <div key={i} className="skel" style={{ height: "44px", marginBottom: ".4rem" }} />)}
+            </div>
+          </div>
         )}
 
         {!loading && !forbidden && apiLessons !== null && apiLessons.length === 0 && (

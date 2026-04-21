@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
@@ -25,6 +26,29 @@ interface QuizQuestion {
   text:    string;
   options: string[];
   correct: number[];
+}
+
+interface ApiQuizQuestion {
+  id:      number;
+  type:    "single" | "multiple" | "ordering";
+  content: { text: string } | string;
+  options: string[];
+  score:   number;
+}
+interface ApiQuizData {
+  id:          number;
+  title:       string;
+  questions:   ApiQuizQuestion[];
+}
+interface ApiCheckResult {
+  question_id:        number;
+  is_correct:         boolean;
+  correct_answer: number[];
+  score:              number;
+  explanation:        string | null;
+}
+function qText(content: ApiQuizQuestion["content"]): string {
+  return typeof content === "string" ? content : content.text;
 }
 
 interface ApiLesson {
@@ -82,7 +106,8 @@ function extractHeadings(content: unknown): TocItem[] {
       const level = (n.attrs as Record<string, unknown>)?.level as number ?? 2;
       const text  = extractText(n.content as unknown[]);
       if (!text) return;
-      const base = text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+      const raw  = text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+      const base = raw || `h-${items.length}`;
       const slug = seen[base] ? `${base}-${seen[base]++}` : base;
       if (!seen[base]) seen[base] = 1;
       items.push({ id: slug, level, text });
@@ -118,8 +143,10 @@ export default function TopicPage() {
   const location = useLocation();
 
   // Контекст от CoursePage (название модуля для хлебных крошек)
-  const locState   = (location.state as { courseName?: string } | null);
+  const locState        = (location.state as { courseName?: string; categoryName?: string; categoryCode?: string } | null);
   const stateCourseName = locState?.courseName;
+  const stateCategoryName = locState?.categoryName;
+  const stateCategoryCode = locState?.categoryCode;
 
   const useApi = isNumericId(topicId);
 
@@ -141,6 +168,13 @@ export default function TopicPage() {
   const [apiLessons, setApiLessons] = useState<ApiLesson[] | null>(null);
   const [apiLoading, setApiLoading] = useState(useApi);
 
+  // API-квиз урока
+  const accessToken          = useAuthStore(s => s.accessToken);
+  const [apiQuiz,            setApiQuiz]            = useState<ApiQuizData | null>(null);
+  const [apiQuizAnswers,     setApiQuizAnswers]     = useState<Record<number, number[]>>({});
+  const [apiQuizResults,     setApiQuizResults]     = useState<ApiCheckResult[] | null>(null);
+  const [apiQuizChecking,    setApiQuizChecking]    = useState(false);
+
   // ── Загрузка API-уроков ───────────────────────────────────────
   useEffect(() => {
     if (!useApi) return;
@@ -151,6 +185,42 @@ export default function TopicPage() {
       .catch(() => {})
       .finally(() => setApiLoading(false));
   }, [courseId, useApi]);
+
+  // ── Квиз урока из API ─────────────────────────────────────────
+  useEffect(() => {
+    if (!useApi || !topicId) return;
+    setApiQuiz(null);
+    setApiQuizAnswers({});
+    setApiQuizResults(null);
+    fetch(`${API_BASE}/lessons/${topicId}/quiz/`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        const quiz = data?.quiz ?? data;
+        if (quiz && Array.isArray(quiz.questions)) setApiQuiz(quiz as ApiQuizData);
+      })
+      .catch(() => {});
+  }, [topicId, useApi]);
+
+  const submitApiQuiz = async () => {
+    if (!apiQuiz) return;
+    setApiQuizChecking(true);
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+      const res = await fetch(`${API_BASE}/quizzes/${apiQuiz.id}/check/`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          answers: apiQuiz.questions.map(q => ({
+            question_id: q.id,
+            selected:    apiQuizAnswers[q.id] ?? [],
+          })),
+        }),
+      });
+      if (res.ok) setApiQuizResults(await res.json() as ApiCheckResult[]);
+    } catch { /* ignore */ }
+    setApiQuizChecking(false);
+  };
 
   const apiLesson = useMemo(
     () => apiLessons?.find(l => String(l.id) === topicId) ?? null,
@@ -429,6 +499,9 @@ export default function TopicPage() {
           .topic-sidebar{display:none !important}
           .topic-main{padding:2rem 1.25rem !important}
         }
+
+        @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+        .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:6px}
       `}</style>
 
       <DashboardNav />
@@ -439,18 +512,29 @@ export default function TopicPage() {
         <aside className="topic-sidebar">
           {/* Breadcrumb */}
           <div style={{ padding: ".25rem 1.25rem 1rem", borderBottom: `1px solid ${COLORS.border}`, marginBottom: ".5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: ".4rem", fontSize: ".72rem", color: COLORS.textFaint }}>
+            <div style={{ display: "flex", alignItems: "center", gap: ".4rem", fontSize: ".72rem", color: COLORS.textFaint, flexWrap: "wrap" }}>
               <span style={{ cursor: "pointer", transition: "color .15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = COLORS.accent)}
                 onMouseLeave={e => (e.currentTarget.style.color = COLORS.textFaint)}
                 onClick={() => navigate("/courses")}>
                 Курсы
               </span>
+              {stateCategoryName && (
+                <>
+                  <span>/</span>
+                  <span style={{ cursor: "pointer", transition: "color .15s" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = COLORS.accent)}
+                    onMouseLeave={e => (e.currentTarget.style.color = COLORS.textFaint)}
+                    onClick={() => stateCategoryCode ? navigate(`/courses/c/${stateCategoryCode}`) : navigate("/courses")}>
+                    {stateCategoryName}
+                  </span>
+                </>
+              )}
               <span>/</span>
               <span style={{ cursor: "pointer", transition: "color .15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = COLORS.accent)}
                 onMouseLeave={e => (e.currentTarget.style.color = COLORS.textFaint)}
-                onClick={() => navigate(`/courses/${courseId}`)}>
+                onClick={() => navigate(`/courses/${courseId}`, { state: { categoryName: stateCategoryName, categoryCode: stateCategoryCode } })}>
                 {moduleLabel || courseId}
               </span>
             </div>
@@ -464,7 +548,7 @@ export default function TopicPage() {
             <div
               key={l.id}
               className={`sidebar-lesson${String(l.id) === topicId ? " active" : ""}`}
-              onClick={() => navigate(`/courses/${courseId}/${l.id}`, { state: locState })}
+              onClick={() => navigate(`/courses/${courseId}/${l.id}`, { state: { courseName: stateCourseName, categoryName: stateCategoryName, categoryCode: stateCategoryCode } })}
             >
               <span style={{ fontSize: ".6rem", fontWeight: 800, width: "16px", flexShrink: 0, textAlign: "right" }}>
                 {String(i + 1).padStart(2, "0")}
@@ -478,7 +562,7 @@ export default function TopicPage() {
         <div>
           <article className="topic-main">
             {/* Заголовок урока */}
-            <div style={{ marginBottom: "2rem" }}>
+            <div className="fade-up-1" style={{ marginBottom: "2rem" }}>
               {moduleLabel && (
                 <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".4rem" }}>
                   {moduleLabel}
@@ -494,13 +578,25 @@ export default function TopicPage() {
 
             {/* Статья */}
             {(apiLoading && useApi) ? (
-              <div style={{ color: COLORS.textFaint, fontSize: ".9rem" }}>Загрузка...</div>
+              <div className="fade-up-2" style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+                <div className="skel" style={{ height: "18px", width: "75%" }} />
+                <div className="skel" style={{ height: "14px", width: "90%" }} />
+                <div className="skel" style={{ height: "14px", width: "60%" }} />
+                <div className="skel" style={{ height: "14px", width: "82%" }} />
+                <div className="skel" style={{ height: "14px", width: "70%", marginTop: ".5rem" }} />
+                <div className="skel" style={{ height: "14px", width: "88%" }} />
+                <div className="skel" style={{ height: "14px", width: "55%" }} />
+              </div>
             ) : content ? (
-              <div className="tiptap-content">
+              <div className="tiptap-content fade-up-2">
                 <EditorContent editor={editor} />
               </div>
             ) : (
-              <div style={{ color: COLORS.textFaint, fontSize: ".9rem" }}>Загрузка...</div>
+              <div className="fade-up-2" style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+                <div className="skel" style={{ height: "18px", width: "75%" }} />
+                <div className="skel" style={{ height: "14px", width: "90%" }} />
+                <div className="skel" style={{ height: "14px", width: "60%" }} />
+              </div>
             )}
 
             {/* ── Тест (только для slug-уроков с локальным квизом) ── */}
@@ -619,8 +715,131 @@ export default function TopicPage() {
               </div>
             )}
 
+            {/* ── Квиз урока из API ── */}
+            {apiQuiz && apiQuiz.questions.length > 0 && (
+              <div className="fade-up-3" style={{ marginTop: "3rem", paddingTop: "2.5rem", borderTop: `1px solid ${COLORS.border}` }}>
+                <p style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
+                  Тест по теме
+                </p>
+                <h2 style={{ fontFamily: FONTS.display, fontSize: "1.3rem", fontWeight: 800, color: COLORS.textPrimary, marginBottom: "2rem" }}>
+                  Проверь себя
+                </h2>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+                  {apiQuiz.questions.map((q, qi) => {
+                    const selected  = apiQuizAnswers[q.id] ?? [];
+                    const result    = apiQuizResults?.find(r => r.question_id === q.id);
+                    const isDone    = !!apiQuizResults;
+                    const isMulti   = q.type !== "single";
+
+                    const toggleOpt = (oi: number) => {
+                      if (isDone) return;
+                      setApiQuizAnswers(prev => {
+                        const cur = prev[q.id] ?? [];
+                        if (isMulti) {
+                          return { ...prev, [q.id]: cur.includes(oi) ? cur.filter(x => x !== oi) : [...cur, oi] };
+                        }
+                        return { ...prev, [q.id]: cur.includes(oi) ? [] : [oi] };
+                      });
+                    };
+
+                    const getOptClass = (oi: number) => {
+                      let cls = "quiz-opt";
+                      if (isDone) {
+                        cls += " quiz-opt--disabled";
+                        const isCorrect  = result?.correct_answer?.includes(oi) ?? false;
+                        const isSelected = selected.includes(oi);
+                        if (isSelected && isCorrect)       cls += " quiz-opt--correct";
+                        else if (isSelected && !isCorrect) cls += " quiz-opt--wrong";
+                        else if (!isSelected && isCorrect) cls += " quiz-opt--missed";
+                      } else if (selected.includes(oi)) {
+                        cls += " quiz-opt--selected";
+                      }
+                      return cls;
+                    };
+
+                    return (
+                      <div key={q.id}>
+                        <div style={{ display: "flex", gap: ".6rem", marginBottom: "1rem", alignItems: "baseline" }}>
+                          <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: ".75rem", color: COLORS.accent, flexShrink: 0 }}>
+                            {String(qi + 1).padStart(2, "0")}
+                          </span>
+                          <p style={{ fontSize: ".92rem", fontWeight: 600, color: COLORS.textPrimary, lineHeight: 1.55 }}>
+                            {qText(q.content)}
+                          </p>
+                        </div>
+                        {isMulti && !isDone && (
+                          <p style={{ fontSize: ".72rem", color: COLORS.textFaint, marginBottom: ".75rem" }}>
+                            Выберите все верные варианты
+                          </p>
+                        )}
+                        <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
+                          {q.options.map((opt, oi) => (
+                            <button key={oi} className={getOptClass(oi)} onClick={() => toggleOpt(oi)}>
+                              <span className="quiz-marker">
+                                {isDone && (result?.correct_answer?.includes(oi) ? "✓" : selected.includes(oi) ? "✗" : "")}
+                              </span>
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                        {isDone && result?.explanation && (
+                          <p style={{ fontSize: ".78rem", color: COLORS.textMuted, marginTop: ".6rem", paddingLeft: "1rem", borderLeft: `2px solid ${COLORS.border}`, lineHeight: 1.6 }}>
+                            💡 {result.explanation}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Результат */}
+                {apiQuizResults && (() => {
+                  const correct = apiQuizResults.filter(r => r.is_correct).length;
+                  const total   = apiQuiz.questions.length;
+                  const perfect = correct === total;
+                  return (
+                    <div style={{
+                      marginTop: "1.5rem", padding: "1rem 1.25rem", borderRadius: "12px",
+                      background: perfect ? "rgba(34,197,94,0.08)" : "rgba(255,58,58,0.08)",
+                      border: `1px solid ${perfect ? "rgba(34,197,94,0.2)" : "rgba(255,58,58,0.2)"}`,
+                      display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: ".75rem",
+                    }}>
+                      <div>
+                        <div style={{ fontSize: ".95rem", fontWeight: 700, color: perfect ? "#4ade80" : COLORS.textPrimary }}>
+                          {perfect ? "Отлично! Все верно." : `${correct} из ${total} правильно`}
+                        </div>
+                        <div style={{ fontSize: ".75rem", color: COLORS.textFaint, marginTop: ".2rem" }}>
+                          {!perfect ? "Перечитай тему и попробуй снова" : "Можно переходить к следующему уроку"}
+                        </div>
+                      </div>
+                      <button
+                        className="quiz-submit"
+                        style={{ background: "transparent", color: COLORS.textMuted, border: `1px solid ${COLORS.border}`, fontSize: ".8rem", padding: ".5rem 1rem" }}
+                        onClick={() => { setApiQuizAnswers({}); setApiQuizResults(null); }}
+                      >
+                        Пройти снова
+                      </button>
+                    </div>
+                  );
+                })()}
+
+                {/* Кнопка проверки */}
+                {!apiQuizResults && (
+                  <button
+                    className="quiz-submit"
+                    style={{ marginTop: "1.5rem" }}
+                    disabled={apiQuizChecking || Object.keys(apiQuizAnswers).length < apiQuiz.questions.length}
+                    onClick={submitApiQuiz}
+                  >
+                    {apiQuizChecking ? "Проверяем..." : "Проверить ответы"}
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Навигация: пред / след */}
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "3rem", paddingTop: "2rem", borderTop: `1px solid ${COLORS.border}` }}>
+            <div className="fade-up-4" style={{ display: "flex", justifyContent: "space-between", marginTop: "3rem", paddingTop: "2rem", borderTop: `1px solid ${COLORS.border}` }}>
               <button
                 className="lesson-nav-btn"
                 disabled={currentIdx <= 0}

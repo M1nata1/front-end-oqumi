@@ -51,7 +51,7 @@ export default function Landing() {
   };
 
   // Кнопки CTA требуют авторизации
-  const handleCTA     = () => navigate(isAuth ? "/dashboard" : "/auth");
+  const handleCTA     = () => navigate(isAuth ? "/courses" : "/auth");
   const handleCourses = () => document.querySelector("#courses")?.scrollIntoView({ behavior: "smooth", block: "start" });
   // Пробный КТ — публичный, не требует авторизации
   const handleTrialExam = () => navigate(EXAM_CTA.route);
