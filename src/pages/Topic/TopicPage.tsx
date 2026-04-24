@@ -34,6 +34,7 @@ interface ApiQuizQuestion {
   content: { text: string } | string;
   options: string[];
   score:   number;
+  image:   string | null;
 }
 interface ApiQuizData {
   id:          number;
@@ -768,6 +769,13 @@ export default function TopicPage() {
                             {qText(q.content)}
                           </p>
                         </div>
+                        {q.image && (
+                          <img
+                            src={q.image}
+                            alt=""
+                            style={{ maxWidth: "100%", maxHeight: "320px", objectFit: "contain", borderRadius: "10px", marginBottom: "1rem", display: "block" }}
+                          />
+                        )}
                         {isMulti && !isDone && (
                           <p style={{ fontSize: ".72rem", color: COLORS.textFaint, marginBottom: ".75rem" }}>
                             Выберите все верные варианты
