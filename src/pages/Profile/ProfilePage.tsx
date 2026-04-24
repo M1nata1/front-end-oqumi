@@ -13,15 +13,23 @@ import { COLORS, FONTS } from "@/pages/Dashboard/dashboard.config";
 interface UserStats {
   total_score:          number;
   total_quizzes_passed: number;
-  attempts?:            AttemptItem[];
+  attempts:             Attempt[];
 }
 
-interface AttemptItem {
-  quiz?:       number | { id: number; title: string };
-  quiz_id?:    number;
-  quiz_title?: string;
-  score?:      number;
-  is_correct?: boolean;
+interface Attempt {
+  id:           number;
+  quiz:         number;
+  score:        number;
+  is_completed: boolean;
+  created_at:   string;
+}
+
+interface QuizItem {
+  id:          number;
+  title:       string;
+  description: string;
+  image:       string | null;
+  questions:   unknown[];
 }
 
 
@@ -181,24 +189,42 @@ export default function ProfilePage() {
   const user        = useAuthStore(s => s.user);
   const accessToken = useAuthStore(s => s.accessToken);
 
-  const [stats,   setStats]   = useState<UserStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [stats,     setStats]     = useState<UserStats | null>(null);
+  const [myQuizzes, setMyQuizzes] = useState<QuizItem[]>([]);
+  const [loading,   setLoading]   = useState(true);
 
   useEffect(() => {
     const h = { Authorization: `Bearer ${accessToken}` };
-    fetch(`${API_BASE}/statistics/me/`, { headers: h })
+
+    const fetchStats = fetch(`${API_BASE}/statistics/me/`, { headers: h })
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setStats(d as UserStats); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => null);
+
+    const fetchQuizzes = fetch(`${API_BASE}/statistics/my-quizzes/`, { headers: h })
+      .then(r => r.ok ? r.json() : [])
+      .catch(() => []);
+
+    Promise.all([fetchStats, fetchQuizzes]).then(([s, q]) => {
+      if (s) setStats(s as UserStats);
+      // API может вернуть [[...]] или [...] — нормализуем
+      const flat = Array.isArray(q?.[0]) ? (q as QuizItem[][])[0] : (q as QuizItem[]);
+      setMyQuizzes(flat ?? []);
+      setLoading(false);
+    });
   }, [accessToken]);
 
-  const initial      = (user?.name ?? "?")[0].toUpperCase();
-  const totalScore   = stats?.total_score ?? 0;
-  const totalPassed  = stats?.total_quizzes_passed ?? 0;
-  const avgScore     = totalPassed > 0 ? Math.round(totalScore / totalPassed) : 0;
-  const quizzes: never[] = [];
-  const maxBarQ      = 0;
+  const initial     = (user?.name ?? "?")[0].toUpperCase();
+  const totalScore  = stats?.total_score ?? 0;
+  const totalPassed = stats?.total_quizzes_passed ?? 0;
+  const avgScore    = totalPassed > 0 ? Math.round(totalScore / totalPassed) : 0;
+
+  // Для каждого квиза ищем score из attempts
+  const attempts    = stats?.attempts ?? [];
+  const quizzes     = myQuizzes.map(q => ({
+    ...q,
+    score: attempts.find(a => a.quiz === q.id)?.score ?? 0,
+  }));
+  const maxBarQ     = quizzes.reduce((m, q) => Math.max(m, q.score), 1);
 
   return (
     <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, minHeight: "100vh" }}>
@@ -321,8 +347,9 @@ export default function ProfilePage() {
                   <HBar
                     key={q.id}
                     label={q.title}
-                    value={q.questions.length}
+                    value={q.score}
                     max={maxBarQ}
+                    score={q.score}
                     color={i % 3 === 0 ? COLORS.accent : i % 3 === 1 ? "#3A8EFF" : "#3AFFB4"}
                     delay={400 + i * 80}
                   />
