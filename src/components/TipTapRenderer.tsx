@@ -39,9 +39,12 @@ export function TTNode({ n }: { n: TTNodeDef }): React.ReactElement | null {
       const Tag = `h${lv}` as "h1"|"h2"|"h3"|"h4"|"h5"|"h6";
       return <Tag style={{ fontWeight: 800, marginBottom: ".5rem", lineHeight: 1.3 }}>{kids}</Tag>;
     }
-    case "bulletList":  return <ul style={{ paddingLeft: "1.4rem", marginBottom: ".65rem" }}>{kids}</ul>;
-    case "orderedList": return <ol style={{ paddingLeft: "1.4rem", marginBottom: ".65rem" }}>{kids}</ol>;
-    case "listItem":    return <li style={{ marginBottom: ".25rem" }}>{kids}</li>;
+    case "bulletList":  return <ul style={{ paddingLeft: "1.4rem", marginBottom: ".65rem", listStyleType: "disc" }}>{kids}</ul>;
+    case "orderedList": {
+      const start = (n.attrs?.start as number) ?? 1;
+      return <ol start={start} style={{ paddingLeft: "1.4rem", marginBottom: ".65rem", listStyleType: "decimal" }}>{kids}</ol>;
+    }
+    case "listItem":    return <li style={{ marginBottom: ".25rem", display: "list-item" }}>{kids}</li>;
     case "blockquote":  return (
       <blockquote style={{ borderLeft: "3px solid rgba(255,255,255,0.12)", paddingLeft: ".9rem", color: "#B4B4D8", marginBottom: ".65rem" }}>
         {kids}
