@@ -3,7 +3,7 @@
 //  ВСЯ КОНФИГУРАЦИЯ ПРОБНОГО ЭКЗАМЕНА
 // ============================================================
 
-export const BRAND = { name: "Bilim", accent: "Ly" };
+export const BRAND = { name: "Oqu", accent: "Mi" };
 
 export const COLORS = {
   bgPage:       "#0D0D11",

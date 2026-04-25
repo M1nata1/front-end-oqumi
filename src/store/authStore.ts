@@ -7,9 +7,9 @@ import { create } from "zustand";
 // ============================================================
 
 const TOKEN_KEYS = {
-  access:  "bilimly_access",
-  refresh: "bilimly_refresh",
-  user:    "bilimly_user",
+  access:  "oqumi_access",
+  refresh: "oqumi_refresh",
+  user:    "oqumi_user",
 };
 
 const STORAGE: "localStorage" | "sessionStorage" = "localStorage";
