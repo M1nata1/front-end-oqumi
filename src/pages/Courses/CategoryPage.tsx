@@ -94,7 +94,7 @@ export default function CategoryPage() {
       <div style={{ background: COLORS.bgPage, minHeight: "100vh", fontFamily: FONTS.body }}>
         <style>{`@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}.skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:8px}`}</style>
         <DashboardNav />
-        <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+        <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
           <div className="skel" style={{ height: "13px", width: "80px", marginBottom: "1rem" }} />
           <div className="skel" style={{ height: "36px", width: "280px", marginBottom: ".75rem" }} />
           <div className="skel" style={{ height: "15px", width: "220px", marginBottom: "2.5rem" }} />
@@ -139,7 +139,7 @@ export default function CategoryPage() {
 
       <DashboardNav />
 
-      <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
 
         {/* Breadcrumb */}
         <div className="fade-up-1" style={{ display: "flex", alignItems: "center", gap: ".5rem", fontSize: ".75rem", color: COLORS.textFaint, marginBottom: "1.5rem" }}>

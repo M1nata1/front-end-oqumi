@@ -136,7 +136,7 @@ export default function CoursePage() {
         </div>
       )}
 
-      <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
 
         {/* Breadcrumb */}
         <div className="fade-up-1" style={{ display: "flex", alignItems: "center", gap: ".5rem", fontSize: ".75rem", color: COLORS.textFaint, marginBottom: "1.5rem", flexWrap: "wrap" }}>

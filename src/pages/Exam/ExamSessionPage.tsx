@@ -524,7 +524,7 @@ export default function ExamSessionPage() {
           </div>
         </nav>
 
-        <main style={{ maxWidth: "860px", margin: "0 auto", padding: "3rem 2rem 5rem" }}>
+        <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3rem 3rem 5rem" }}>
 
           {/* ── Hero score ── */}
           <div className="fu1" style={{ display: "flex", alignItems: "center", gap: "2.5rem", background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "20px", padding: "2rem 2.5rem", marginBottom: "1.5rem" }}>

@@ -62,7 +62,7 @@ export default function FAQ() {
         onCTA={() => navigate(isAuth ? "/courses" : "/auth")}
       />
 
-      <div className="faq-main" style={{ maxWidth: "800px", margin: "0 auto", padding: "4rem 2.5rem" }}>
+      <div className="faq-main" style={{ maxWidth: "1000px", margin: "0 auto", padding: "4rem 3rem" }}>
         <FaqAbout />
 
         <div style={{ height: "1px", background: COLORS.border, marginBottom: "4rem" }} />

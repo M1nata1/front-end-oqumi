@@ -92,7 +92,7 @@ export default function Landing() {
 
       <LandingHero left={left} onCTA={handleCTA} onCourses={handleCourses} />
 
-      <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 2.5rem" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 2.5rem" }}>
         <div style={{ height: "1px", background: COLORS.border }} />
       </div>
 

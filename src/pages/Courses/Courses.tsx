@@ -69,7 +69,7 @@ export default function Courses() {
 
       <DashboardNav />
 
-      <main className="dash-main" style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main className="dash-main" style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
         <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
           Обучение
         </p>

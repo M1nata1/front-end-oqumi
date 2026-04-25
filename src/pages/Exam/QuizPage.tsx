@@ -238,7 +238,7 @@ export default function QuizPage() {
   if (phase === "intro") {
     return (
       <Shell>
-        <main style={{ maxWidth: "900px", margin: "0 auto", padding: "5.5rem 2rem", textAlign: "center" }}>
+        <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "5.5rem 2rem", textAlign: "center" }}>
           <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".75rem" }}>
             Квиз
           </p>
@@ -297,7 +297,7 @@ export default function QuizPage() {
     const correctCount = results.filter(r => r.is_correct).length;
     return (
       <Shell>
-        <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+        <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 2rem" }}>
 
           <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>
             Результат
