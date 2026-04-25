@@ -63,6 +63,9 @@ export default function CoursePage() {
   const [courseQuiz, setCourseQuiz] = useState<{ id: number; title: string } | null>(null);
   const [forbidden,  setForbidden]  = useState(false);
   const [loading,    setLoading]    = useState(true);
+  const [search,    setSearch]    = useState("");
+  const [fading,    setFading]    = useState(false);
+  const [displayed, setDisplayed] = useState<ApiLesson[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -85,7 +88,7 @@ export default function CoursePage() {
         if (r.status === 403) { setForbidden(true); return null; }
         return r.ok ? r.json() : null;
       })
-      .then(data => { if (data) setApiLessons(data as ApiLesson[]); })
+      .then(data => { if (data) { setApiLessons(data as ApiLesson[]); setDisplayed(data as ApiLesson[]); } })
       .catch(() => {});
 
     fetch(`${API_BASE}/courses/${courseId}/quiz/`)
@@ -95,6 +98,15 @@ export default function CoursePage() {
 
     Promise.all([fetchCourse, fetchLessons]).finally(() => setLoading(false));
   }, [courseId]);
+
+  function handleSearch(q: string) {
+    setSearch(q);
+    setFading(true);
+    setTimeout(() => {
+      setDisplayed((apiLessons ?? []).filter(l => l.title.toLowerCase().includes(q.toLowerCase())));
+      setFading(false);
+    }, 150);
+  }
 
   // Если уроки загрузились — страница рабочая, course_name берём из первого урока
   const courseName = course?.name ?? apiLessons?.[0]?.course_name ?? courseId;
@@ -117,6 +129,11 @@ export default function CoursePage() {
         .lesson-row:hover .lesson-arrow{transform:translateX(3px);color:${COLORS.accent}}
         @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
         .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:10px}
+        .c-search{width:100%;background:${COLORS.bgCard};border:1px solid ${COLORS.border};border-radius:12px;padding:.75rem 1rem .75rem 2.75rem;color:${COLORS.textPrimary};font-family:${FONTS.body};font-size:.9rem;outline:none;transition:border-color .2s}
+        .c-search:focus{border-color:rgba(255,255,255,0.22)}
+        .c-search::placeholder{color:${COLORS.textFaint}}
+        .lesson-list{transition:opacity .15s ease,transform .15s ease}
+        .lesson-list.fading{opacity:0;transform:translateY(4px)}
       `}</style>
 
       <DashboardNav />
@@ -192,40 +209,62 @@ export default function CoursePage() {
 
         {/* Уроки */}
         {!loading && apiLessons && apiLessons.length > 0 && (
-          <div className="fade-up-3" style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", overflow: "hidden" }}>
-            <div style={{ padding: "1rem 1.25rem", borderBottom: `1px solid ${COLORS.border}` }}>
-              <div style={{ fontFamily: FONTS.display, fontSize: ".95rem", fontWeight: 800, color: COLORS.textPrimary }}>
-                Уроки
-              </div>
-              <div style={{ fontSize: ".68rem", color: COLORS.textFaint, marginTop: ".1rem" }}>
-                {apiLessons.length} {apiLessons.length === 1 ? "урок" : "урока"}
-              </div>
+          <>
+            <div className="fade-up-3" style={{ position: "relative", marginBottom: ".75rem" }}>
+              <svg style={{ position: "absolute", left: ".9rem", top: "50%", transform: "translateY(-50%)", opacity: .4, pointerEvents: "none" }} width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <circle cx="8.5" cy="8.5" r="5.5" stroke="#FAFAFF" strokeWidth="1.6"/>
+                <path d="M13 13l3.5 3.5" stroke="#FAFAFF" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+              <input
+                className="c-search"
+                type="text"
+                placeholder="Поиск урока..."
+                value={search}
+                onChange={e => handleSearch(e.target.value)}
+              />
             </div>
-            <div style={{ padding: ".5rem" }}>
-              {apiLessons.map((lesson, i) => (
-                <div
-                  key={lesson.id}
-                  className="lesson-row"
-                  onClick={() => navigate(`/courses/${courseId}/${lesson.id}`, { state: { courseName, categoryName, categoryCode } })}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
-                    <span style={{ fontSize: ".65rem", fontWeight: 800, color: COLORS.textFaint, width: "20px", flexShrink: 0, textAlign: "right" }}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span style={{ fontSize: ".85rem", fontWeight: 600, color: COLORS.textBody }}>
-                      {lesson.title}
-                    </span>
-                    {lesson.auto_test && (
-                      <span style={{ fontSize: ".62rem", color: COLORS.textFaint, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>
-                        тест
-                      </span>
-                    )}
-                  </div>
-                  <span className="lesson-arrow">→</span>
+
+            <div className="fade-up-3" style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "14px", overflow: "hidden" }}>
+              <div style={{ padding: "1rem 1.25rem", borderBottom: `1px solid ${COLORS.border}` }}>
+                <div style={{ fontFamily: FONTS.display, fontSize: ".95rem", fontWeight: 800, color: COLORS.textPrimary }}>
+                  Уроки
                 </div>
-              ))}
+                <div style={{ fontSize: ".68rem", color: COLORS.textFaint, marginTop: ".1rem" }}>
+                  {apiLessons.length} {apiLessons.length === 1 ? "урок" : "урока"}
+                </div>
+              </div>
+              <div className={`lesson-list${fading ? " fading" : ""}`} style={{ padding: ".5rem" }}>
+                {!fading && displayed.length === 0 ? (
+                  <div style={{ padding: ".75rem 1rem", fontSize: ".8rem", color: COLORS.textFaint, fontStyle: "italic" }}>
+                    Ничего не найдено
+                  </div>
+                ) : (
+                  displayed.map((lesson, i) => (
+                    <div
+                      key={lesson.id}
+                      className="lesson-row"
+                      onClick={() => navigate(`/courses/${courseId}/${lesson.id}`, { state: { courseName, categoryName, categoryCode } })}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: ".75rem" }}>
+                        <span style={{ fontSize: ".65rem", fontWeight: 800, color: COLORS.textFaint, width: "20px", flexShrink: 0, textAlign: "right" }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span style={{ fontSize: ".85rem", fontWeight: 600, color: COLORS.textBody }}>
+                          {lesson.title}
+                        </span>
+                        {lesson.auto_test && (
+                          <span style={{ fontSize: ".62rem", color: COLORS.textFaint, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>
+                            тест
+                          </span>
+                        )}
+                      </div>
+                      <span className="lesson-arrow">→</span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Квиз курса */}

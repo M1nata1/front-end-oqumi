@@ -154,6 +154,9 @@ export default function TopicPage() {
   const [quiz,    setQuiz]        = useState<QuizQuestion[]>([]);
   const [answers, setAnswers]     = useState<Record<number, number[]>>({});
 
+  // Ref на скролл-контейнер основного контента
+  const mainScrollRef = useRef<HTMLDivElement>(null);
+
   // Флаг: подавляем scroll listener пока идёт программный скролл
   const suppressScroll  = useRef(false);
   const suppressTimer   = useRef<ReturnType<typeof setTimeout>>();
@@ -304,15 +307,17 @@ export default function TopicPage() {
       if (tocItems[activeIdx]) setActiveId(tocItems[activeIdx].id);
     };
 
-    // Запускаем после инъекции ID (следующий кадр)
+    const container = mainScrollRef.current;
+    if (!container) return;
+
     const raf = requestAnimationFrame(() => {
       onScroll();
-      window.addEventListener("scroll", onScroll, { passive: true });
+      container.addEventListener("scroll", onScroll, { passive: true });
     });
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
+      container.removeEventListener("scroll", onScroll);
     };
   }, [tocItems]);
 
@@ -330,18 +335,25 @@ export default function TopicPage() {
   const moduleLabel  = apiLesson?.course_name ?? stateCourseName ?? "";
 
   return (
-    <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, minHeight: "100vh" }}>
+    <div style={{ background: COLORS.bgPage, color: COLORS.textBody, fontFamily: FONTS.body, height: "100vh", overflow: "hidden" }}>
       <link href={FONTS.googleUrl} rel="stylesheet" />
       <style>{`
         *{box-sizing:border-box;margin:0;padding:0}
 
         /* ── Сайдбар ── */
-        .topic-layout{display:grid;grid-template-columns:300px 1fr 260px;min-height:calc(100vh - 57px);align-items:start}
+        .topic-layout{display:grid;grid-template-columns:300px 1fr 260px;height:calc(100vh - 57px);overflow:hidden}
         .topic-sidebar{
-          position:sticky;top:57px;height:calc(100vh - 57px);
-          overflow-y:auto;background:${COLORS.bgSidebar};
+          height:100%;overflow-y:auto;background:${COLORS.bgSidebar};
           border-right:1px solid ${COLORS.border};padding:1.25rem 0;
         }
+        .topic-main-scroll{height:100%;overflow-y:auto}
+
+        /* ── Scrollbars ── */
+        .topic-sidebar,.topic-main-scroll,.topic-toc{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
+        .topic-sidebar::-webkit-scrollbar,.topic-main-scroll::-webkit-scrollbar,.topic-toc::-webkit-scrollbar{width:4px}
+        .topic-sidebar::-webkit-scrollbar-track,.topic-main-scroll::-webkit-scrollbar-track,.topic-toc::-webkit-scrollbar-track{background:transparent}
+        .topic-sidebar::-webkit-scrollbar-thumb,.topic-main-scroll::-webkit-scrollbar-thumb,.topic-toc::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:99px}
+        .topic-sidebar::-webkit-scrollbar-thumb:hover,.topic-main-scroll::-webkit-scrollbar-thumb:hover,.topic-toc::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
         .sidebar-mod{padding:.5rem 1.25rem .25rem;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${COLORS.textFaint}}
         .sidebar-lesson{
           display:flex;align-items:center;gap:.6rem;
@@ -357,8 +369,8 @@ export default function TopicPage() {
 
         /* ── TOC (содержание справа) ── */
         .topic-toc{
-          position:sticky;top:57px;height:calc(100vh - 57px);
-          overflow-y:auto;padding:2rem 1.25rem 2rem 0.75rem;
+          height:100%;overflow-y:auto;
+          padding:2rem 1.25rem 2rem 0.75rem;
           border-left:1px solid ${COLORS.border};
         }
         .toc-title{
@@ -561,7 +573,7 @@ export default function TopicPage() {
         </aside>
 
         {/* ── Основной контент ── */}
-        <div>
+        <div className="topic-main-scroll" ref={mainScrollRef}>
           <article className="topic-main">
             {/* Заголовок урока */}
             <div className="fade-up-1" style={{ marginBottom: "2rem" }}>
@@ -888,9 +900,10 @@ export default function TopicPage() {
                     }, 900);
 
                     const el = document.getElementById(item.id);
-                    if (!el) return;
-                    const top = el.getBoundingClientRect().top + window.scrollY - 72;
-                    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+                    const container = mainScrollRef.current;
+                    if (!el || !container) return;
+                    const newTop = container.scrollTop + el.getBoundingClientRect().top - container.getBoundingClientRect().top - 20;
+                    container.scrollTo({ top: Math.max(0, newTop), behavior: "smooth" });
                   }}
                 >
                   {item.text}
