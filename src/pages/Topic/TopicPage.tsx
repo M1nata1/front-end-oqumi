@@ -31,7 +31,7 @@ interface QuizQuestion {
 interface ApiQuizQuestion {
   id:      number;
   type:    "single" | "multiple" | "ordering";
-  content: { text: string } | string;
+  content: unknown;
   options: string[];
   score:   number;
   image:   string | null;
@@ -48,8 +48,29 @@ interface ApiCheckResult {
   score:              number;
   explanation:        string | null;
 }
-function qText(content: ApiQuizQuestion["content"]): string {
-  return typeof content === "string" ? content : content.text;
+
+interface TTNodeDef { type?: string; text?: string; content?: TTNodeDef[]; marks?: { type: string }[] }
+function TTNode({ n }: { n: TTNodeDef }): React.ReactNode {
+  if (n.type === "text") {
+    let el: React.ReactNode = n.text ?? "";
+    (n.marks ?? []).forEach(m => {
+      if (m.type === "bold")   el = <strong>{el}</strong>;
+      if (m.type === "italic") el = <em>{el}</em>;
+    });
+    return el;
+  }
+  const kids = Array.isArray(n.content) ? n.content.map((c, i) => <TTNode key={i} n={c} />) : null;
+  if (n.type === "paragraph") return <p style={{ margin: "0 0 .4em" }}>{kids}</p>;
+  if (n.type === "hardBreak") return <br />;
+  return <>{kids}</>;
+}
+function TipTapContent({ content }: { content: unknown }) {
+  if (typeof content === "string") return <>{content}</>;
+  let obj = content as TTNodeDef;
+  if (obj && !obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
+    obj = obj.content as TTNodeDef;
+  if (!obj?.content) return null;
+  return <>{(Array.isArray(obj.content) ? obj.content : []).map((c, i) => <TTNode key={i} n={c} />)}</>;
 }
 
 interface ApiLesson {
@@ -202,6 +223,11 @@ export default function TopicPage() {
       .catch(() => {});
   }, [topicId, useApi]);
 
+  const apiLesson = useMemo(
+    () => apiLessons?.find(l => String(l.id) === topicId) ?? null,
+    [apiLessons, topicId],
+  );
+
   const submitApiQuiz = async () => {
     if (!apiQuiz) return;
     setApiQuizChecking(true);
@@ -222,11 +248,6 @@ export default function TopicPage() {
     } catch { /* ignore */ }
     setApiQuizChecking(false);
   };
-
-  const apiLesson = useMemo(
-    () => apiLessons?.find(l => String(l.id) === topicId) ?? null,
-    [apiLessons, topicId],
-  );
 
   // ── Загрузка контента ─────────────────────────────────────────
   useEffect(() => {
@@ -255,7 +276,10 @@ export default function TopicPage() {
   });
 
   useEffect(() => {
-    if (editor && content) editor.commands.setContent(content as object);
+    if (editor && content) {
+      const c = content as Record<string, unknown>;
+      if (c?.type === "doc") editor.commands.setContent(c as object);
+    }
   }, [editor, content]);
 
   // ── TOC: извлекаем заголовки из JSON ────────────────────────
@@ -765,9 +789,9 @@ export default function TopicPage() {
                           <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: ".75rem", color: COLORS.accent, flexShrink: 0 }}>
                             {String(qi + 1).padStart(2, "0")}
                           </span>
-                          <p style={{ fontSize: ".92rem", fontWeight: 600, color: COLORS.textPrimary, lineHeight: 1.55 }}>
-                            {qText(q.content)}
-                          </p>
+                          <div style={{ fontSize: ".92rem", fontWeight: 600, color: COLORS.textPrimary, lineHeight: 1.55 }}>
+                            <TipTapContent content={q.content} />
+                          </div>
                         </div>
                         {q.image && (
                           <img

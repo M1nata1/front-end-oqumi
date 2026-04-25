@@ -302,6 +302,34 @@ function problemText(content: unknown): string {
 const SUBJECT_COLORS = ["#3A8EFF", "#FF3A3A", "#3AFFB4", "#FF9F3A", "#B43AFF"];
 const subjectColor = (i: number) => SUBJECT_COLORS[i % SUBJECT_COLORS.length];
 
+const EXAM_SESSION_KEY = "oqumi_exam_session";
+interface SavedSession {
+  examStartTime:  number;
+  totalDuration:  number;
+  profileSlug:    string | null;
+  answers:        Record<number, number[]>;
+  examData:       ExamData;
+}
+function loadSession(profileSlug: string | null): SavedSession | null {
+  try {
+    const raw = localStorage.getItem(EXAM_SESSION_KEY);
+    if (!raw) return null;
+    const s: SavedSession = JSON.parse(raw);
+    if (s.profileSlug !== profileSlug) return null;
+    return s;
+  } catch { return null; }
+}
+function saveSession(patch: Partial<SavedSession>) {
+  try {
+    const raw = localStorage.getItem(EXAM_SESSION_KEY);
+    const prev: SavedSession = raw ? JSON.parse(raw) : {};
+    localStorage.setItem(EXAM_SESSION_KEY, JSON.stringify({ ...prev, ...patch }));
+  } catch { /* quota exceeded or private mode */ }
+}
+function clearSession() {
+  try { localStorage.removeItem(EXAM_SESSION_KEY); } catch { /* ignore */ }
+}
+
 // ─── Main component ────────────────────────────────────────────
 
 export default function ExamSessionPage() {
@@ -327,6 +355,23 @@ export default function ExamSessionPage() {
     if (fetched.current) return;
     fetched.current = true;
 
+    // Restore saved session if available
+    const saved = loadSession(profileSlug);
+    if (saved) {
+      const elapsed    = Math.floor((Date.now() - saved.examStartTime) / 1000);
+      const remaining  = saved.totalDuration - elapsed;
+      if (remaining > 0) {
+        setExamData(saved.examData);
+        setAnswers(saved.answers);
+        answersRef.current = saved.answers;
+        setTimeLeft(remaining);
+        setPhase("exam");
+        return;
+      }
+      // Time expired while away — clear and submit empty
+      clearSession();
+    }
+
     const url = profileSlug
       ? `${API_BASE}/exam/?subject=${encodeURIComponent(profileSlug)}`
       : `${API_BASE}/exam/`;
@@ -338,6 +383,13 @@ export default function ExamSessionPage() {
         setExamData(data);
         setTimeLeft(data.total_duration_sec);
         setPhase("exam");
+        saveSession({
+          examStartTime: Date.now(),
+          totalDuration: data.total_duration_sec,
+          profileSlug,
+          answers: {},
+          examData: data,
+        });
       })
       .catch(() => navigate("/exam", { replace: true }));
   }, [accessToken, profileSlug, navigate]);
@@ -383,6 +435,7 @@ export default function ExamSessionPage() {
         : cur.includes(optIdx) ? cur.filter(x => x !== optIdx) : [...cur, optIdx];
       const updated = { ...prev, [qId]: next };
       answersRef.current = updated;
+      saveSession({ answers: updated });
       return updated;
     });
   };
@@ -391,6 +444,7 @@ export default function ExamSessionPage() {
   const submitExam = async () => {
     if (!examData) return;
     if (timerRef.current) clearInterval(timerRef.current);
+    clearSession();
     setPhase("checking");
 
     const snapshot = answersRef.current;
@@ -778,7 +832,8 @@ export default function ExamSessionPage() {
         .sub-tab{
           padding:.42rem .9rem;border-radius:7px;font-size:.78rem;font-weight:700;
           cursor:pointer;transition:all .16s;border:1.5px solid transparent;
-          font-family:${FONTS.body};color:${COLORS.textFaint};background:transparent;flex:1;
+          font-family:${FONTS.body};color:${COLORS.textFaint};background:transparent;
+          width:100%;text-align:left;
         }
         .sub-tab:hover:not(.active){color:${COLORS.textMuted}}
 
@@ -832,7 +887,7 @@ export default function ExamSessionPage() {
                   onClick={() => { setActiveTab(i); setCurrent(subjectStart[i]); }}
                 >
                   <div style={{ fontSize: ".6rem", fontWeight: 700, color, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: ".15rem" }}>
-                    {s.name.length > 8 ? s.name.slice(0, 8) + "…" : s.name}
+                    {s.name}
                   </div>
                   <div className="num" style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: ".95rem", color: COLORS.textPrimary }}>
                     {cnt}<span style={{ fontSize: ".75rem", fontWeight: 400, color: COLORS.textFaint }}>/{s.problems.length}</span>
@@ -868,7 +923,7 @@ export default function ExamSessionPage() {
       </nav>
 
       {/* ── Body ── */}
-      <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 216px", gap: "1.25rem", alignItems: "start" }}>
+      <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 248px", gap: "1.25rem", alignItems: "start" }}>
 
         {/* ── Question area ── */}
         {q && (
@@ -960,7 +1015,7 @@ export default function ExamSessionPage() {
         <div style={{ position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: ".75rem" }}>
 
           {/* Subject tabs */}
-          <div style={{ display: "flex", gap: ".3rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: ".3rem" }}>
             {examData.subjects.map((s, i) => {
               const color = subjectColor(i);
               const isAct = activeTab === i;
@@ -971,7 +1026,7 @@ export default function ExamSessionPage() {
                   style={{ borderColor: isAct ? color + "40" : "transparent", color: isAct ? color : undefined, background: isAct ? color + "0D" : undefined }}
                   onClick={() => { setActiveTab(i); setCurrent(subjectStart[i]); }}
                 >
-                  {s.name.length > 6 ? s.name.slice(0, 6) + "…" : s.name}
+                  {s.name}
                 </button>
               );
             })}
