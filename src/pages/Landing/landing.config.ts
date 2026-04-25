@@ -20,11 +20,11 @@ export const COLORS = {
   accentSoft:   "rgba(255,58,58,0.08)",
   accentBorder: "rgba(255,58,58,0.15)",
   accentText:   "#FF5555",
-  textPrimary:  "#FAFAFF",
+  textPrimary:  "#FFFFFF",
   textBody:     "#F0F0FF",
-  textMuted:    "#66668A",
-  textFaint:    "#44445A",
-  textGhost:    "#2A2A3A",
+  textMuted:    "#B4B4D8",
+  textFaint:    "#7878A8",
+  textGhost:    "#525270",
 };
 
 export const FONTS = {
