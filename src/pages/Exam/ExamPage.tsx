@@ -41,7 +41,9 @@ export default function ExamPage() {
   const [profile,      setProfile]      = useState<ApiSubject[]>([]);
   const [selectedSlug, setSelectedSlug] = useState<string>("");
   const [loading,      setLoading]      = useState(true);
-  const [search,       setSearch]       = useState("");
+  const [search,           setSearch]           = useState("");
+  const [fadingProfile,    setFadingProfile]    = useState(false);
+  const [displayedProfile, setDisplayedProfile] = useState<ApiSubject[]>([]);
   const fetched = useRef(false);
 
   useEffect(() => {
@@ -57,11 +59,21 @@ export default function ExamPage() {
         const p = raw.find(g => g.type === "PROFILE")?.subjects  ?? [];
         setMandatory(m);
         setProfile(p);
+        setDisplayedProfile(p);
         if (p.length > 0) setSelectedSlug(p[0].slug);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [accessToken]);
+
+  function handleSearchProfile(q: string) {
+    setSearch(q);
+    setFadingProfile(true);
+    setTimeout(() => {
+      setDisplayedProfile(profile.filter(s => s.name.toLowerCase().includes(q.toLowerCase())));
+      setFadingProfile(false);
+    }, 150);
+  }
 
   const selectedProfileSub = profile.find(s => s.slug === selectedSlug);
   const allSelected        = [...mandatory, ...(selectedProfileSub ? [selectedProfileSub] : [])];
@@ -93,7 +105,7 @@ export default function ExamPage() {
           border-radius:16px;overflow:hidden;
           display:flex;flex-direction:column;
           background:${COLORS.bgCard};
-          border:2px solid transparent;
+          border:1px solid ${COLORS.border};
           cursor:pointer;text-align:left;
           transition:border-color .2s, transform .2s, box-shadow .2s;
         }
@@ -132,6 +144,10 @@ export default function ExamPage() {
         @media(max-width:480px){
           .profile-grid{grid-template-columns:1fr !important}
         }
+        .profile-grid{transition:opacity .15s ease,transform .15s ease}
+        .profile-grid.fading{opacity:0 !important;transform:translateY(4px) !important}
+        @keyframes cardIn{from{opacity:0;transform:translateY(6px) scale(0.97)}to{opacity:1;transform:none}}
+        .subj-card,.profile-tile{animation:cardIn .25s ease both}
       `}</style>
 
       <DashboardNav />
@@ -204,7 +220,7 @@ export default function ExamPage() {
                     {/* Banner */}
                     <div style={{
                       height: "120px",
-                      background: `linear-gradient(135deg, ${color}22 0%, ${color}08 100%)`,
+                      background: COLORS.bgCard,
                       borderBottom: `1px solid ${COLORS.border}`,
                       position: "relative",
                       display: "flex",
@@ -212,8 +228,7 @@ export default function ExamPage() {
                       padding: ".9rem 1.1rem",
                       flexShrink: 0,
                     }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: color, borderRadius: "16px 16px 0 0" }} />
-                      <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: "1rem", color: "#FAFAFF", letterSpacing: "-.01em" }}>
+                        <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: "1rem", color: "#FAFAFF", letterSpacing: "-.01em" }}>
                         {sub.name}
                       </span>
                       <span style={{
@@ -272,7 +287,7 @@ export default function ExamPage() {
                   type="text"
                   placeholder="Поиск профильного предмета..."
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
+                  onChange={e => handleSearchProfile(e.target.value)}
                 />
               </div>
             )}
@@ -286,8 +301,8 @@ export default function ExamPage() {
               Профильный предмет — выберите один
             </p>
 
-            <div className="profile-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
-              {profile.filter(s => s.name.toLowerCase().includes(search.toLowerCase())).map((sub, i) => {
+            <div className={`profile-grid${fadingProfile ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
+              {displayedProfile.map((sub, i) => {
                 const color   = subjectColor(mandatory.length + i);
                 const isSel   = selectedSlug === sub.slug;
 
@@ -296,15 +311,15 @@ export default function ExamPage() {
                     key={sub.slug}
                     className={`profile-tile${isSel ? " sel" : ""}`}
                     style={{
-                      borderColor: isSel ? color : "transparent",
-                      boxShadow: isSel ? `0 0 0 1px ${color}40, 0 8px 32px rgba(0,0,0,0.35)` : undefined,
+                      borderColor: isSel ? color : undefined,
+                      boxShadow: isSel ? `0 8px 32px rgba(0,0,0,0.35)` : undefined,
                     }}
                     onClick={() => setSelectedSlug(sub.slug)}
                   >
                     {/* Banner */}
                     <div style={{
                       height: "120px",
-                      background: `linear-gradient(135deg, ${color}22 0%, ${color}08 100%)`,
+                      background: COLORS.bgCard,
                       borderBottom: `1px solid ${COLORS.border}`,
                       position: "relative",
                       display: "flex",
@@ -312,25 +327,9 @@ export default function ExamPage() {
                       padding: ".9rem 1.1rem",
                       flexShrink: 0,
                     }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: color, borderRadius: "16px 16px 0 0", opacity: isSel ? 1 : 0.5, transition: "opacity .18s" }} />
                       <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: "1rem", color: "#FAFAFF", letterSpacing: "-.01em" }}>
                         {sub.name}
                       </span>
-                      {/* Checkmark badge */}
-                      <div style={{
-                        position: "absolute", top: ".65rem", right: ".65rem",
-                        width: "22px", height: "22px", borderRadius: "50%",
-                        background: isSel ? color : "rgba(255,255,255,0.08)",
-                        border: `1.5px solid ${isSel ? color : "rgba(255,255,255,0.15)"}`,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        transition: "all .18s",
-                      }}>
-                        {isSel && (
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                            <path d="M2 5l2.2 2.2L8 3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        )}
-                      </div>
                     </div>
                     {/* Body */}
                     <div style={{ padding: ".85rem 1.1rem 1rem", display: "flex", flexDirection: "column", gap: ".4rem", flex: 1 }}>

@@ -63,6 +63,8 @@ export default function CategoryPage() {
   const [lessonsLoading, setLessonsLoading] = useState<Record<string, boolean>>({});
   const [search,         setSearch]         = useState("");
   const [visitedLessons, setVisitedLessons] = useState<Set<number>>(loadVisitedLessons);
+  const [fading,    setFading]    = useState(false);
+  const [displayed, setDisplayed] = useState<ApiCourse[]>(stateCategory?.courses ?? []);
 
   // 1. Загружаем категорию если нет в state
   useEffect(() => {
@@ -100,6 +102,23 @@ export default function CategoryPage() {
       m.description?.toLowerCase().includes(search.toLowerCase())
     );
   }, [category, search]);
+
+  useEffect(() => {
+    if (category) setDisplayed(category.courses);
+  }, [category]);
+
+  function handleSearch(q: string) {
+    setSearch(q);
+    if (!category) return;
+    setFading(true);
+    setTimeout(() => {
+      setDisplayed(category.courses.filter(m =>
+        m.name.toLowerCase().includes(q.toLowerCase()) ||
+        m.description?.toLowerCase().includes(q.toLowerCase())
+      ));
+      setFading(false);
+    }, 150);
+  }
 
   function handleLessonClick(mod: ApiCourse, lesson: ApiLesson) {
     markLessonVisited(lesson.id);
@@ -181,6 +200,13 @@ export default function CategoryPage() {
         .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:8px}
         @media(max-width:900px){ .m-grid{grid-template-columns:1fr 1fr !important} }
         @media(max-width:560px){ .m-grid{grid-template-columns:1fr !important} }
+        .m-grid{transition:opacity .15s ease,transform .15s ease}
+        .m-grid.fading{opacity:0 !important;transform:translateY(4px) !important}
+        @keyframes cardIn{from{opacity:0;transform:translateY(6px) scale(0.97)}to{opacity:1;transform:none}}
+        .lesson-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+        .lesson-scroll::-webkit-scrollbar{width:4px}
+        .lesson-scroll::-webkit-scrollbar-track{background:transparent}
+        .lesson-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px}
       `}</style>
 
       <DashboardNav />
@@ -202,9 +228,6 @@ export default function CategoryPage() {
         </div>
 
         {/* Header */}
-        <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".4rem" }}>
-          Курс
-        </p>
         <h1 className="fade-up-2" style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,3.5vw,2.4rem)", fontWeight: 800, letterSpacing: "-.025em", color: COLORS.textPrimary, marginBottom: "1.75rem" }}>
           {category.name}
         </h1>
@@ -220,7 +243,7 @@ export default function CategoryPage() {
             type="text"
             placeholder="Поиск модуля..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
           />
         </div>
         <p className="fade-up-3" style={{ fontSize: ".75rem", color: COLORS.textFaint, marginBottom: "1.75rem" }}>
@@ -230,16 +253,16 @@ export default function CategoryPage() {
         </p>
 
         {/* Empty */}
-        {filtered.length === 0 && (
+        {!fading && filtered.length === 0 && (
           <div style={{ color: COLORS.textFaint, fontSize: ".85rem", fontStyle: "italic" }}>
             {search ? "Ничего не найдено" : "Модули скоро появятся"}
           </div>
         )}
 
         {/* Grid */}
-        {filtered.length > 0 && (
-          <div className="m-grid fade-up-4" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", alignItems: "start" }}>
-            {filtered.map((mod: ApiCourse) => {
+        {(fading || displayed.length > 0) && (
+          <div className={`m-grid fade-up-4${fading ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", alignItems: "start" }}>
+            {displayed.map((mod: ApiCourse) => {
               const { bg, bar } = slugPalette(mod.slug);
               const imgUrl      = mediaUrl(mod.image);
               const lessons     = lessonsMap[mod.slug] ?? [];
@@ -293,7 +316,7 @@ export default function CategoryPage() {
                   </div>
 
                   {/* Lessons */}
-                  <div style={{ padding: ".5rem", flex: 1 }}>
+                  <div className="lesson-scroll" style={{ padding: ".5rem", flex: 1, overflowY: "auto", maxHeight: "300px" }}>
                     {isLoading ? (
                       <div style={{ padding: ".25rem" }}>
                         {[0,1,2].map(i => (

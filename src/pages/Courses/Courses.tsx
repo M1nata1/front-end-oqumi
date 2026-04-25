@@ -65,11 +65,14 @@ export default function Courses() {
   const [search,     setSearch]     = useState("");
   const [visited,    setVisited]    = useState<Set<string>>(loadVisited);
 
+  const [fading,    setFading]    = useState(false);
+  const [displayed, setDisplayed] = useState<ApiCategory[]>([]);
+
   useEffect(() => {
     fetch(`${API_BASE}/courses/categories/?page_size=100`)
       .then(r => r.ok ? r.json() : { result: [] })
-      .then(data => setCategories(data.result ?? []))
-      .catch(() => setCategories([]))
+      .then(data => { const r = data.result ?? []; setCategories(r); setDisplayed(r); })
+      .catch(() => { setCategories([]); setDisplayed([]); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -82,6 +85,18 @@ export default function Courses() {
   );
 
   const visitedCount = categories.filter(c => visited.has(c.code)).length;
+
+  function handleSearch(q: string) {
+    setSearch(q);
+    setFading(true);
+    setTimeout(() => {
+      setDisplayed(categories.filter(c =>
+        c.name.toLowerCase().includes(q.toLowerCase()) ||
+        c.description?.toLowerCase().includes(q.toLowerCase())
+      ));
+      setFading(false);
+    }, 150);
+  }
 
   function handleCardClick(cat: ApiCategory) {
     const next = new Set(visited);
@@ -132,6 +147,10 @@ export default function Courses() {
         .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:10px}
         @media(max-width:900px){ .c-grid{grid-template-columns:1fr 1fr !important} }
         @media(max-width:560px){ .c-grid{grid-template-columns:1fr !important} }
+        .c-grid{transition:opacity .15s ease,transform .15s ease}
+        .c-grid.fading{opacity:0 !important;transform:translateY(4px) !important}
+        @keyframes cardIn{from{opacity:0;transform:translateY(6px) scale(0.97)}to{opacity:1;transform:none}}
+        .c-card{animation:cardIn .25s ease both}
       `}</style>
 
       <DashboardNav />
@@ -157,7 +176,7 @@ export default function Courses() {
             type="text"
             placeholder="Поиск курса..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
           />
         </div>
         {!loading && (
@@ -186,16 +205,16 @@ export default function Courses() {
         )}
 
         {/* Empty */}
-        {!loading && filtered.length === 0 && (
+        {!loading && !fading && filtered.length === 0 && (
           <div style={{ color: COLORS.textFaint, fontSize: ".85rem", fontStyle: "italic" }}>
             {search ? "Ничего не найдено" : "Курсы не найдены"}
           </div>
         )}
 
         {/* Grid */}
-        {!loading && filtered.length > 0 && (
-          <div className="c-grid fade-up-4" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem" }}>
-            {filtered.map(cat => {
+        {!loading && (fading || displayed.length > 0) && (
+          <div className={`c-grid fade-up-4${fading ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem" }}>
+            {displayed.map(cat => {
               const { bg, bar } = catPalette(cat.code);
               const imgUrl      = mediaUrl(cat.image);
               const modCount    = cat.courses.length;

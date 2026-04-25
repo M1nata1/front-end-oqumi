@@ -308,10 +308,10 @@ export default function ProfilePage() {
         {!loading && (totalScore > 0 || quizzes.length > 0) && (
           <div className="fade-up-3" style={{
             display: "grid",
-            gridTemplateColumns: quizzes.length > 0 ? "auto 1fr" : "1fr",
+            gridTemplateColumns: quizzes.length > 0 ? "1fr 1fr" : "1fr",
             gap: "1.5rem",
             marginBottom: "2.5rem",
-            alignItems: "start",
+            alignItems: "stretch",
           }}>
 
             {/* Rings */}
