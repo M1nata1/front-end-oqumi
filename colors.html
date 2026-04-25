@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OquMi — Color Palette</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D0D11;
+      color: #F0F0FF;
+      font-family: 'Nunito', sans-serif;
+      padding: 3rem 2rem 6rem;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: #FAFAFF;
+      margin-bottom: .4rem;
+    }
+    .subtitle {
+      font-size: .9rem;
+      color: #8888AA;
+      margin-bottom: 3.5rem;
+    }
+    .accent { color: #FF3A3A; }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+    .section-label {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #44445A;
+      margin-bottom: 1.1rem;
+    }
+
+    /* ── Swatch grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .75rem;
+    }
+
+    .swatch {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .swatch-color {
+      height: 72px;
+      width: 100%;
+      position: relative;
+    }
+    .swatch-color.transparent-pattern {
+      background-image:
+        linear-gradient(45deg, #1a1a24 25%, transparent 25%),
+        linear-gradient(-45deg, #1a1a24 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1a1a24 75%),
+        linear-gradient(-45deg, transparent 75%, #1a1a24 75%);
+      background-size: 12px 12px;
+      background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+    }
+    .swatch-color-inner {
+      position: absolute;
+      inset: 0;
+    }
+    .swatch-info {
+      background: #13131A;
+      padding: .65rem .85rem;
+    }
+    .swatch-name {
+      font-size: .78rem;
+      font-weight: 700;
+      color: #FAFAFF;
+      margin-bottom: .2rem;
+    }
+    .swatch-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem;
+      color: #8888AA;
+    }
+
+    /* ── Palette row (accent palette) ── */
+    .palette-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .75rem;
+    }
+    .palette-tile {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .palette-tile-top {
+      height: 90px;
+      display: flex;
+      align-items: flex-end;
+      padding: .7rem .85rem;
+    }
+    .palette-tile-index {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.35);
+      line-height: 1;
+    }
+    .palette-tile-bottom {
+      background: #13131A;
+      padding: .65rem .85rem;
+    }
+    .palette-tile-name {
+      font-size: .78rem;
+      font-weight: 700;
+      color: #FAFAFF;
+      margin-bottom: .2rem;
+    }
+    .palette-tile-hex {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem;
+      color: #8888AA;
+    }
+
+    /* ── Dark bg row ── */
+    .dark-bg-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .75rem;
+    }
+    .dark-tile {
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden;
+    }
+    .dark-tile-top {
+      height: 70px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dark-tile-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dark-tile-bottom {
+      background: #13131A;
+      padding: .6rem .85rem;
+    }
+
+    /* ── Font demo ── */
+    .font-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .75rem;
+    }
+    .font-card {
+      background: #13131A;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .font-card-label {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #44445A;
+      margin-bottom: .75rem;
+    }
+    .font-demo-syne {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #FAFAFF;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+    }
+    .font-demo-nunito {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #F0F0FF;
+      line-height: 1.65;
+    }
+    .font-demo-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .88rem;
+      color: #3AFFB4;
+      line-height: 1.7;
+    }
+    .font-sub {
+      font-size: .72rem;
+      color: #44445A;
+      margin-top: .5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── State demo ── */
+    .state-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .75rem;
+    }
+    .state-card {
+      border-radius: 12px;
+      padding: .85rem 1rem;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+
+    /* ── Divider ── */
+    hr {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin: 3.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Oqu<span class="accent">Mi</span> — Color Palette</h1>
+  <p class="subtitle">Полная цветовая система фронтенда</p>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- БАЗОВЫЕ ФОНЫ -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Фоны</p>
+    <div class="grid">
+
+      <div class="swatch">
+        <div class="swatch-color"><div class="swatch-color-inner" style="background:#0D0D11"></div></div>
+        <div class="swatch-info">
+          <div class="swatch-name">bgPage</div>
+          <div class="swatch-value">#0D0D11</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color"><div class="swatch-color-inner" style="background:#0A0A0E"></div></div>
+        <div class="swatch-info">
+          <div class="swatch-name">bgSection / bgLeft / bgSidebar</div>
+          <div class="swatch-value">#0A0A0E</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color"><div class="swatch-color-inner" style="background:#0E0E14"></div></div>
+        <div class="swatch-info">
+          <div class="swatch-name">bgRight (Auth)</div>
+          <div class="swatch-value">#0E0E14</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color"><div class="swatch-color-inner" style="background:#13131A"></div></div>
+        <div class="swatch-info">
+          <div class="swatch-name">bgCard / bgInput</div>
+          <div class="swatch-value">#13131A</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color"><div class="swatch-color-inner" style="background:#161620"></div></div>
+        <div class="swatch-info">
+          <div class="swatch-name">bgCardHover</div>
+          <div class="swatch-value">#161620</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- АКЦЕНТ -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Акцент</p>
+    <div class="grid">
+
+      <div class="swatch">
+        <div class="swatch-color"><div class="swatch-color-inner" style="background:#FF3A3A"></div></div>
+        <div class="swatch-info">
+          <div class="swatch-name">accent</div>
+          <div class="swatch-value">#FF3A3A</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color"><div class="swatch-color-inner" style="background:#FF5555"></div></div>
+        <div class="swatch-info">
+          <div class="swatch-name">accentHover</div>
+          <div class="swatch-value">#FF5555</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color transparent-pattern">
+          <div class="swatch-color-inner" style="background:rgba(255,58,58,0.08)"></div>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">accentSoft</div>
+          <div class="swatch-value">rgba(255,58,58, 0.08)</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color transparent-pattern">
+          <div class="swatch-color-inner" style="background:rgba(255,58,58,0.2)"></div>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">accentBorder</div>
+          <div class="swatch-value">rgba(255,58,58, 0.2)</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color transparent-pattern">
+          <div class="swatch-color-inner" style="background:rgba(255,58,58,0.5)"></div>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">borderFocus (Auth)</div>
+          <div class="swatch-value">rgba(255,58,58, 0.5)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- РАМКИ -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Рамки</p>
+    <div class="grid">
+
+      <div class="swatch">
+        <div class="swatch-color transparent-pattern">
+          <div class="swatch-color-inner" style="background:rgba(255,255,255,0.07)"></div>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">border</div>
+          <div class="swatch-value">rgba(255,255,255, 0.07)</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color transparent-pattern">
+          <div class="swatch-color-inner" style="background:rgba(255,255,255,0.08)"></div>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">border (Auth)</div>
+          <div class="swatch-value">rgba(255,255,255, 0.08)</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color transparent-pattern">
+          <div class="swatch-color-inner" style="background:rgba(255,58,58,0.3)"></div>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">borderHover</div>
+          <div class="swatch-value">rgba(255,58,58, 0.3)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- ТЕКСТ -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Текст</p>
+    <div class="grid">
+
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FAFAFF; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; color:#0D0D11">Aa</span>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">textPrimary</div>
+          <div class="swatch-value">#FAFAFF</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F0F0FF; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'Nunito',sans-serif; font-size:1.3rem; font-weight:700; color:#0D0D11">Aa</span>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">textBody</div>
+          <div class="swatch-value">#F0F0FF</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background:#8888AA; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'Nunito',sans-serif; font-size:1.3rem; font-weight:700; color:#0D0D11">Aa</span>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">textMuted</div>
+          <div class="swatch-value">#8888AA</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background:#66668A; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'Nunito',sans-serif; font-size:1.3rem; font-weight:700; color:#0D0D11">Aa</span>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">textMuted (Landing)</div>
+          <div class="swatch-value">#66668A</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background:#44445A; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'Nunito',sans-serif; font-size:1.3rem; font-weight:700; color:#F0F0FF">Aa</span>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">textFaint</div>
+          <div class="swatch-value">#44445A</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background:#2A2A3A; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'Nunito',sans-serif; font-size:1.3rem; font-weight:700; color:#F0F0FF">Aa</span>
+        </div>
+        <div class="swatch-info">
+          <div class="swatch-name">textGhost (Landing)</div>
+          <div class="swatch-value">#2A2A3A</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- СОСТОЯНИЯ (correct / wrong / ok / err) -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Состояния — правильно / неправильно / успех / ошибка</p>
+    <div class="state-row">
+
+      <div class="state-card" style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.18); color:#4ADE80">
+        ✓ &nbsp;Правильный ответ / Успех — <code style="font-family:'JetBrains Mono',monospace; font-size:.78rem">#4ADE80</code>
+        <div style="font-size:.72rem; color:#4ADE80; opacity:.7; margin-top:.3rem">rgba(34,197,94, 0.08) · border: 0.18 · text: #4ADE80</div>
+      </div>
+
+      <div class="state-card" style="background:rgba(58,255,148,0.08); border:1px solid rgba(58,255,148,0.35); color:#3AFFB4">
+        ✓ &nbsp;Правильный ответ (Quiz) — <code style="font-family:'JetBrains Mono',monospace; font-size:.78rem">#3AFFB4</code>
+        <div style="font-size:.72rem; color:#3AFFB4; opacity:.7; margin-top:.3rem">rgba(58,255,148, 0.08) · border: 0.35 · text: #3AFFB4</div>
+      </div>
+
+      <div class="state-card" style="background:rgba(255,58,58,0.08); border:1px solid rgba(255,58,58,0.2); color:#FF6B6B">
+        ✗ &nbsp;Неверный / Ошибка формы — <code style="font-family:'JetBrains Mono',monospace; font-size:.78rem">#FF6B6B</code>
+        <div style="font-size:.72rem; color:#FF6B6B; opacity:.7; margin-top:.3rem">rgba(255,58,58, 0.08) · border: 0.2 · text: #FF6B6B</div>
+      </div>
+
+      <div class="state-card" style="background:rgba(255,58,58,0.08); border:1px solid rgba(255,58,58,0.35); color:#FF6B6B">
+        ✗ &nbsp;Неверный ответ (Quiz) — <code style="font-family:'JetBrains Mono',monospace; font-size:.78rem">#FF6B6B</code>
+        <div style="font-size:.72rem; color:#FF6B6B; opacity:.7; margin-top:.3rem">rgba(255,58,58, 0.10) · border: 0.35 · text: #FF6B6B</div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- АКЦЕНТНАЯ ПАЛИТРА -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Акцентная палитра — предметы, категории, плитки</p>
+    <div class="palette-row">
+
+      <div class="palette-tile">
+        <div class="palette-tile-top" style="background:#FF3A3A">
+          <span class="palette-tile-index">0</span>
+        </div>
+        <div class="palette-tile-bottom">
+          <div class="palette-tile-name">Красный</div>
+          <div class="palette-tile-hex">#FF3A3A</div>
+        </div>
+      </div>
+
+      <div class="palette-tile">
+        <div class="palette-tile-top" style="background:#3A8EFF">
+          <span class="palette-tile-index">1</span>
+        </div>
+        <div class="palette-tile-bottom">
+          <div class="palette-tile-name">Синий</div>
+          <div class="palette-tile-hex">#3A8EFF</div>
+        </div>
+      </div>
+
+      <div class="palette-tile">
+        <div class="palette-tile-top" style="background:#FF9F3A">
+          <span class="palette-tile-index">2</span>
+        </div>
+        <div class="palette-tile-bottom">
+          <div class="palette-tile-name">Оранжевый</div>
+          <div class="palette-tile-hex">#FF9F3A</div>
+        </div>
+      </div>
+
+      <div class="palette-tile">
+        <div class="palette-tile-top" style="background:#3AFFB4">
+          <span class="palette-tile-index" style="color:rgba(0,0,0,0.3)">3</span>
+        </div>
+        <div class="palette-tile-bottom">
+          <div class="palette-tile-name">Зелёный</div>
+          <div class="palette-tile-hex">#3AFFB4</div>
+        </div>
+      </div>
+
+      <div class="palette-tile">
+        <div class="palette-tile-top" style="background:#B43AFF">
+          <span class="palette-tile-index">4</span>
+        </div>
+        <div class="palette-tile-bottom">
+          <div class="palette-tile-name">Фиолетовый</div>
+          <div class="palette-tile-hex">#B43AFF</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Тёмные фоны плиток -->
+  <div class="section">
+    <p class="section-label">Тёмные фоны плиток профильных предметов</p>
+    <div class="dark-bg-row">
+
+      <div class="dark-tile">
+        <div class="dark-tile-top" style="background:#0D1F3C">
+          <div class="dark-tile-dot" style="background:#3A8EFF"></div>
+        </div>
+        <div class="dark-tile-bottom">
+          <div class="swatch-name" style="font-size:.75rem">darkBg[0]</div>
+          <div class="swatch-value">#0D1F3C</div>
+        </div>
+      </div>
+
+      <div class="dark-tile">
+        <div class="dark-tile-top" style="background:#2A0A0A">
+          <div class="dark-tile-dot" style="background:#FF3A3A"></div>
+        </div>
+        <div class="dark-tile-bottom">
+          <div class="swatch-name" style="font-size:.75rem">darkBg[1]</div>
+          <div class="swatch-value">#2A0A0A</div>
+        </div>
+      </div>
+
+      <div class="dark-tile">
+        <div class="dark-tile-top" style="background:#0A2A1F">
+          <div class="dark-tile-dot" style="background:#3AFFB4"></div>
+        </div>
+        <div class="dark-tile-bottom">
+          <div class="swatch-name" style="font-size:.75rem">darkBg[2]</div>
+          <div class="swatch-value">#0A2A1F</div>
+        </div>
+      </div>
+
+      <div class="dark-tile">
+        <div class="dark-tile-top" style="background:#2A1A0A">
+          <div class="dark-tile-dot" style="background:#FF9F3A"></div>
+        </div>
+        <div class="dark-tile-bottom">
+          <div class="swatch-name" style="font-size:.75rem">darkBg[3]</div>
+          <div class="swatch-value">#2A1A0A</div>
+        </div>
+      </div>
+
+      <div class="dark-tile">
+        <div class="dark-tile-top" style="background:#1A0A2A">
+          <div class="dark-tile-dot" style="background:#B43AFF"></div>
+        </div>
+        <div class="dark-tile-bottom">
+          <div class="swatch-name" style="font-size:.75rem">darkBg[4]</div>
+          <div class="swatch-value">#1A0A2A</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- ШРИФТЫ -->
+  <!-- ─────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Шрифты</p>
+    <div class="font-row">
+
+      <div class="font-card">
+        <div class="font-card-label">Display — Syne 800</div>
+        <div class="font-demo-syne">Заголовок<br/>OquMi</div>
+        <div class="font-sub">'Syne', sans-serif · wght 800</div>
+      </div>
+
+      <div class="font-card">
+        <div class="font-card-label">Body — Nunito 600</div>
+        <div class="font-demo-nunito">Основной текст интерфейса.<br/>Кнопки, лейблы, описания.</div>
+        <div class="font-sub">'Nunito', sans-serif · wght 400–700</div>
+      </div>
+
+      <div class="font-card">
+        <div class="font-card-label">Mono — JetBrains Mono</div>
+        <div class="font-demo-mono">const color = "#FF3A3A";<br/>bgPage: "#0D0D11"</div>
+        <div class="font-sub">'JetBrains Mono' · TopicPage only</div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

@@ -8,8 +8,9 @@ import Landing    from "@/pages/Landing/Landing";
 import Auth       from "@/pages/Auth/Auth";
 import FAQ        from "@/pages/FAQ/FAQ";
 import TrialExam  from "@/pages/Exam/TrialExam";
-import ExamPage   from "@/pages/Exam/ExamPage";
-import QuizPage   from "@/pages/Exam/QuizPage";
+import ExamPage        from "@/pages/Exam/ExamPage";
+import ExamSessionPage from "@/pages/Exam/ExamSessionPage";
+import QuizPage        from "@/pages/Exam/QuizPage";
 import { Navigate } from "react-router-dom";
 import Subscriptions from "@/pages/Subscriptions/Subscriptions";
 import Courses       from "@/pages/Courses/Courses";
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/courses/:courseId"                 element={<CoursePage />} />
           <Route path="/courses/:courseId/:topicId"        element={<TopicPage />} />
           <Route path="/exam"                              element={<ExamPage />} />
+          <Route path="/exam/session"                      element={<ExamSessionPage />} />
           <Route path="/exam/:quizId"                      element={<QuizPage />} />
           <Route path="/profile"                           element={<ProfilePage />} />
         </Route>

@@ -1,6 +1,6 @@
 // src/pages/Subscriptions/subscriptions.config.ts
 
-export const BRAND = { name: "Bilim", accent: "Ly" };
+export const BRAND = { name: "Oqu", accent: "Mi" };
 
 export const API_SUB = {
   tariffs:   "/subscription/tariffs/",

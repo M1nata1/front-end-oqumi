@@ -1,8 +1,8 @@
 // src/pages/Dashboard/dashboard.config.ts
 
 export const BRAND = {
-  name:   "Bilim",
-  accent: "Ly",
+  name:   "Oqu",
+  accent: "Mi",
 };
 
 export const COLORS = {

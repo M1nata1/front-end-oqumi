@@ -6,8 +6,8 @@
 import { API_BASE } from "@api/auth.ts";
 
 export const BRAND = {
-  name:   "Bilim",
-  accent: "Ly",
+  name:   "Oqu",
+  accent: "Mi",
   year:   "2025",
 };
 

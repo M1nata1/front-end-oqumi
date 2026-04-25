@@ -3,7 +3,7 @@
 //  ВСЯ КОНФИГУРАЦИЯ СТРАНИЦЫ FAQ
 // ============================================================
 
-export const BRAND = { name: "Bilim", accent: "Ly" };
+export const BRAND = { name: "Oqu", accent: "Mi" };
 
 export const COLORS = {
   bgPage:       "#0D0D11",
@@ -30,9 +30,9 @@ export const FONTS = {
 // id="about" — сюда ведёт nav "О платформе" из Landing
 export const ABOUT = {
   label: "О платформе",
-  title: "Что такое BilimLy?",
+  title: "Что такое OquMi?",
   body: [
-    "BilimLy — образовательная платформа для подготовки к Комплексному тестированию (КТ). Комплексное тестирование — это вступительный экзамен в магистратуру.",
+    "OquMi — образовательная платформа для подготовки к Комплексному тестированию (КТ). Комплексное тестирование — это вступительный экзамен в магистратуру.",
     "Мы собрали структурированные курсы по всем предметам КТ: теория, мини-тесты после каждой темы и реальный формат пробного экзамена.",
     "Платформа создана для помощи будущим магистрантам. Каждый курс строится по принципу Курс → Модуль → Урок, что позволяет двигаться последовательно и не теряться в материале.",
   ],
@@ -69,7 +69,7 @@ export const CONTACTS = {
   title: "Связаться с нами",
   desc: "Если у тебя есть вопросы, нашёл ошибку или хочешь предложить улучшение — напиши нам.",
   items: [
-    { label: "Email",    value: "support@bilimly.kz",  href: "mailto:support@bilimly.kz"      },
-    { label: "Telegram", value: "@bilimly_support",    href: "https://t.me/bilimly_support"   },
+    { label: "Email",    value: "support@oqumi.kz",  href: "mailto:support@oqumi.kz"      },
+    { label: "Telegram", value: "@oqumi_support",    href: "https://t.me/oqumi_support"   },
   ],
 };
