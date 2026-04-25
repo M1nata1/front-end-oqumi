@@ -116,7 +116,7 @@ export default function ExamPage() {
 
       <DashboardNav />
 
-      <main style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
 
         {/* ── Header ── */}
         <div className="fu1" style={{ marginBottom: "2.5rem" }}>
@@ -173,16 +173,48 @@ export default function ExamPage() {
           )}
         </div>
 
+        {/* ── Summary + start ── */}
+        {!loading && (
+          <div className="fu3" style={{
+            background: COLORS.bgCard, border: `1px solid ${COLORS.border}`,
+            borderRadius: "16px", padding: "1.25rem 1.75rem", marginBottom: "2rem",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem",
+          }}>
+            <div style={{ display: "flex", gap: "2.5rem" }}>
+              <div>
+                <p style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".25rem" }}>Время</p>
+                <p className="num" style={{ fontFamily: FONTS.display, fontSize: "1.3rem", fontWeight: 800, color: COLORS.textPrimary }}>
+                  {totalDuration > 0 ? fmtDuration(totalDuration) : "—"}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".25rem" }}>Макс. баллов</p>
+                <p className="num" style={{ fontFamily: FONTS.display, fontSize: "1.3rem", fontWeight: 800, color: COLORS.textPrimary }}>
+                  {totalScore > 0 ? totalScore : "—"}
+                </p>
+              </div>
+            </div>
+
+            <button
+              className="btn-start"
+              disabled={profile.length > 0 && !selectedSlug}
+              onClick={handleStart}
+            >
+              Начать экзамен →
+            </button>
+          </div>
+        )}
+
         {/* ── Profile subject tiles ── */}
         {!loading && profile.length > 0 && (
           <>
-            <div className="fu3" style={{ marginBottom: "1rem" }}>
+            <div className="fu4" style={{ marginBottom: "1rem" }}>
               <p style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.textFaint }}>
                 Профильный предмет
               </p>
             </div>
 
-            <div className="fu3" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+            <div className="fu4" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
               {profile.map((sub, i) => {
                 const color    = subjectColor(mandatory.length + i);
                 const bgColor  = subjectBg(mandatory.length + i);
@@ -257,38 +289,6 @@ export default function ExamPage() {
               })}
             </div>
           </>
-        )}
-
-        {/* ── Summary + start ── */}
-        {!loading && (
-          <div className="fu4" style={{
-            background: COLORS.bgCard, border: `1px solid ${COLORS.border}`,
-            borderRadius: "16px", padding: "1.25rem 1.75rem",
-            display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem",
-          }}>
-            <div style={{ display: "flex", gap: "2.5rem" }}>
-              <div>
-                <p style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".25rem" }}>Время</p>
-                <p className="num" style={{ fontFamily: FONTS.display, fontSize: "1.3rem", fontWeight: 800, color: COLORS.textPrimary }}>
-                  {totalDuration > 0 ? fmtDuration(totalDuration) : "—"}
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: COLORS.textFaint, marginBottom: ".25rem" }}>Макс. баллов</p>
-                <p className="num" style={{ fontFamily: FONTS.display, fontSize: "1.3rem", fontWeight: 800, color: COLORS.textPrimary }}>
-                  {totalScore > 0 ? totalScore : "—"}
-                </p>
-              </div>
-            </div>
-
-            <button
-              className="btn-start"
-              disabled={profile.length > 0 && !selectedSlug}
-              onClick={handleStart}
-            >
-              Начать экзамен →
-            </button>
-          </div>
         )}
 
       </main>

@@ -11,7 +11,7 @@ export default function LandingCourses({ onCTA }: Props) {
     <section
       id="courses"
       className="courses-section"
-      style={{ maxWidth: "1080px", margin: "0 auto", padding: "4rem 2.5rem", scrollMarginTop: "80px" }}
+      style={{ maxWidth: "1280px", margin: "0 auto", padding: "4rem 2.5rem", scrollMarginTop: "80px" }}
     >
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "1.75rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>

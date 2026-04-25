@@ -89,7 +89,7 @@ export default function Subscriptions() {
 
       <DashboardNav />
 
-      <main className="sub-main" style={{ maxWidth: "860px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main className="sub-main" style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
 
         {/* Заголовок */}
         <p className="fade-up-1" style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: COLORS.accent, marginBottom: ".5rem" }}>

@@ -335,7 +335,7 @@ export default function TopicPage() {
         *{box-sizing:border-box;margin:0;padding:0}
 
         /* ── Сайдбар ── */
-        .topic-layout{display:grid;grid-template-columns:248px 1fr 220px;min-height:calc(100vh - 57px);align-items:start}
+        .topic-layout{display:grid;grid-template-columns:300px 1fr 260px;min-height:calc(100vh - 57px);align-items:start}
         .topic-sidebar{
           position:sticky;top:57px;height:calc(100vh - 57px);
           overflow-y:auto;background:${COLORS.bgSidebar};

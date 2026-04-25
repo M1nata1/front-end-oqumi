@@ -7,7 +7,7 @@ interface Props {
 
 export default function TrialExamIntro({ onStart }: Props) {
   return (
-    <div className="exam-intro-main" style={{ maxWidth: "700px", margin: "0 auto", padding: "4rem 2rem" }}>
+    <div className="exam-intro-main" style={{ maxWidth: "900px", margin: "0 auto", padding: "4rem 3rem" }}>
       <span className="section-label">{COPY.pageLabel}</span>
       <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,4vw,2.6rem)", fontWeight: 800, color: COLORS.textPrimary, letterSpacing: "-.025em", marginBottom: ".5rem" }}>
         {COPY.pageTitle}

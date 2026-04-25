@@ -13,7 +13,7 @@ export default function LandingHero({ left, onCTA, onCourses }: Props) {
 
   return (
     <section className="hero-grid" style={{
-      padding: "5.5rem 2.5rem 3rem", maxWidth: "1080px", margin: "0 auto",
+      padding: "5.5rem 2.5rem 3rem", maxWidth: "1280px", margin: "0 auto",
       display: "grid", gridTemplateColumns: "1fr minmax(0,420px)", gap: "4rem",
       alignItems: "center", minHeight: "88vh",
     }}>

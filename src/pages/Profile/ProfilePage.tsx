@@ -260,7 +260,7 @@ export default function ProfilePage() {
 
       <DashboardNav />
 
-      <main style={{ maxWidth: "900px", margin: "0 auto", padding: "3.5rem 2rem" }}>
+      <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
 
         {/* ── Avatar + name ── */}
         <div className="fade-up-1" style={{ display: "flex", alignItems: "center", gap: "1.25rem", marginBottom: "3rem" }}>

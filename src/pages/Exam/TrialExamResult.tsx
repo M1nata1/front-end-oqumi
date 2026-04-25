@@ -27,7 +27,7 @@ export default function TrialExamResult({ answers, resultTab, onSetResultTab, on
     .map((q, i) => ({ q, globalIdx: resultStart + i, localIdx: i }));
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "3rem 2rem 5rem" }}>
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "3rem 2rem 5rem" }}>
       <span className="section-label">{COPY.resultTitle}</span>
       <h1 style={{ fontFamily: FONTS.display, fontSize: "clamp(1.8rem,3.5vw,2.4rem)", fontWeight: 800, color: COLORS.textPrimary, letterSpacing: "-.025em", marginBottom: "2rem" }}>
         Экзамен завершён

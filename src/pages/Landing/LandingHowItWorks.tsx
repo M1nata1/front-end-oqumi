@@ -5,7 +5,7 @@ import { COLORS, FONTS, HOW_SECTION, HOW_STEPS } from "./landing.config";
 export default function LandingHowItWorks() {
   return (
     <section className="steps-section" style={{ background: COLORS.bgSection, borderTop: `1px solid ${COLORS.border}`, borderBottom: `1px solid ${COLORS.border}`, padding: "4rem 2.5rem" }}>
-      <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
         <p className="section-label">{HOW_SECTION.label}</p>
         <h2 style={{ fontFamily: FONTS.display, fontSize: "1.6rem", fontWeight: 800, color: COLORS.textPrimary, letterSpacing: "-.02em", marginBottom: "2rem" }}>{HOW_SECTION.title}</h2>
         <div className="steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: ".75rem" }}>
