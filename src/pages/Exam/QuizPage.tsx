@@ -19,7 +19,7 @@ interface QuizOption {
 interface QuizQuestion {
   id:      number;
   type:    "single" | "multiple" | "ordering";
-  content: string | { text: string };
+  content: unknown;
   image:   string | null;
   options: (QuizOption | string)[];
   score:   number;
@@ -34,8 +34,30 @@ interface QuizDetail {
   questions:   QuizQuestion[];
 }
 
-function qText(content: string | { text: string }): string {
-  return typeof content === "string" ? content : (content?.text ?? "");
+interface TTNodeDef { type?: string; text?: string; content?: TTNodeDef[]; marks?: { type: string }[] }
+
+function TTNode({ n }: { n: TTNodeDef }): React.ReactNode {
+  if (n.type === "text") {
+    let el: React.ReactNode = n.text ?? "";
+    (n.marks ?? []).forEach(m => {
+      if (m.type === "bold")   el = <strong>{el}</strong>;
+      if (m.type === "italic") el = <em>{el}</em>;
+    });
+    return el;
+  }
+  const kids = Array.isArray(n.content) ? n.content.map((c, i) => <TTNode key={i} n={c} />) : null;
+  if (n.type === "paragraph") return <p style={{ margin: "0 0 .4em" }}>{kids}</p>;
+  if (n.type === "hardBreak") return <br />;
+  return <>{kids}</>;
+}
+
+function TipTapContent({ content }: { content: unknown }) {
+  if (typeof content === "string") return <>{content}</>;
+  let obj = content as TTNodeDef;
+  if (obj && !obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
+    obj = obj.content as TTNodeDef;
+  if (!obj?.content) return null;
+  return <>{(Array.isArray(obj.content) ? obj.content : []).map((c, i) => <TTNode key={i} n={c} />)}</>;
 }
 
 function optText(opt: QuizOption | string, idx: number): { id: number; text: string } {
@@ -353,9 +375,9 @@ export default function QuizPage() {
                       style={{ width: "100%", maxHeight: "180px", objectFit: "cover", borderRadius: "6px", marginBottom: ".75rem" }}
                     />
                   )}
-                  <p style={{ fontSize: ".88rem", color: COLORS.textPrimary, lineHeight: 1.6, marginBottom: ".85rem" }}>
-                    {qText(question.content)}
-                  </p>
+                  <div style={{ fontSize: ".88rem", color: COLORS.textPrimary, lineHeight: 1.6, marginBottom: ".85rem" }}>
+                    <TipTapContent content={question.content} />
+                  </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: ".4rem" }}>
                     {question.options.map((rawOpt, oi) => {
@@ -432,9 +454,9 @@ export default function QuizPage() {
             />
           )}
 
-          <p style={{ fontSize: "1rem", fontWeight: 600, color: COLORS.textPrimary, lineHeight: 1.65, marginBottom: "1.25rem" }}>
-            {q && qText(q.content)}
-          </p>
+          <div style={{ fontSize: "1rem", fontWeight: 600, color: COLORS.textPrimary, lineHeight: 1.65, marginBottom: "1.25rem" }}>
+            {q && <TipTapContent content={q.content} />}
+          </div>
 
           <p style={{ fontSize: ".7rem", color: COLORS.textFaint, marginBottom: ".85rem" }}>
             {q.type === "single" ? "Один правильный ответ" : "Выберите все верные ответы"}
