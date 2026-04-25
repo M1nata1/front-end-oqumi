@@ -18,10 +18,10 @@ export const COLORS = {
   correctText:  "#4ADE80",
   wrong:        "rgba(255,58,58,0.10)",
   wrongBorder:  "rgba(255,58,58,0.35)",
-  textPrimary:  "#FAFAFF",
+  textPrimary:  "#FFFFFF",
   textBody:     "#F0F0FF",
-  textMuted:    "#8888AA",
-  textFaint:    "#44445A",
+  textMuted:    "#B4B4D8",
+  textFaint:    "#7878A8",
 };
 
 export const FONTS = {

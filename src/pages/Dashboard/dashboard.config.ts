@@ -16,10 +16,10 @@ export const COLORS = {
   accentHover:  "#FF5555",
   accentSoft:   "rgba(255,58,58,0.08)",
   accentBorder: "rgba(255,58,58,0.2)",
-  textPrimary:  "#FAFAFF",
+  textPrimary:  "#FFFFFF",
   textBody:     "#F0F0FF",
-  textMuted:    "#8888AA",
-  textFaint:    "#44445A",
+  textMuted:    "#B4B4D8",
+  textFaint:    "#7878A8",
 };
 
 export const FONTS = {
