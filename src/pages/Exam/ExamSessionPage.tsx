@@ -95,7 +95,7 @@ function TTNode({ n }: { n: TipTapNodeData }): React.ReactElement | null {
     return <>{el}</>;
   }
 
-  const kids = n.content?.map((c, i) => <TTNode key={i} n={c} />) ?? null;
+  const kids = Array.isArray(n.content) ? n.content.map((c, i) => <TTNode key={i} n={c} />) : null;
 
   switch (n.type) {
     case "doc":         return <>{kids}</>;
@@ -110,7 +110,7 @@ function TTNode({ n }: { n: TipTapNodeData }): React.ReactElement | null {
     case "orderedList": return <ol style={{ paddingLeft: "1.4rem", marginBottom: ".65rem" }}>{kids}</ol>;
     case "listItem":    return <li style={{ marginBottom: ".25rem" }}>{kids}</li>;
     case "blockquote":  return (
-      <blockquote style={{ borderLeft: "3px solid rgba(255,255,255,0.1)", paddingLeft: ".9rem", color: "#8888AA", marginBottom: ".65rem" }}>
+      <blockquote style={{ borderLeft: "3px solid rgba(255,255,255,0.1)", paddingLeft: ".9rem", color: "#B4B4D8", marginBottom: ".65rem" }}>
         {kids}
       </blockquote>
     );
@@ -146,7 +146,11 @@ function TipTapContent({ content }: { content: unknown }) {
   if (!content || typeof content !== "object") return null;
   const obj = content as Record<string, unknown>;
   if (typeof obj.text === "string") return <p style={{ lineHeight: 1.65 }}>{obj.text}</p>;
-  return <TTNode n={content as TipTapNodeData} />;
+  // Unwrap double-wrapped content: { content: { type: "doc", ... } }
+  const node = (!obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
+    ? obj.content as TipTapNodeData
+    : obj as TipTapNodeData;
+  return <TTNode n={node} />;
 }
 
 // ─── Custom audio player ──────────────────────────────────────
@@ -718,7 +722,7 @@ export default function ExamSessionPage() {
                         {p.is_correct
                           ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#4ADE80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                           : skipped
-                            ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v4M5 7.5v.5" stroke="#44445A" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                            ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v4M5 7.5v.5" stroke="#7878A8" strokeWidth="1.5" strokeLinecap="round"/></svg>
                             : <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
                         }
                       </div>

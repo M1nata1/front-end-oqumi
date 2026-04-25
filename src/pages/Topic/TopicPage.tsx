@@ -125,7 +125,7 @@ const COLORS = {
   bgPage: "#0D0D11", bgCard: "#13131A", bgSidebar: "#0A0A0E",
   border: "rgba(255,255,255,0.07)", borderHover: "rgba(255,58,58,0.3)",
   accent: "#FF3A3A", textPrimary: "#FAFAFF", textBody: "#F0F0FF",
-  textMuted: "#8888AA", textFaint: "#44445A",
+  textMuted: "#B4B4D8", textFaint: "#7878A8",
 };
 const FONTS = {
   display: "'Syne', sans-serif",
