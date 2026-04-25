@@ -116,7 +116,7 @@ export default function ExamPage() {
 
       <DashboardNav />
 
-      <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
+      <main className="exam-page-main" style={{ maxWidth: "1100px", margin: "0 auto", padding: "3.5rem 3rem" }}>
 
         {/* ── Header ── */}
         <div className="fu1" style={{ marginBottom: "2.5rem" }}>

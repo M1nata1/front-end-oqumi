@@ -68,7 +68,7 @@ export default function DashboardNav() {
         {BRAND.name}<span style={{ color: COLORS.accent }}>{BRAND.accent}</span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+      <div className="dash-nav-links" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
         {NAV_LINKS.map(link => {
           const active = isActive(link.match);
           return (

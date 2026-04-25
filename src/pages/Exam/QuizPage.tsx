@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import { API_BASE, mediaUrl } from "@/api/auth";
 import DashboardNav from "@/pages/Dashboard/DashboardNav";
 import { COLORS, FONTS } from "@/pages/Dashboard/dashboard.config";
+import { TipTapContent } from "@/components/TipTapRenderer";
 
 // ─── API types ───────────────────────────────────────────────
 
@@ -34,31 +35,6 @@ interface QuizDetail {
   questions:   QuizQuestion[];
 }
 
-interface TTNodeDef { type?: string; text?: string; content?: TTNodeDef[]; marks?: { type: string }[] }
-
-function TTNode({ n }: { n: TTNodeDef }): React.ReactNode {
-  if (n.type === "text") {
-    let el: React.ReactNode = n.text ?? "";
-    (n.marks ?? []).forEach(m => {
-      if (m.type === "bold")   el = <strong>{el}</strong>;
-      if (m.type === "italic") el = <em>{el}</em>;
-    });
-    return el;
-  }
-  const kids = Array.isArray(n.content) ? n.content.map((c, i) => <TTNode key={i} n={c} />) : null;
-  if (n.type === "paragraph") return <p style={{ margin: "0 0 .4em" }}>{kids}</p>;
-  if (n.type === "hardBreak") return <br />;
-  return <>{kids}</>;
-}
-
-function TipTapContent({ content }: { content: unknown }) {
-  if (typeof content === "string") return <>{content}</>;
-  let obj = content as TTNodeDef;
-  if (obj && !obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
-    obj = obj.content as TTNodeDef;
-  if (!obj?.content) return null;
-  return <>{(Array.isArray(obj.content) ? obj.content : []).map((c, i) => <TTNode key={i} n={c} />)}</>;
-}
 
 function optText(opt: QuizOption | string, idx: number): { id: number; text: string } {
   if (typeof opt === "string") return { id: idx, text: opt };
@@ -433,7 +409,7 @@ export default function QuizPage() {
   // ── Exam ─────────────────────────────────────────────────
   return (
     <Shell>
-      <div style={{
+      <div className="quiz-grid" style={{
         maxWidth: "1100px", margin: "0 auto",
         padding: "1.5rem",
         display: "grid", gridTemplateColumns: "1fr 204px",
@@ -503,7 +479,7 @@ export default function QuizPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="fade-up-2" style={{
+        <div className="fade-up-2 quiz-sidebar" style={{
           background: COLORS.bgCard,
           border:     `1px solid ${COLORS.border}`,
           borderRadius: "14px",

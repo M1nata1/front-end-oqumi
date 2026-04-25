@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { API_BASE } from "@/api/auth";
 import { COLORS, FONTS } from "@/pages/Dashboard/dashboard.config";
+import { TipTapContent } from "@/components/TipTapRenderer";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -72,85 +73,6 @@ function formatTime(sec: number) {
   const ss = s % 60;
   if (h > 0) return `${pad2(h)}:${pad2(m)}:${pad2(ss)}`;
   return `${pad2(m)}:${pad2(ss)}`;
-}
-
-// ─── TipTap renderer ──────────────────────────────────────────
-
-type TipTapNodeData = {
-  type:    string;
-  text?:   string;
-  content?: TipTapNodeData[];
-  marks?:  { type: string; attrs?: Record<string, unknown> }[];
-  attrs?:  Record<string, unknown>;
-};
-
-function TTNode({ n }: { n: TipTapNodeData }): React.ReactElement | null {
-  if (n.type === "text") {
-    let el: React.ReactNode = n.text ?? "";
-    for (const m of n.marks ?? []) {
-      if (m.type === "bold")   el = <strong>{el}</strong>;
-      if (m.type === "italic") el = <em>{el}</em>;
-      if (m.type === "code")   el = <code style={{ background: "rgba(255,255,255,0.08)", borderRadius: "4px", padding: "0 .3em", fontFamily: "ui-monospace,monospace", fontSize: ".85em" }}>{el}</code>;
-    }
-    return <>{el}</>;
-  }
-
-  const kids = Array.isArray(n.content) ? n.content.map((c, i) => <TTNode key={i} n={c} />) : null;
-
-  switch (n.type) {
-    case "doc":         return <>{kids}</>;
-    case "paragraph":   return <p style={{ marginBottom: ".65rem", lineHeight: 1.65 }}>{kids}</p>;
-    case "hardBreak":   return <br />;
-    case "heading": {
-      const lv = (n.attrs?.level as number) ?? 2;
-      const Tag = `h${lv}` as "h1"|"h2"|"h3"|"h4"|"h5"|"h6";
-      return <Tag style={{ fontWeight: 800, marginBottom: ".5rem", lineHeight: 1.3 }}>{kids}</Tag>;
-    }
-    case "bulletList":  return <ul style={{ paddingLeft: "1.4rem", marginBottom: ".65rem" }}>{kids}</ul>;
-    case "orderedList": return <ol style={{ paddingLeft: "1.4rem", marginBottom: ".65rem" }}>{kids}</ol>;
-    case "listItem":    return <li style={{ marginBottom: ".25rem" }}>{kids}</li>;
-    case "blockquote":  return (
-      <blockquote style={{ borderLeft: "3px solid rgba(255,255,255,0.1)", paddingLeft: ".9rem", color: "#B4B4D8", marginBottom: ".65rem" }}>
-        {kids}
-      </blockquote>
-    );
-    case "codeBlock":   return (
-      <pre style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: ".75rem 1rem", marginBottom: ".65rem", overflowX: "auto" }}>
-        <code style={{ fontFamily: "ui-monospace,monospace", fontSize: ".82rem", color: "#7BB8FF" }}>{kids}</code>
-      </pre>
-    );
-    case "table":       return (
-      <div style={{ overflowX: "auto", marginBottom: ".75rem" }}>
-        <table style={{ borderCollapse: "collapse", width: "100%", fontSize: ".85rem" }}>
-          <tbody>{kids}</tbody>
-        </table>
-      </div>
-    );
-    case "tableRow":    return <tr>{kids}</tr>;
-    case "tableHeader": return (
-      <th style={{ border: "1px solid rgba(255,255,255,0.1)", padding: ".45rem .75rem", background: "rgba(255,255,255,0.05)", fontWeight: 700, textAlign: "left", color: "#FAFAFF" }}>
-        {kids}
-      </th>
-    );
-    case "tableCell":   return (
-      <td style={{ border: "1px solid rgba(255,255,255,0.07)", padding: ".45rem .75rem", verticalAlign: "top", color: "#F0F0FF" }}>
-        {kids}
-      </td>
-    );
-    default:            return <>{kids}</>;
-  }
-}
-
-function TipTapContent({ content }: { content: unknown }) {
-  if (typeof content === "string") return <p style={{ lineHeight: 1.65 }}>{content}</p>;
-  if (!content || typeof content !== "object") return null;
-  const obj = content as Record<string, unknown>;
-  if (typeof obj.text === "string") return <p style={{ lineHeight: 1.65 }}>{obj.text}</p>;
-  // Unwrap double-wrapped content: { content: { type: "doc", ... } }
-  const node = (!obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
-    ? obj.content as TipTapNodeData
-    : obj as TipTapNodeData;
-  return <TTNode n={node} />;
 }
 
 // ─── Custom audio player ──────────────────────────────────────
@@ -302,6 +224,34 @@ function problemText(content: unknown): string {
 const SUBJECT_COLORS = ["#3A8EFF", "#FF3A3A", "#3AFFB4", "#FF9F3A", "#B43AFF"];
 const subjectColor = (i: number) => SUBJECT_COLORS[i % SUBJECT_COLORS.length];
 
+const EXAM_SESSION_KEY = "oqumi_exam_session";
+interface SavedSession {
+  examStartTime:  number;
+  totalDuration:  number;
+  profileSlug:    string | null;
+  answers:        Record<number, number[]>;
+  examData:       ExamData;
+}
+function loadSession(profileSlug: string | null): SavedSession | null {
+  try {
+    const raw = localStorage.getItem(EXAM_SESSION_KEY);
+    if (!raw) return null;
+    const s: SavedSession = JSON.parse(raw);
+    if (s.profileSlug !== profileSlug) return null;
+    return s;
+  } catch { return null; }
+}
+function saveSession(patch: Partial<SavedSession>) {
+  try {
+    const raw = localStorage.getItem(EXAM_SESSION_KEY);
+    const prev: SavedSession = raw ? JSON.parse(raw) : {};
+    localStorage.setItem(EXAM_SESSION_KEY, JSON.stringify({ ...prev, ...patch }));
+  } catch { /* quota exceeded or private mode */ }
+}
+function clearSession() {
+  try { localStorage.removeItem(EXAM_SESSION_KEY); } catch { /* ignore */ }
+}
+
 // ─── Main component ────────────────────────────────────────────
 
 export default function ExamSessionPage() {
@@ -327,6 +277,23 @@ export default function ExamSessionPage() {
     if (fetched.current) return;
     fetched.current = true;
 
+    // Restore saved session if available
+    const saved = loadSession(profileSlug);
+    if (saved) {
+      const elapsed    = Math.floor((Date.now() - saved.examStartTime) / 1000);
+      const remaining  = saved.totalDuration - elapsed;
+      if (remaining > 0) {
+        setExamData(saved.examData);
+        setAnswers(saved.answers);
+        answersRef.current = saved.answers;
+        setTimeLeft(remaining);
+        setPhase("exam");
+        return;
+      }
+      // Time expired while away — clear and submit empty
+      clearSession();
+    }
+
     const url = profileSlug
       ? `${API_BASE}/exam/?subject=${encodeURIComponent(profileSlug)}`
       : `${API_BASE}/exam/`;
@@ -338,6 +305,13 @@ export default function ExamSessionPage() {
         setExamData(data);
         setTimeLeft(data.total_duration_sec);
         setPhase("exam");
+        saveSession({
+          examStartTime: Date.now(),
+          totalDuration: data.total_duration_sec,
+          profileSlug,
+          answers: {},
+          examData: data,
+        });
       })
       .catch(() => navigate("/exam", { replace: true }));
   }, [accessToken, profileSlug, navigate]);
@@ -383,6 +357,7 @@ export default function ExamSessionPage() {
         : cur.includes(optIdx) ? cur.filter(x => x !== optIdx) : [...cur, optIdx];
       const updated = { ...prev, [qId]: next };
       answersRef.current = updated;
+      saveSession({ answers: updated });
       return updated;
     });
   };
@@ -391,6 +366,7 @@ export default function ExamSessionPage() {
   const submitExam = async () => {
     if (!examData) return;
     if (timerRef.current) clearInterval(timerRef.current);
+    clearSession();
     setPhase("checking");
 
     const snapshot = answersRef.current;
@@ -778,7 +754,8 @@ export default function ExamSessionPage() {
         .sub-tab{
           padding:.42rem .9rem;border-radius:7px;font-size:.78rem;font-weight:700;
           cursor:pointer;transition:all .16s;border:1.5px solid transparent;
-          font-family:${FONTS.body};color:${COLORS.textFaint};background:transparent;flex:1;
+          font-family:${FONTS.body};color:${COLORS.textFaint};background:transparent;
+          width:100%;text-align:left;
         }
         .sub-tab:hover:not(.active){color:${COLORS.textMuted}}
 
@@ -793,7 +770,7 @@ export default function ExamSessionPage() {
       `}</style>
 
       {/* ── Nav (TrialExam style) ── */}
-      <nav style={{
+      <nav className="exam-nav" style={{
         padding: ".7rem 1.75rem",
         background: `${COLORS.bgPage}F2`, backdropFilter: "blur(18px)",
         borderBottom: `1px solid ${COLORS.border}`,
@@ -821,7 +798,7 @@ export default function ExamSessionPage() {
           <div style={{ width: "1px", height: "36px", background: COLORS.border }} />
 
           {/* Per-subject answered counters */}
-          <div style={{ display: "flex", gap: "1.25rem" }}>
+          <div className="exam-nav-subjects" style={{ display: "flex", gap: "1.25rem" }}>
             {examData.subjects.map((s, i) => {
               const color = subjectColor(i);
               const cnt   = s.problems.filter(p => (answers[p.id] ?? []).length > 0).length;
@@ -832,7 +809,7 @@ export default function ExamSessionPage() {
                   onClick={() => { setActiveTab(i); setCurrent(subjectStart[i]); }}
                 >
                   <div style={{ fontSize: ".6rem", fontWeight: 700, color, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: ".15rem" }}>
-                    {s.name.length > 8 ? s.name.slice(0, 8) + "…" : s.name}
+                    {s.name}
                   </div>
                   <div className="num" style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: ".95rem", color: COLORS.textPrimary }}>
                     {cnt}<span style={{ fontSize: ".75rem", fontWeight: 400, color: COLORS.textFaint }}>/{s.problems.length}</span>
@@ -868,7 +845,7 @@ export default function ExamSessionPage() {
       </nav>
 
       {/* ── Body ── */}
-      <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 216px", gap: "1.25rem", alignItems: "start" }}>
+      <div className="exam-grid" style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 248px", gap: "1.25rem", alignItems: "start" }}>
 
         {/* ── Question area ── */}
         {q && (
@@ -957,10 +934,10 @@ export default function ExamSessionPage() {
         )}
 
         {/* ── Sidebar ── */}
-        <div style={{ position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: ".75rem" }}>
+        <div className="exam-sidebar-wrap" style={{ position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: ".75rem" }}>
 
           {/* Subject tabs */}
-          <div style={{ display: "flex", gap: ".3rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: ".3rem" }}>
             {examData.subjects.map((s, i) => {
               const color = subjectColor(i);
               const isAct = activeTab === i;
@@ -971,7 +948,7 @@ export default function ExamSessionPage() {
                   style={{ borderColor: isAct ? color + "40" : "transparent", color: isAct ? color : undefined, background: isAct ? color + "0D" : undefined }}
                   onClick={() => { setActiveTab(i); setCurrent(subjectStart[i]); }}
                 >
-                  {s.name.length > 6 ? s.name.slice(0, 6) + "…" : s.name}
+                  {s.name}
                 </button>
               );
             })}
