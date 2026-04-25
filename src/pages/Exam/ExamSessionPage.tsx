@@ -848,7 +848,7 @@ export default function ExamSessionPage() {
       `}</style>
 
       {/* ── Nav (TrialExam style) ── */}
-      <nav style={{
+      <nav className="exam-nav" style={{
         padding: ".7rem 1.75rem",
         background: `${COLORS.bgPage}F2`, backdropFilter: "blur(18px)",
         borderBottom: `1px solid ${COLORS.border}`,
@@ -876,7 +876,7 @@ export default function ExamSessionPage() {
           <div style={{ width: "1px", height: "36px", background: COLORS.border }} />
 
           {/* Per-subject answered counters */}
-          <div style={{ display: "flex", gap: "1.25rem" }}>
+          <div className="exam-nav-subjects" style={{ display: "flex", gap: "1.25rem" }}>
             {examData.subjects.map((s, i) => {
               const color = subjectColor(i);
               const cnt   = s.problems.filter(p => (answers[p.id] ?? []).length > 0).length;
@@ -923,7 +923,7 @@ export default function ExamSessionPage() {
       </nav>
 
       {/* ── Body ── */}
-      <div style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 248px", gap: "1.25rem", alignItems: "start" }}>
+      <div className="exam-grid" style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 248px", gap: "1.25rem", alignItems: "start" }}>
 
         {/* ── Question area ── */}
         {q && (
@@ -1012,7 +1012,7 @@ export default function ExamSessionPage() {
         )}
 
         {/* ── Sidebar ── */}
-        <div style={{ position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: ".75rem" }}>
+        <div className="exam-sidebar-wrap" style={{ position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: ".75rem" }}>
 
           {/* Subject tabs */}
           <div style={{ display: "flex", flexDirection: "column", gap: ".3rem" }}>

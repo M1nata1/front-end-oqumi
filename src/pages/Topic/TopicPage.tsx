@@ -62,15 +62,36 @@ function TTNode({ n }: { n: TTNodeDef }): React.ReactNode {
   const kids = Array.isArray(n.content) ? n.content.map((c, i) => <TTNode key={i} n={c} />) : null;
   if (n.type === "paragraph") return <p style={{ margin: "0 0 .4em" }}>{kids}</p>;
   if (n.type === "hardBreak") return <br />;
+  if (n.type === "table") return (
+    <div style={{ overflowX: "auto", marginBottom: ".75rem" }}>
+      <table style={{ borderCollapse: "collapse", width: "100%", fontSize: ".85rem" }}>
+        <tbody>{kids}</tbody>
+      </table>
+    </div>
+  );
+  if (n.type === "tableRow")    return <tr>{kids}</tr>;
+  if (n.type === "tableHeader") return (
+    <th style={{ border: "1px solid rgba(255,255,255,0.1)", padding: ".45rem .75rem", background: "rgba(255,255,255,0.05)", fontWeight: 700, textAlign: "left", color: "#FAFAFF" }}>
+      {kids}
+    </th>
+  );
+  if (n.type === "tableCell")   return (
+    <td style={{ border: "1px solid rgba(255,255,255,0.07)", padding: ".45rem .75rem", verticalAlign: "top" }}>
+      {kids}
+    </td>
+  );
   return <>{kids}</>;
 }
 function TipTapContent({ content }: { content: unknown }) {
   if (typeof content === "string") return <>{content}</>;
-  let obj = content as TTNodeDef;
-  if (obj && !obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
-    obj = obj.content as TTNodeDef;
-  if (!obj?.content) return null;
-  return <>{(Array.isArray(obj.content) ? obj.content : []).map((c, i) => <TTNode key={i} n={c} />)}</>;
+  if (!content || typeof content !== "object") return null;
+  const obj = content as TTNodeDef & { text?: unknown };
+  if (typeof obj.text === "string") return <>{obj.text}</>;
+  if (obj.text && typeof obj.text === "object") return <TipTapContent content={obj.text} />;
+  const node = (!obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
+    ? obj.content as TTNodeDef : obj;
+  if (!node?.content) return null;
+  return <>{(Array.isArray(node.content) ? node.content : []).map((c, i) => <TTNode key={i} n={c} />)}</>;
 }
 
 interface ApiLesson {
