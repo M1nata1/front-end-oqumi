@@ -489,7 +489,7 @@ export default function ExamSessionPage() {
         `}</style>
 
         {/* Nav */}
-        <nav style={{ padding: ".9rem 2rem", background: `${COLORS.bgPage}EC`, backdropFilter: "blur(14px)", borderBottom: `1px solid ${COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+        <nav style={{ padding: ".9rem 2rem", background: `${COLORS.bgPage}EC`, backdropFilter: "blur(14px)", borderBottom: `1px solid ${COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}>
           <div
             onClick={() => navigate("/exam")}
             style={{ fontFamily: FONTS.display, fontSize: "1.28rem", fontWeight: 800, color: COLORS.textBody, cursor: "pointer", transition: "opacity .18s" }}
@@ -500,7 +500,7 @@ export default function ExamSessionPage() {
           </div>
         </nav>
 
-        <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3rem 3rem 5rem" }}>
+        <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "3rem 3rem 5rem", paddingTop: "calc(3rem + 57px)" }}>
 
           {/* ── Hero score ── */}
           <div className="fu1" style={{ display: "flex", alignItems: "center", gap: "2.5rem", background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "20px", padding: "2rem 2.5rem", marginBottom: "1.5rem" }}>
@@ -570,7 +570,7 @@ export default function ExamSessionPage() {
           </div>
 
           {/* ── Subject cards ── */}
-          <div className="fu2" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: ".85rem", marginBottom: "2rem" }}>
+          <div className="fu2" style={{ display: "grid", gridTemplateColumns: `repeat(${checkResult.subjects.length}, 1fr)`, gap: ".85rem", marginBottom: "2rem", alignItems: "stretch" }}>
             {checkResult.subjects.map((s, i) => {
               const maxScore  = examData.subjects.find(es => es.name === s.name)?.max_score ?? 0;
               const subPct    = maxScore > 0 ? Math.round((s.total_score_get / maxScore) * 100) : 0;
