@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { API_BASE } from "@/api/auth";
 import { COLORS, FONTS } from "@/pages/Dashboard/dashboard.config";
+import { TipTapContent } from "@/components/TipTapRenderer";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -72,85 +73,6 @@ function formatTime(sec: number) {
   const ss = s % 60;
   if (h > 0) return `${pad2(h)}:${pad2(m)}:${pad2(ss)}`;
   return `${pad2(m)}:${pad2(ss)}`;
-}
-
-// ─── TipTap renderer ──────────────────────────────────────────
-
-type TipTapNodeData = {
-  type:    string;
-  text?:   string;
-  content?: TipTapNodeData[];
-  marks?:  { type: string; attrs?: Record<string, unknown> }[];
-  attrs?:  Record<string, unknown>;
-};
-
-function TTNode({ n }: { n: TipTapNodeData }): React.ReactElement | null {
-  if (n.type === "text") {
-    let el: React.ReactNode = n.text ?? "";
-    for (const m of n.marks ?? []) {
-      if (m.type === "bold")   el = <strong>{el}</strong>;
-      if (m.type === "italic") el = <em>{el}</em>;
-      if (m.type === "code")   el = <code style={{ background: "rgba(255,255,255,0.08)", borderRadius: "4px", padding: "0 .3em", fontFamily: "ui-monospace,monospace", fontSize: ".85em" }}>{el}</code>;
-    }
-    return <>{el}</>;
-  }
-
-  const kids = Array.isArray(n.content) ? n.content.map((c, i) => <TTNode key={i} n={c} />) : null;
-
-  switch (n.type) {
-    case "doc":         return <>{kids}</>;
-    case "paragraph":   return <p style={{ marginBottom: ".65rem", lineHeight: 1.65 }}>{kids}</p>;
-    case "hardBreak":   return <br />;
-    case "heading": {
-      const lv = (n.attrs?.level as number) ?? 2;
-      const Tag = `h${lv}` as "h1"|"h2"|"h3"|"h4"|"h5"|"h6";
-      return <Tag style={{ fontWeight: 800, marginBottom: ".5rem", lineHeight: 1.3 }}>{kids}</Tag>;
-    }
-    case "bulletList":  return <ul style={{ paddingLeft: "1.4rem", marginBottom: ".65rem" }}>{kids}</ul>;
-    case "orderedList": return <ol style={{ paddingLeft: "1.4rem", marginBottom: ".65rem" }}>{kids}</ol>;
-    case "listItem":    return <li style={{ marginBottom: ".25rem" }}>{kids}</li>;
-    case "blockquote":  return (
-      <blockquote style={{ borderLeft: "3px solid rgba(255,255,255,0.1)", paddingLeft: ".9rem", color: "#B4B4D8", marginBottom: ".65rem" }}>
-        {kids}
-      </blockquote>
-    );
-    case "codeBlock":   return (
-      <pre style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: ".75rem 1rem", marginBottom: ".65rem", overflowX: "auto" }}>
-        <code style={{ fontFamily: "ui-monospace,monospace", fontSize: ".82rem", color: "#7BB8FF" }}>{kids}</code>
-      </pre>
-    );
-    case "table":       return (
-      <div style={{ overflowX: "auto", marginBottom: ".75rem" }}>
-        <table style={{ borderCollapse: "collapse", width: "100%", fontSize: ".85rem" }}>
-          <tbody>{kids}</tbody>
-        </table>
-      </div>
-    );
-    case "tableRow":    return <tr>{kids}</tr>;
-    case "tableHeader": return (
-      <th style={{ border: "1px solid rgba(255,255,255,0.1)", padding: ".45rem .75rem", background: "rgba(255,255,255,0.05)", fontWeight: 700, textAlign: "left", color: "#FAFAFF" }}>
-        {kids}
-      </th>
-    );
-    case "tableCell":   return (
-      <td style={{ border: "1px solid rgba(255,255,255,0.07)", padding: ".45rem .75rem", verticalAlign: "top", color: "#F0F0FF" }}>
-        {kids}
-      </td>
-    );
-    default:            return <>{kids}</>;
-  }
-}
-
-function TipTapContent({ content }: { content: unknown }) {
-  if (typeof content === "string") return <p style={{ lineHeight: 1.65 }}>{content}</p>;
-  if (!content || typeof content !== "object") return null;
-  const obj = content as Record<string, unknown>;
-  if (typeof obj.text === "string") return <p style={{ lineHeight: 1.65 }}>{obj.text}</p>;
-  // Unwrap double-wrapped content: { content: { type: "doc", ... } }
-  const node = (!obj.type && obj.content && typeof obj.content === "object" && !Array.isArray(obj.content))
-    ? obj.content as TipTapNodeData
-    : obj as TipTapNodeData;
-  return <TTNode n={node} />;
 }
 
 // ─── Custom audio player ──────────────────────────────────────
