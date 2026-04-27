@@ -232,7 +232,12 @@ export default function TopicPage() {
   // ── Загрузка контента ─────────────────────────────────────────
   useEffect(() => {
     if (useApi) {
-      if (apiLesson) setContent(fixMediaUrls(apiLesson.content));
+      if (apiLesson) {
+        const raw = apiLesson.content as Record<string, unknown> | null;
+        // Some lessons wrap the actual doc inside `lesson_text`
+        const doc = raw && typeof raw === "object" && raw.lesson_text ? raw.lesson_text : raw;
+        setContent(fixMediaUrls(doc));
+      }
       return;
     }
     const loader = LESSON_CONTENT[topicId ?? ""];
@@ -643,7 +648,7 @@ export default function TopicPage() {
                       let cls = "quiz-opt";
                       if (checked) {
                         cls += " quiz-opt--disabled";
-                        const isCorrect = q.correct.includes(oi);
+                        const isCorrect = Array.isArray(q.correct) && q.correct.includes(oi);
                         const isSelected = selected.includes(oi);
                         if (isSelected && isCorrect)       cls += " quiz-opt--correct";
                         else if (isSelected && !isCorrect) cls += " quiz-opt--wrong";
@@ -670,13 +675,13 @@ export default function TopicPage() {
                           </p>
                         )}
                         <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
-                          {q.options.map((opt, oi) => (
+                          {(Array.isArray(q.options) ? q.options : []).map((opt, oi) => (
                             <button key={oi} className={getOptClass(oi)} onClick={() => toggle(oi)}>
                               <span className="quiz-marker">
-                                {checked && q.correct.includes(oi) ? "✓" :
-                                 checked && selected.includes(oi) && !q.correct.includes(oi) ? "✗" : ""}
+                                {checked && Array.isArray(q.correct) && q.correct.includes(oi) ? "✓" :
+                                 checked && selected.includes(oi) && !(Array.isArray(q.correct) && q.correct.includes(oi)) ? "✗" : ""}
                               </span>
-                              {opt}
+                              {typeof opt === "string" ? opt : String(opt ?? "")}
                             </button>
                           ))}
                         </div>
@@ -795,12 +800,12 @@ export default function TopicPage() {
                           </p>
                         )}
                         <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
-                          {q.options.map((opt, oi) => (
+                          {(Array.isArray(q.options) ? q.options : []).map((opt, oi) => (
                             <button key={oi} className={getOptClass(oi)} onClick={() => toggleOpt(oi)}>
                               <span className="quiz-marker">
                                 {isDone && (result?.correct_answer?.includes(oi) ? "✓" : selected.includes(oi) ? "✗" : "")}
                               </span>
-                              {opt}
+                              {typeof opt === "string" ? opt : String(opt ?? "")}
                             </button>
                           ))}
                         </div>
