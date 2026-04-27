@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>OquMi — Diploma Poster (EN)</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page { size: 594mm 841mm; margin: 0; }
+@media print {
+  html, body { width: 594mm; height: 841mm; }
+  .poster { transform: none !important; margin-bottom: 0 !important; }
+  .screen-hint { display: none !important; }
+}
+
+:root {
+  --red: #E63946;
+  --red-soft: rgba(230,57,70,0.12);
+  --red-glow: rgba(230,57,70,0.25);
+  --bg-deep: #0B0B10;
+  --bg-card: #111118;
+  --bg-surface: #16161F;
+  --text-primary: #F1F1F8;
+  --text-secondary: rgba(241,241,248,0.55);
+  --text-muted: rgba(241,241,248,0.3);
+  --border: rgba(241,241,248,0.08);
+}
+
+body {
+  background: #08080C;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0 3rem;
+  font-family: 'Outfit', sans-serif;
+}
+
+.screen-hint {
+  color: rgba(255,255,255,0.3);
+  font-size: .82rem;
+  margin-bottom: 1rem;
+  letter-spacing: .06em;
+}
+
+.poster {
+  width: 594mm;
+  height: 841mm;
+  background: var(--bg-deep);
+  position: relative;
+  overflow: hidden;
+  color: var(--text-primary);
+}
+
+/* ════ TOP HEADER BAR ════ */
+.top-bar {
+  height: 248mm;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.top-bar::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+}
+
+.grid-pattern {
+  display: none;
+}
+
+.uni-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11mm 18mm;
+  position: relative;
+  z-index: 2;
+  border-bottom: 1px solid var(--border);
+}
+
+.uni-left {
+  display: flex;
+  align-items: center;
+  gap: 6mm;
+}
+
+.sdu-badge {
+  width: 22mm; height: 22mm;
+  background: #fff;
+  border-radius: 4mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  padding: 1.5mm;
+}
+.sdu-badge img { width: 100%; height: 100%; object-fit: contain; }
+
+.uni-text { display: flex; flex-direction: column; gap: 1.5mm; }
+
+.uni-name {
+  font-size: 13pt;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.uni-sub {
+  font-size: 11pt;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.program-pill {
+  background: var(--red-soft);
+  border: 1px solid rgba(230,57,70,0.3);
+  border-radius: 100px;
+  padding: 3mm 7mm;
+  font-size: 12pt;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: .03em;
+}
+
+.hero-section {
+  padding: 16mm 18mm 10mm;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-eyebrow {
+  font-size: 13pt;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 5mm;
+}
+
+.hero-title {
+  font-size: 92pt;
+  font-weight: 800;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -.04em;
+  line-height: 0.92;
+  margin-bottom: 7mm;
+}
+
+.hero-title .accent { color: var(--red); }
+
+.hero-subtitle {
+  font-size: 17pt;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  max-width: 360mm;
+  font-weight: 400;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 0;
+  padding: 0 18mm;
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--border);
+}
+
+.stat-item {
+  flex: 1;
+  padding: 8mm 0;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.stat-item:last-child { border-right: none; }
+
+.stat-num {
+  font-size: 54pt;
+  font-weight: 900;
+  color: var(--red);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 12pt;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-top: 2mm;
+}
+
+.team-row {
+  display: flex;
+  padding: 0 18mm;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 2;
+}
+
+.team-cell {
+  flex: 1;
+  padding: 7mm 8mm;
+  border-right: 1px solid var(--border);
+}
+
+.team-cell:last-child { border-right: none; }
+
+.cell-label {
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 3mm;
+}
+
+.cell-value {
+  font-size: 14pt;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+.cell-value.small {
+  font-size: 12pt;
+  color: var(--text-secondary);
+}
+
+/* ════ MAIN CONTENT ════ */
+.main-content {
+  height: 482mm;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 160mm 157mm 165mm;
+  gap: 0;
+  overflow: hidden;
+}
+
+.mockup-section {
+  grid-column: 1 / -1;
+  height: 160mm;
+  padding: 4mm 18mm 8mm;
+  display: flex;
+  gap: 10mm;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+
+.mockup-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transform: rotate(180deg);
+  padding: 0 2mm;
+}
+
+.browser-frame {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: 5mm;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.browser-bar {
+  height: 12mm;
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  padding: 0 5mm;
+  gap: 3mm;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.dot { width: 4mm; height: 4mm; border-radius: 50%; }
+.dot-r { background: #FF5F57; }
+.dot-y { background: #FEBC2E; }
+.dot-g { background: #28C840; }
+
+.url-bar {
+  flex: 1;
+  height: 6mm;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2mm;
+  margin-left: 4mm;
+  display: flex;
+  align-items: center;
+  padding: 0 3.5mm;
+  font-size: 8pt;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.app-nav {
+  height: 14mm;
+  background: rgba(10,10,14,0.9);
+  display: flex;
+  align-items: center;
+  padding: 0 7mm;
+  gap: 8mm;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.app-logo { font-size: 14pt; font-weight: 800; font-family: 'Syne', sans-serif; color: var(--text-primary); }
+.app-logo .a { color: var(--red); }
+
+.nav-link { font-size: 10pt; font-weight: 600; color: var(--text-muted); }
+.nav-link.active {
+  color: var(--red);
+  border-bottom: 0.7mm solid var(--red);
+  padding-bottom: 0.5mm;
+}
+
+.app-body {
+  flex: 1;
+  padding: 6mm;
+  display: flex;
+  flex-direction: column;
+  gap: 4mm;
+}
+
+.app-search {
+  height: 9mm;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 2.5mm;
+  display: flex;
+  align-items: center;
+  padding: 0 4mm;
+  gap: 3mm;
+}
+
+.search-icon { width: 4mm; height: 4mm; border: 1px solid var(--text-muted); border-radius: 50%; }
+.search-text { height: 2mm; width: 36mm; background: rgba(255,255,255,0.08); border-radius: 1mm; }
+
+.course-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3mm;
+  flex: 1;
+}
+
+.course-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 3.5mm;
+  padding: 3.5mm;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5mm;
+}
+
+.card-banner { height: 19mm; border-radius: 2.5mm; position: relative; overflow: hidden; }
+.card-banner::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.3));
+}
+
+.card-tag {
+  font-size: 7pt; font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(0,0,0,0.5);
+  border-radius: 1.5mm;
+  padding: 0.8mm 2mm;
+  position: absolute; top: 2mm; left: 2mm; z-index: 1;
+}
+
+.card-title-line { height: 2.5mm; background: rgba(255,255,255,0.14); border-radius: 0.5mm; width: 75%; }
+.card-sub-line   { height: 2mm;   background: rgba(255,255,255,0.06); border-radius: 0.5mm; width: 55%; }
+.card-progress   { height: 2mm;   background: rgba(255,255,255,0.05); border-radius: 1mm; overflow: hidden; margin-top: auto; }
+.card-progress-fill { height: 100%; border-radius: 1mm; }
+
+.phone-frame {
+  width: 74mm;
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border-radius: 7mm;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-notch { height: 5mm; display: flex; justify-content: center; padding-top: 2mm; }
+.notch-bar { width: 18mm; height: 2mm; background: rgba(255,255,255,0.1); border-radius: 1mm; }
+
+.phone-body { flex: 1; padding: 4mm; display: flex; flex-direction: column; gap: 2.5mm; }
+
+.phone-header-bar { display: flex; justify-content: space-between; align-items: center; padding: 1mm 0; }
+.phone-title { font-size: 10pt; font-weight: 800; color: var(--text-primary); }
+.phone-avatar { width: 6mm; height: 6mm; border-radius: 50%; background: var(--red-soft); border: 1px solid rgba(230,57,70,0.3); }
+
+.phone-quiz-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 3mm;
+  padding: 4mm;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5mm;
+}
+
+.quiz-q { height: 2.5mm; background: rgba(255,255,255,0.1); border-radius: 0.8mm; }
+.quiz-q.short { width: 60%; }
+
+.quiz-option {
+  height: 7mm;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 2mm;
+  display: flex; align-items: center;
+  padding: 0 2.5mm; gap: 2mm;
+}
+.quiz-option.selected { background: var(--red-soft); border-color: rgba(230,57,70,0.3); }
+
+.quiz-radio { width: 3.5mm; height: 3.5mm; border-radius: 50%; border: 0.6mm solid var(--text-muted); flex-shrink: 0; }
+.quiz-option.selected .quiz-radio { border-color: var(--red); background: var(--red); }
+.quiz-text-line { height: 1.8mm; background: rgba(255,255,255,0.08); border-radius: 0.8mm; flex: 1; }
+
+/* ─── Features grid ─── */
+.features-grid {
+  grid-column: 1 / -1;
+  height: 157mm;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.feat {
+  padding: 13mm 13mm;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.feat:last-child { border-right: none; }
+
+.feat-number {
+  font-size: 88pt;
+  font-weight: 900;
+  color: rgba(255,255,255,0.025);
+  line-height: 1;
+  position: absolute;
+  top: 5mm; right: 6mm;
+}
+
+.feat-icon {
+  width: 18mm; height: 18mm;
+  border-radius: 4.5mm;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20pt;
+  margin-bottom: 6mm;
+  position: relative; z-index: 1;
+}
+
+.feat-title {
+  font-size: 20pt;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -.02em;
+  margin-bottom: 4mm;
+  line-height: 1.2;
+  position: relative; z-index: 1;
+}
+
+.feat-desc {
+  font-size: 11.5pt;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  flex: 1;
+  position: relative; z-index: 1;
+}
+
+.mini-viz { margin-top: 6mm; position: relative; z-index: 1; }
+
+.bar-chart { display: flex; align-items: flex-end; gap: 2mm; height: 30mm; }
+.bar-col { flex: 1; border-radius: 1.5mm 1.5mm 0 0; position: relative; }
+.bar-val {
+  position: absolute;
+  top: -6mm; left: 50%;
+  transform: translateX(-50%);
+  font-size: 7.5pt;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.timer-box {
+  background: var(--red-soft);
+  border: 1px solid rgba(230,57,70,0.25);
+  border-radius: 3mm;
+  padding: 4mm;
+  text-align: center;
+  margin-bottom: 4mm;
+}
+.timer-digits { font-family: 'JetBrains Mono', monospace; font-size: 26pt; font-weight: 700; color: var(--red); letter-spacing: .05em; }
+.timer-label { font-size: 8pt; color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 1.5mm; }
+
+.q-grid { display: grid; grid-template-columns: repeat(8,1fr); gap: 1.5mm; }
+.q-cell { height: 6mm; border-radius: 1.5mm; background: rgba(255,255,255,0.04); border: 0.5px solid var(--border); }
+.q-cell.done { background: rgba(58,180,120,0.15); border-color: rgba(58,180,120,0.35); }
+.q-cell.now  { background: var(--red-soft); border-color: rgba(230,57,70,0.4); }
+
+.ring-row { display: flex; gap: 5mm; align-items: center; }
+.ring { width: 26mm; height: 26mm; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ring-val { font-size: 12pt; font-weight: 800; }
+.ring-info { display: flex; flex-direction: column; gap: 2.5mm; }
+.ring-info-row { display: flex; align-items: center; gap: 2.5mm; }
+.ring-dot { width: 3mm; height: 3mm; border-radius: 50%; flex-shrink: 0; }
+.ring-info-label { font-size: 9.5pt; color: var(--text-muted); }
+
+/* ─── About + Tech ─── */
+.info-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 165mm;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.about-panel {
+  padding: 10mm 16mm;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.section-tag {
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 4mm;
+}
+
+.section-title {
+  font-size: 22pt;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -.02em;
+  margin-bottom: 5mm;
+  line-height: 1.2;
+}
+
+.section-text {
+  font-size: 12pt;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 3mm; margin-top: 5mm; }
+.tag {
+  background: var(--red-soft);
+  border: 1px solid rgba(230,57,70,0.2);
+  border-radius: 100px;
+  padding: 2mm 5mm;
+  font-size: 10.5pt;
+  font-weight: 700;
+  color: rgba(230,90,100,0.9);
+}
+
+.tech-panel {
+  padding: 10mm 16mm;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5mm; margin-top: 5mm; }
+
+.tech-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  border-radius: 3mm;
+  padding: 3mm 4.5mm;
+}
+
+.tech-card-role {
+  font-size: 9.5pt;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 3mm;
+}
+
+.tech-badges { display: flex; flex-wrap: wrap; gap: 2.5mm; }
+
+.tech-badge {
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.06);
+  border-radius: 2mm;
+  padding: 1.5mm 3.5mm;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tech-badge.hl { background: var(--red-soft); color: #FF8A8A; }
+
+/* ════ FOOTER ════ */
+.footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 111mm;
+  background: #08080C;
+  border-top: 2.5px solid var(--red);
+  display: flex;
+}
+
+.footer-team {
+  flex: 1;
+  padding: 10mm 13mm;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 5mm;
+  overflow: hidden;
+}
+
+.footer-label {
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 5mm;
+}
+
+.member-cards { display: flex; flex-wrap: wrap; gap: 3mm; }
+
+.m-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 3mm;
+  padding: 4mm 6mm;
+  min-width: 68mm;
+}
+
+.m-name { font-size: 13pt; font-weight: 700; color: var(--text-primary); }
+.m-id { font-size: 9.5pt; color: var(--text-muted); margin-top: 1mm; font-family: 'JetBrains Mono', monospace; }
+
+.footer-qr {
+  width: 92mm;
+  padding: 10mm;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+}
+
+#qr-canvas img, #qr-canvas canvas { display: block; width: 52mm !important; height: 52mm !important; }
+
+.qr-label { font-size: 11pt; font-weight: 600; color: var(--text-muted); text-align: center; line-height: 1.5; }
+
+.footer-meta {
+  width: 150mm;
+  padding: 10mm 14mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.adviser-block { display: flex; flex-direction: column; gap: 2mm; }
+.adviser-name-val { font-size: 17pt; font-weight: 800; color: var(--text-primary); }
+
+.company-box { display: flex; flex-direction: column; gap: 3mm; }
+
+.company-logo-pill {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 3.5mm;
+  padding: 4mm 8mm;
+  display: inline-flex; align-items: center;
+  gap: 4mm; width: fit-content;
+}
+
+.company-text { font-size: 14pt; font-weight: 800; color: rgba(255,255,255,0.6); letter-spacing: .03em; }
+.year-tag { font-size: 13pt; font-weight: 700; color: var(--red); letter-spacing: .1em; }
+.github-link { font-size: 10.5pt; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-top: 2mm; }
+</style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<p class="screen-hint">Use Ctrl+/- or scroll wheel to zoom &middot; To print: Ctrl+P &rarr; A1 without margins</p>
+
+<div class="poster">
+
+<!-- ═══ TOP HEADER BAR ═══ -->
+<div class="top-bar">
+  <div class="grid-pattern"></div>
+
+  <div class="uni-row">
+    <div class="uni-left">
+      <div class="sdu-badge"><img src="https://storage.googleapis.com/bilimly-projectx-media/lesson_images/logo.png" alt="SDU"/></div>
+      <div class="uni-text">
+        <div class="uni-name">SDU University</div>
+        <div class="uni-sub">School of Information Technology and Applied Mathematics</div>
+      </div>
+    </div>
+    <div class="program-pill">6B06101 · Information Systems</div>
+  </div>
+
+  <div class="hero-section">
+    <div class="hero-eyebrow">Diploma Project · 2026</div>
+   <!-- <div class="hero-title">Oqu<span class="accent">Mi</span></div> -->
+    <div class="hero-subtitle">
+      A web platform for systematic preparation for the Comprehensive Testing (CT) exam for master's degree admission in Kazakhstan. Courses, quizzes, mock exams and personal progress analytics.
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Learning Modules</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">80+</div>
+      <div class="stat-label">Exam Questions</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Unlimited Retakes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Online Access</div>
+    </div>
+  </div>
+
+  <!-- ─── Modular grid logo construction ─── -->
+  <div style="border-top:1px solid var(--border);padding:3mm 18mm 0;overflow:hidden;">
+    <svg viewBox="0 0 996 100" width="100%" style="display:block;height:63mm;" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="logoGrid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+          <circle cx="5" cy="5" r="0.65" fill="rgba(241,241,248,0.11)"/>
+        </pattern>
+      </defs>
+
+      <!-- Dot grid -->
+      <rect width="996" height="100" fill="url(#logoGrid)"/>
+
+      <!-- Guide lines -->
+      <line x1="0" y1="10" x2="996" y2="10" stroke="rgba(230,57,70,0.14)" stroke-width="0.4" stroke-dasharray="3,5"/>
+      <line x1="0" y1="30" x2="996" y2="30" stroke="rgba(230,57,70,0.18)" stroke-width="0.4" stroke-dasharray="3,5"/>
+      <line x1="0" y1="80" x2="996" y2="80" stroke="rgba(230,57,70,0.35)" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="0" y1="98" x2="996" y2="98" stroke="rgba(230,57,70,0.09)" stroke-width="0.3" stroke-dasharray="2,7"/>
+
+      <!-- Guide labels -->
+      <text x="6" y="8"  font-family="'JetBrains Mono',monospace" font-size="5" fill="rgba(230,57,70,0.28)">cap-height</text>
+      <text x="6" y="28" font-family="'JetBrains Mono',monospace" font-size="5" fill="rgba(230,57,70,0.28)">x-height</text>
+      <text x="6" y="78" font-family="'JetBrains Mono',monospace" font-size="5" fill="rgba(230,57,70,0.45)">baseline</text>
+      <text x="6" y="96" font-family="'JetBrains Mono',monospace" font-size="5" fill="rgba(230,57,70,0.18)">descender</text>
+
+      <!-- O: capital circle construction -->
+      <circle cx="410" cy="45" r="35" fill="none" stroke="rgba(230,57,70,0.32)" stroke-width="0.7" stroke-dasharray="3,3"/>
+      <circle cx="410" cy="45" r="25" fill="none" stroke="rgba(230,57,70,0.12)" stroke-width="0.5" stroke-dasharray="2,5"/>
+      <line x1="373" y1="45" x2="447" y2="45" stroke="rgba(230,57,70,0.22)" stroke-width="0.4"/>
+      <line x1="410" y1="8"  x2="410" y2="82" stroke="rgba(230,57,70,0.22)" stroke-width="0.4"/>
+      <circle cx="410" cy="45" r="1.8" fill="rgba(230,57,70,0.6)"/>
+
+      <!-- q: lowercase bowl construction -->
+      <circle cx="461" cy="55" r="24" fill="none" stroke="rgba(241,241,248,0.08)" stroke-width="0.5" stroke-dasharray="2,5"/>
+      <line x1="461" y1="30" x2="461" y2="98" stroke="rgba(241,241,248,0.06)" stroke-width="0.4" stroke-dasharray="2,5"/>
+      <circle cx="461" cy="55" r="1.2" fill="rgba(241,241,248,0.15)"/>
+
+      <!-- M: stems + diagonal construction -->
+      <line x1="535" y1="10" x2="535" y2="80" stroke="rgba(230,57,70,0.18)" stroke-width="0.5" stroke-dasharray="2.5,3"/>
+      <line x1="599" y1="10" x2="599" y2="80" stroke="rgba(230,57,70,0.18)" stroke-width="0.5" stroke-dasharray="2.5,3"/>
+      <line x1="535" y1="10" x2="567" y2="52" stroke="rgba(230,57,70,0.3)"  stroke-width="0.65" stroke-dasharray="3,3"/>
+      <line x1="599" y1="10" x2="567" y2="52" stroke="rgba(230,57,70,0.3)"  stroke-width="0.65" stroke-dasharray="3,3"/>
+      <line x1="535" y1="45" x2="599" y2="45" stroke="rgba(230,57,70,0.12)" stroke-width="0.4" stroke-dasharray="2,4"/>
+      <circle cx="567" cy="52" r="1.5" fill="rgba(230,57,70,0.45)"/>
+
+      <!-- Cap-height bracket -->
+      <line x1="965" y1="10" x2="965" y2="80" stroke="rgba(241,241,248,0.14)" stroke-width="0.5"/>
+      <line x1="960" y1="10" x2="970" y2="10" stroke="rgba(241,241,248,0.14)" stroke-width="0.5"/>
+      <line x1="960" y1="80" x2="970" y2="80" stroke="rgba(241,241,248,0.14)" stroke-width="0.5"/>
+      <text x="975" y="45" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="5" fill="rgba(241,241,248,0.18)">H</text>
+
+      <!-- Module unit box -->
+      <rect x="978" y="82" width="10" height="10" fill="none" stroke="rgba(241,241,248,0.15)" stroke-width="0.5"/>
+      <text x="983" y="96" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="4.5" fill="rgba(241,241,248,0.18)">1u</text>
+
+      <!-- Section label -->
+      <text x="990" y="8" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="5" fill="rgba(241,241,248,0.12)" letter-spacing="0.8">MODULAR GRID</text>
+
+      <!-- OquMi text -->
+      <text x="498" y="80"
+        text-anchor="middle"
+        font-family="'Syne',sans-serif"
+        font-size="78"
+        font-weight="800"
+        letter-spacing="-3"
+        fill="rgba(241,241,248,0.9)">Oqu<tspan fill="#E63946">Mi</tspan></text>
+
+    </svg>
+  </div>
+
+</div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="main-content">
+
+  <!-- Mockup -->
+  <div class="mockup-section">
+    <div class="mockup-label">PLATFORM INTERFACE</div>
+
+    <div class="browser-frame">
+      <div class="browser-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <div class="url-bar">oqumi.kz/courses</div>
+      </div>
+      <div class="app-nav">
+        <div class="app-logo">Oqu<span class="a">Mi</span></div>
+        <div style="display:flex;gap:6mm;align-items:center;flex:1;justify-content:center;">
+          <div class="nav-link active">Courses</div>
+          <div class="nav-link">Exam</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:2mm;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.1);border-radius:2.5mm;padding:1.5mm 3mm 1.5mm 2mm;">
+          <div style="width:6mm;height:6mm;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:6pt;font-weight:800;color:#fff;flex-shrink:0;">A</div>
+          <span style="font-size:7.5pt;font-weight:600;color:rgba(241,241,248,0.85);">Aidos</span>
+          <svg width="6" height="6" viewBox="0 0 8 8" fill="none" style="opacity:.5"><path d="M1 2.5l3 3 3-3" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="app-body">
+        <div class="app-search">
+          <div class="search-icon"></div>
+          <div class="search-text"></div>
+        </div>
+        <div class="course-grid">
+          <div class="course-card">
+            <div class="card-banner" style="background:linear-gradient(135deg,#1a3a5c,#2d6aa0)"><div class="card-tag">TRL</div></div>
+            <div class="card-title-line"></div><div class="card-sub-line"></div>
+            <div class="card-progress"><div class="card-progress-fill" style="width:72%;background:var(--red)"></div></div>
+          </div>
+          <div class="course-card">
+            <div class="card-banner" style="background:linear-gradient(135deg,#5c1a1a,#a02d2d)"><div class="card-tag">English</div></div>
+            <div class="card-title-line"></div><div class="card-sub-line"></div>
+            <div class="card-progress"><div class="card-progress-fill" style="width:45%;background:#3a8eff"></div></div>
+          </div>
+          <div class="course-card">
+            <div class="card-banner" style="background:linear-gradient(135deg,#1a4a3a,#2d8a5a)"><div class="card-tag">Elective</div></div>
+            <div class="card-title-line"></div><div class="card-sub-line"></div>
+            <div class="card-progress"><div class="card-progress-fill" style="width:30%;background:#3affb4"></div></div>
+          </div>
+          <div class="course-card">
+            <div class="card-banner" style="background:linear-gradient(135deg,#3a2a1a,#8a6a2d)"><div class="card-tag">Math</div></div>
+            <div class="card-title-line"></div><div class="card-sub-line"></div>
+            <div class="card-progress"><div class="card-progress-fill" style="width:88%;background:#ffb03a"></div></div>
+          </div>
+          <div class="course-card">
+            <div class="card-banner" style="background:linear-gradient(135deg,#2a1a4a,#5a2d8a)"><div class="card-tag">Logic</div></div>
+            <div class="card-title-line"></div><div class="card-sub-line"></div>
+            <div class="card-progress"><div class="card-progress-fill" style="width:55%;background:#a06aff"></div></div>
+          </div>
+          <div class="course-card">
+            <div class="card-banner" style="background:linear-gradient(135deg,#1a3a3a,#2d7a7a)"><div class="card-tag">Analytics</div></div>
+            <div class="card-title-line"></div><div class="card-sub-line"></div>
+            <div class="card-progress"><div class="card-progress-fill" style="width:20%;background:#3ad4ff"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-frame">
+      <div class="phone-notch"><div class="notch-bar"></div></div>
+      <div class="phone-body">
+        <div class="phone-header-bar">
+          <div class="phone-title">Quiz: TRL</div>
+          <div class="phone-avatar"></div>
+        </div>
+        <div class="phone-quiz-card">
+          <div class="quiz-q" style="width:90%"></div>
+          <div class="quiz-q short"></div>
+          <div style="height:2mm"></div>
+          <div class="quiz-option"><div class="quiz-radio"></div><div class="quiz-text-line"></div></div>
+          <div class="quiz-option selected"><div class="quiz-radio"></div><div class="quiz-text-line"></div></div>
+          <div class="quiz-option"><div class="quiz-radio"></div><div class="quiz-text-line"></div></div>
+          <div class="quiz-option"><div class="quiz-radio"></div><div class="quiz-text-line"></div></div>
+        </div>
+        <div class="phone-quiz-card" style="margin-top:auto">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:8pt;color:var(--text-muted);font-weight:700">Question 4 / 20</div>
+            <div style="font-size:8pt;color:var(--red);font-weight:700">⏱ 12:34</div>
+          </div>
+          <div class="card-progress" style="margin-top:1.5mm"><div class="card-progress-fill" style="width:20%;background:var(--red)"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-number">01</div>
+      <div class="feat-icon" style="background:rgba(58,142,255,0.1);border:1px solid rgba(58,142,255,0.25);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A8EFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <div class="feat-title">Courses & Lessons</div>
+      <div class="feat-desc">
+        Structured courses on CT exam subjects. Hierarchy: Course → Module → Lesson. Each lesson includes theory, examples and practice questions. 
+      </div>
+      <div class="mini-viz">
+        <div class="bar-chart">
+          <div class="bar-col" style="height:70%;background:rgba(58,142,255,0.3)"><div class="bar-val" style="color:#3a8eff">TRL</div></div>
+          <div class="bar-col" style="height:100%;background:rgba(230,57,70,0.3)"><div class="bar-val" style="color:var(--red)">Eng</div></div>
+          <div class="bar-col" style="height:50%;background:rgba(58,255,180,0.2)"><div class="bar-val" style="color:#3affb4">Math</div></div>
+          <div class="bar-col" style="height:85%;background:rgba(255,176,58,0.2)"><div class="bar-val" style="color:#ffb03a">Log</div></div>
+          <div class="bar-col" style="height:40%;background:rgba(160,106,255,0.2)"><div class="bar-val" style="color:#a06aff">IS</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat" style="background:rgba(230,57,70,0.015)">
+      <div class="feat-number">02</div>
+      <div class="feat-icon" style="background:var(--red-soft);border:1px solid rgba(230,57,70,0.3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E63946" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 12"/>
+        </svg>
+      </div>
+      <div class="feat-title">CT Mock Exam</div>
+      <div class="feat-desc">
+        Full-format exam: mandatory + elective subjects. Countdown timer, question navigation, automatic result checking with detailed explanations for each answer.
+      </div>
+      <div class="mini-viz">
+        <div class="timer-box">
+          <div class="timer-digits">01:24:38</div>
+          <div class="timer-label">Remaining</div>
+        </div>
+        <div class="q-grid">
+          <div class="q-cell done"></div><div class="q-cell done"></div>
+          <div class="q-cell done"></div><div class="q-cell now"></div>
+          <div class="q-cell"></div><div class="q-cell"></div>
+          <div class="q-cell"></div><div class="q-cell"></div>
+          <div class="q-cell done"></div><div class="q-cell done"></div>
+          <div class="q-cell"></div><div class="q-cell"></div>
+          <div class="q-cell done"></div><div class="q-cell"></div>
+          <div class="q-cell"></div><div class="q-cell"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="feat-number">03</div>
+      <div class="feat-icon" style="background:rgba(58,255,180,0.08);border:1px solid rgba(58,255,180,0.2);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3AFFB4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
+      <div class="feat-title">Statistics & Progress</div>
+      <div class="feat-desc">
+        Include total score, completed quizzes, average result. Animated ring charts and horizontal bar graphs showing performance for each individual test.
+      </div>
+      <div class="mini-viz" style="display:flex;justify-content:center;gap:9mm;">
+        <!-- Quizzes Passed ring -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2.5mm;">
+          <svg width="38mm" height="38mm" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke="#E63946" stroke-width="4"
+              stroke-linecap="round"
+              stroke-dasharray="113.1"
+              stroke-dashoffset="28.3"
+              transform="rotate(-90 22 22)"/>
+            <text x="22" y="21" text-anchor="middle" fill="#E63946" font-size="7.5" font-weight="800" font-family="'Syne',sans-serif">12</text>
+            <text x="22" y="27" text-anchor="middle" fill="rgba(241,241,248,0.3)" font-size="4" font-family="'JetBrains Mono',monospace">/ 20</text>
+          </svg>
+          <div style="font-size:7.5pt;font-weight:700;color:var(--text-muted);text-align:center;letter-spacing:.05em;text-transform:uppercase;">Quizzes Passed</div>
+        </div>
+        <!-- Total Score ring -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2.5mm;">
+          <svg width="38mm" height="38mm" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke="#3A8EFF" stroke-width="4"
+              stroke-linecap="round"
+              stroke-dasharray="113.1"
+              stroke-dashoffset="17.0"
+              transform="rotate(-90 22 22)"/>
+            <text x="22" y="21" text-anchor="middle" fill="#3A8EFF" font-size="7.5" font-weight="800" font-family="'Syne',sans-serif">240</text>
+            <text x="22" y="27" text-anchor="middle" fill="rgba(241,241,248,0.3)" font-size="4" font-family="'JetBrains Mono',monospace">pts</text>
+          </svg>
+          <div style="font-size:7.5pt;font-weight:700;color:var(--text-muted);text-align:center;letter-spacing:.05em;text-transform:uppercase;">Total Score</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About + Tech -->
+  <div class="info-row">
+    <div class="about-panel">
+      <div class="section-tag">About the Project</div>
+      <div class="section-title">Why OquMi?</div>
+      <div class="section-text">
+        In Kazakhstan, thousands of students take the Comprehensive Testing (CT) exam annually to enter master's degree programs. However, there are almost no quality online resources for systematic preparation.<br/><br/>
+        OquMi solves this problem: the platform combines structured courses, interactive quizzes, and a full-format mock exam with a countdown timer and automatic result checking.<br/><br/>
+        Students receive personal progress analytics, identify their weak areas, and can purposefully focus on the topics they need most.
+      </div>
+      <div class="tag-row">
+        <div class="tag">EdTech</div>
+        <div class="tag">E-Learning</div>
+        <div class="tag">CT Master's</div>
+        <div class="tag">Adaptive Learning</div>
+      </div>
+    </div>
+
+    <div class="tech-panel">
+      <div class="section-tag">Technology Stack</div>
+      <div class="section-title">Architecture & Tools</div>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-card-role">Frontend</div>
+          <div class="tech-badges">
+            <div class="tech-badge hl">React</div>
+            <div class="tech-badge">Vite</div>
+            <div class="tech-badge">TipTap</div>
+            <div class="tech-badge">Zustand</div>
+            <div class="tech-badge">Lucide</div>
+          </div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card-role">Backend</div>
+          <div class="tech-badges">
+            <div class="tech-badge hl">Django</div>
+            <div class="tech-badge">DRF</div>
+            <div class="tech-badge">Pillow</div>
+            <div class="tech-badge">PostgreSQL</div>
+          </div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card-role">LLM</div>
+          <div class="tech-badges">
+            <div class="tech-badge hl">FastAPI</div>
+            <div class="tech-badge">OpenAI API</div>
+            <div class="tech-badge">Pydantic</div>
+            <div class="tech-badge">Python</div>
+          </div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card-role">DevOps</div>
+          <div class="tech-badges">
+            <div class="tech-badge hl">GCP</div>
+            <div class="tech-badge">Cloud Run</div>
+            <div class="tech-badge">Docker</div>
+            <div class="tech-badge">Cloud Build</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <div class="footer-team">
+
+    <!-- ── Colour Palette ── -->
+    <div>
+      <div class="footer-label">Colour Palette</div>
+      <div style="display:flex;gap:6mm;align-items:center;">
+
+        <!-- Backgrounds -->
+        <div style="display:flex;flex-direction:column;gap:2mm;">
+          <div style="font-size:6.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);">Background</div>
+          <div style="display:flex;gap:1.5mm;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#0A0A0E;border:1px solid rgba(255,255,255,0.1);"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#0A0A0E</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#0D0D11;border:1px solid rgba(255,255,255,0.1);"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#0D0D11</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#13131A;border:1px solid rgba(255,255,255,0.1);"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#13131A</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#161620;border:1px solid rgba(255,255,255,0.1);"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#161620</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:1px;height:13mm;background:var(--border);flex-shrink:0;"></div>
+
+        <!-- Accent -->
+        <div style="display:flex;flex-direction:column;gap:2mm;">
+          <div style="font-size:6.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);">Accent</div>
+          <div style="display:flex;gap:1.5mm;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#FF3A3A;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#FF3A3A</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#FF5555;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#FF5555</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:1px;height:13mm;background:var(--border);flex-shrink:0;"></div>
+
+        <!-- Text -->
+        <div style="display:flex;flex-direction:column;gap:2mm;">
+          <div style="font-size:6.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);">Text</div>
+          <div style="display:flex;gap:1.5mm;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#FFFFFF;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#FFFFFF</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#F0F0FF;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#F0F0FF</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#B4B4D8;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#B4B4D8</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#7878A8;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#7878A8</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:1px;height:13mm;background:var(--border);flex-shrink:0;"></div>
+
+        <!-- Charts -->
+        <div style="display:flex;flex-direction:column;gap:2mm;">
+          <div style="font-size:6.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);">Charts</div>
+          <div style="display:flex;gap:1.5mm;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#3A8EFF;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#3A8EFF</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#3AFFB4;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#3AFFB4</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;">
+              <div style="width:9mm;height:9mm;border-radius:2mm;background:#4ADE80;"></div>
+              <span style="font-size:5pt;font-family:'JetBrains Mono',monospace;color:var(--text-muted);">#4ADE80</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Typography ── -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:3mm;">
+      <div class="footer-label">Typography</div>
+      <div style="display:flex;gap:4mm;flex:1;align-items:stretch;">
+
+        <!-- Syne — logo/display -->
+        <div style="background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:3mm;padding:3.5mm 5mm;display:flex;flex-direction:column;justify-content:space-between;flex:1;min-width:0;overflow:hidden;">
+          <div style="font-family:'Syne',sans-serif;font-size:18pt;font-weight:800;line-height:1;letter-spacing:-.02em;white-space:nowrap;">Oqu<span style="color:#FF3A3A;">Mi</span></div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:6.5pt;color:#FF3A3A;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5mm;">Syne</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:5.5pt;color:var(--text-muted);">Display · Logo · Headings</div>
+          </div>
+        </div>
+
+        <!-- Nunito — body -->
+        <div style="background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:3mm;padding:3.5mm 5mm;display:flex;flex-direction:column;justify-content:space-between;flex:1;min-width:0;overflow:hidden;">
+          <div style="font-family:'Nunito',sans-serif;font-size:13pt;font-weight:600;line-height:1.25;color:var(--text-primary);">Aa Bb Cc<br/><span style="font-size:9.5pt;color:var(--text-secondary);font-weight:400;">1 2 3 4 5</span></div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:6.5pt;color:#3A8EFF;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5mm;">Nunito</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:5.5pt;color:var(--text-muted);">Body · UI · Navigation</div>
+          </div>
+        </div>
+
+        <!-- JetBrains Mono — code -->
+        <div style="background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:3mm;padding:3.5mm 5mm;display:flex;flex-direction:column;justify-content:space-between;flex:1;min-width:0;overflow:hidden;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10pt;font-weight:600;line-height:1.4;color:#3AFFB4;">#FF3A3A<br/><span style="color:var(--text-muted);font-size:8pt;font-weight:400;">const px = 42;</span></div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:6.5pt;color:#3AFFB4;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5mm;">JetBrains Mono</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:5.5pt;color:var(--text-muted);">Code · Values · Labels</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div>
+      <div class="github-link"></div>
+    </div>
+  </div>
+
+  <!-- Team Members column -->
+  <div style="width:100mm;padding:10mm 12mm;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5mm;text-align:center;">
+    <div>
+      <div class="footer-label" style="margin-bottom:3mm;">Team</div>
+      <div style="font-size:15pt;font-weight:800;color:var(--text-primary);letter-spacing:-.01em;">Unicorn</div>
+    </div>
+    <div style="width:100%;height:1px;background:var(--border);"></div>
+    <div>
+      <div class="footer-label" style="margin-bottom:3mm;">Members</div>
+      <div style="display:flex;flex-direction:column;gap:2.5mm;align-items:center;">
+        <div style="font-size:12pt;font-weight:600;color:var(--text-primary);">Kapar Aida</div>
+        <div style="font-size:12pt;font-weight:600;color:var(--text-primary);">Zhokenov Akylbek</div>
+        <div style="font-size:12pt;font-weight:600;color:var(--text-primary);">Gilmanov Alisher</div>
+        <div style="font-size:12pt;font-weight:600;color:var(--text-primary);">Alimkulov Nurbol</div>
+        <div style="font-size:12pt;font-weight:600;color:var(--text-primary);">Moldabek Bekzat</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-meta">
+    <!-- QR centered -->
+    <div style="flex:1;display:flex;align-items:flex-start;justify-content:center;padding-top:4mm;">
+      <div id="qr-canvas"></div>
+    </div>
+    <!-- Bottom row: supervisor left, year right -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+      <div class="adviser-block">
+        <div class="footer-label">Scientific Supervisor</div>
+        <div class="adviser-name-val" style="font-size:13pt;">Bauyrzhan Berlikozha</div>
+      </div>
+      <div class="year-tag">KASKELEN · 2026</div>
+    </div>
+  </div>
+</div>
+
+</div>
+  <script>
+    new QRCode(document.getElementById("qr-canvas"), {
+      text: "https://bilimly-frontend-718606133437.us-central1.run.app/",
+      width: 256,
+      height: 256,
+      colorDark: "#E63946",
+      colorLight: "#0B0B10",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  </script>
+</body>
+</html>
