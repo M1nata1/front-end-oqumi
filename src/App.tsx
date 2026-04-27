@@ -3,6 +3,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import PublicRoute    from "@/router/PublicRoute";
 import ProtectedRoute from "@/router/ProtectedRoute";
+import ErrorBoundary  from "@/components/ErrorBoundary";
 
 import Landing    from "@/pages/Landing/Landing";
 import Auth       from "@/pages/Auth/Auth";
@@ -31,6 +32,7 @@ export default function App() {
   const location = useLocation();
 
   return (
+    <ErrorBoundary key={location.pathname}>
     <div key={location.key} className="page-enter">
       <Routes location={location}>
 
@@ -66,5 +68,6 @@ export default function App() {
 
       </Routes>
     </div>
+    </ErrorBoundary>
   );
 }
