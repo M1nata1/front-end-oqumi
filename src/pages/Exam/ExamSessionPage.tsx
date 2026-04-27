@@ -225,6 +225,8 @@ const SUBJECT_COLORS = ["#3A8EFF", "#FF3A3A", "#3AFFB4", "#FF9F3A", "#B43AFF"];
 const subjectColor = (i: number) => SUBJECT_COLORS[i % SUBJECT_COLORS.length];
 
 const EXAM_SESSION_KEY = "oqumi_exam_session";
+const EXAM_RESULT_KEY  = "oqumi_exam_result";
+
 interface SavedSession {
   examStartTime:  number;
   totalDuration:  number;
@@ -232,6 +234,11 @@ interface SavedSession {
   answers:        Record<number, number[]>;
   examData:       ExamData;
 }
+interface SavedResult {
+  checkResult: CheckResult;
+  examData:    ExamData;
+}
+
 function loadSession(profileSlug: string | null): SavedSession | null {
   try {
     const raw = localStorage.getItem(EXAM_SESSION_KEY);
@@ -250,6 +257,20 @@ function saveSession(patch: Partial<SavedSession>) {
 }
 function clearSession() {
   try { localStorage.removeItem(EXAM_SESSION_KEY); } catch { /* ignore */ }
+}
+
+function loadResult(): SavedResult | null {
+  try {
+    const raw = localStorage.getItem(EXAM_RESULT_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SavedResult;
+  } catch { return null; }
+}
+function saveResult(data: SavedResult) {
+  try { localStorage.setItem(EXAM_RESULT_KEY, JSON.stringify(data)); } catch { /* ignore */ }
+}
+function clearResult() {
+  try { localStorage.removeItem(EXAM_RESULT_KEY); } catch { /* ignore */ }
 }
 
 // ─── Main component ────────────────────────────────────────────
@@ -276,6 +297,16 @@ export default function ExamSessionPage() {
   useEffect(() => {
     if (fetched.current) return;
     fetched.current = true;
+
+    // Restore finished result if available (survives page refresh)
+    const savedResult = loadResult();
+    if (savedResult) {
+      setExamData(savedResult.examData);
+      setCheckResult(savedResult.checkResult);
+      setResultTab(0);
+      setPhase("result");
+      return;
+    }
 
     // Restore saved session if available
     const saved = loadSession(profileSlug);
@@ -398,6 +429,7 @@ export default function ExamSessionPage() {
       setCheckResult(data);
       setResultTab(0);
       setPhase("result");
+      saveResult({ checkResult: data, examData });
     } catch {
       setPhase("result");
     }
@@ -491,7 +523,7 @@ export default function ExamSessionPage() {
         {/* Nav */}
         <nav style={{ padding: ".9rem 2rem", background: `${COLORS.bgPage}EC`, backdropFilter: "blur(14px)", borderBottom: `1px solid ${COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}>
           <div
-            onClick={() => navigate("/exam")}
+            onClick={() => { clearResult(); navigate("/exam"); }}
             style={{ fontFamily: FONTS.display, fontSize: "1.28rem", fontWeight: 800, color: COLORS.textBody, cursor: "pointer", transition: "opacity .18s" }}
             onMouseEnter={e => (e.currentTarget.style.opacity = ".72")}
             onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
