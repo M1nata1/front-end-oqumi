@@ -177,13 +177,22 @@ export default function TopicPage() {
   const [apiQuizResults,     setApiQuizResults]     = useState<ApiCheckResult[] | null>(null);
   const [apiQuizChecking,    setApiQuizChecking]    = useState(false);
 
+  // ── Поиск ─────────────────────────────────────────────────────
+  const [searchQuery,      setSearchQuery]      = useState("");
+  const [searchFading,     setSearchFading]     = useState(false);
+  const [displayedLessons, setDisplayedLessons] = useState<ApiLesson[]>([]);
+  const [matchCount,       setMatchCount]       = useState(0);
+  const [matchIndex,       setMatchIndex]       = useState(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const matchMarksRef  = useRef<HTMLElement[]>([]);
+
   // ── Загрузка API-уроков ───────────────────────────────────────
   useEffect(() => {
     if (!useApi) return;
     setApiLoading(true);
     fetch(`${API_BASE}/courses/${courseId}/lessons/`)
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setApiLessons(data as ApiLesson[]); })
+      .then(data => { if (data) { setApiLessons(data as ApiLesson[]); setDisplayedLessons(data as ApiLesson[]); } })
       .catch(() => {})
       .finally(() => setApiLoading(false));
   }, [courseId, useApi]);
@@ -228,6 +237,96 @@ export default function TopicPage() {
     } catch { /* ignore */ }
     setApiQuizChecking(false);
   };
+
+  // ── Поиск: функции ───────────────────────────────────────────
+  function clearHighlights() {
+    matchMarksRef.current.forEach(mark => {
+      const parent = mark.parentNode;
+      if (!parent) return;
+      parent.replaceChild(document.createTextNode(mark.textContent ?? ""), mark);
+      parent.normalize();
+    });
+    matchMarksRef.current = [];
+    setMatchCount(0);
+    setMatchIndex(0);
+  }
+
+  function applyHighlights(query: string): HTMLElement[] {
+    const container = document.querySelector(".tiptap-content .ProseMirror");
+    if (!container || !query.trim()) return [];
+    const q = query.toLowerCase();
+    const marks: HTMLElement[] = [];
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const textNodes: Text[] = [];
+    let node: Node | null;
+    while ((node = walker.nextNode())) textNodes.push(node as Text);
+    textNodes.forEach(textNode => {
+      const text = textNode.textContent ?? "";
+      const lower = text.toLowerCase();
+      if (!lower.includes(q)) return;
+      const parent = textNode.parentNode;
+      if (!parent) return;
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      let idx = lower.indexOf(q, 0);
+      while (idx !== -1) {
+        if (idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+        const mark = document.createElement("mark");
+        mark.dataset.sh = "1";
+        mark.textContent = text.slice(idx, idx + query.length);
+        frag.appendChild(mark);
+        marks.push(mark);
+        last = idx + query.length;
+        idx = lower.indexOf(q, last);
+      }
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      parent.replaceChild(frag, textNode);
+    });
+    return marks;
+  }
+
+  function goToMatch(marks: HTMLElement[], idx: number) {
+    marks.forEach((m, i) => {
+      m.style.background = i === idx ? "rgba(255,160,0,0.65)" : "";
+      m.style.outline    = i === idx ? "1px solid rgba(255,160,0,0.6)" : "";
+    });
+    marks[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function handleSearch(q: string) {
+    setSearchQuery(q);
+    // Fade + filter lesson list
+    setSearchFading(true);
+    setTimeout(() => {
+      setDisplayedLessons((apiLessons ?? []).filter(l => l.title.toLowerCase().includes(q.toLowerCase())));
+      setSearchFading(false);
+    }, 150);
+    // Highlight matching text in content
+    clearHighlights();
+    if (q.trim()) {
+      const marks = applyHighlights(q);
+      matchMarksRef.current = marks;
+      setMatchCount(marks.length);
+      setMatchIndex(0);
+      if (marks.length) goToMatch(marks, 0);
+    }
+  }
+
+  function goNext() {
+    const marks = matchMarksRef.current;
+    if (!marks.length) return;
+    const next = (matchIndex + 1) % marks.length;
+    setMatchIndex(next);
+    goToMatch(marks, next);
+  }
+
+  function goPrev() {
+    const marks = matchMarksRef.current;
+    if (!marks.length) return;
+    const prev = (matchIndex - 1 + marks.length) % marks.length;
+    setMatchIndex(prev);
+    goToMatch(marks, prev);
+  }
 
   // ── Загрузка контента ─────────────────────────────────────────
   useEffect(() => {
@@ -326,6 +425,33 @@ export default function TopicPage() {
     };
   }, [tocItems]);
 
+  // ── Поиск: Ctrl+F фокусирует строку в сайдбаре ──────────────
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  // ── Поиск: сброс при смене урока ──────────────────────────────
+  useEffect(() => {
+    setSearchQuery("");
+    setSearchFading(false);
+    setDisplayedLessons(apiLessons ?? []);
+    matchMarksRef.current.forEach(mark => {
+      const parent = mark.parentNode;
+      if (parent) { parent.replaceChild(document.createTextNode(mark.textContent ?? ""), mark); parent.normalize(); }
+    });
+    matchMarksRef.current = [];
+    setMatchCount(0);
+    setMatchIndex(0);
+  }, [topicId]);
+
   // ── Навигация prev/next ───────────────────────────────────────
   const allLessons = useMemo(
     () => apiLessons?.map(l => ({ id: String(l.id), title: l.title })) ?? [],
@@ -333,6 +459,12 @@ export default function TopicPage() {
   );
 
   const currentIdx = allLessons.findIndex(l => l.id === topicId);
+
+  const filteredTocItems = useMemo(() => {
+    if (!searchQuery.trim()) return tocItems;
+    const q = searchQuery.toLowerCase();
+    return tocItems.filter(item => item.text.toLowerCase().includes(q));
+  }, [tocItems, searchQuery]);
 
   // ── Заголовок урока ───────────────────────────────────────────
   // course_name из API = название модуля (например "База данных")
@@ -521,6 +653,22 @@ export default function TopicPage() {
 
         @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
         .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:6px}
+
+        /* ── Поиск ── */
+        mark[data-sh]{background:rgba(255,200,0,0.28);color:inherit;border-radius:2px;padding:0 1px}
+        .s-search{
+          width:100%;background:rgba(255,255,255,0.03);
+          border:1px solid ${COLORS.border};border-radius:7px;
+          padding:.4rem .6rem .4rem 1.95rem;
+          color:${COLORS.textPrimary};font-family:${FONTS.body};font-size:.78rem;
+          outline:none;transition:border-color .2s;
+        }
+        .s-search:focus{border-color:rgba(255,255,255,0.16)}
+        .s-search::placeholder{color:${COLORS.textFaint}}
+        .s-lesson-list{transition:opacity .15s ease,transform .15s ease}
+        .s-lesson-list.fading{opacity:0 !important;transform:translateY(4px) !important}
+        .search-nav-btn{background:none;border:none;color:${COLORS.textMuted};cursor:pointer;padding:2px 4px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+        .search-nav-btn:hover{background:rgba(255,255,255,0.08);color:${COLORS.textBody}}
       `}</style>
 
       <DashboardNav />
@@ -559,22 +707,63 @@ export default function TopicPage() {
             </div>
           </div>
 
-          {/* Плоский список уроков из API */}
+          {/* Поиск */}
+          <div style={{ padding: ".5rem .75rem", borderBottom: `1px solid ${COLORS.border}`, position: "relative", display: "flex", alignItems: "center", gap: ".35rem" }}>
+            <svg style={{ position: "absolute", left: "1.45rem", top: "50%", transform: "translateY(-50%)", opacity: .32, pointerEvents: "none", flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+              <circle cx="8.5" cy="8.5" r="5.5" stroke="#FAFAFF" strokeWidth="1.7"/>
+              <path d="M13 13l3.5 3.5" stroke="#FAFAFF" strokeWidth="1.7" strokeLinecap="round"/>
+            </svg>
+            <input
+              ref={searchInputRef}
+              className="s-search"
+              type="text"
+              placeholder="Поиск..."
+              value={searchQuery}
+              onChange={e => handleSearch(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === "Enter") { e.preventDefault(); e.shiftKey ? goPrev() : goNext(); }
+                if (e.key === "Escape") handleSearch("");
+              }}
+            />
+            {searchQuery && matchCount > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: "1px", flexShrink: 0 }}>
+                <span style={{ fontSize: ".62rem", color: COLORS.textFaint, minWidth: "26px", textAlign: "center" }}>
+                  {matchIndex + 1}/{matchCount}
+                </span>
+                <button className="search-nav-btn" onClick={goPrev} title="Предыдущее (Shift+Enter)">
+                  <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 6.5l3-3 3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+                <button className="search-nav-btn" onClick={goNext} title="Следующее (Enter)">
+                  <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Список уроков */}
           {apiLoading && (
             <div style={{ padding: ".75rem 1.25rem", fontSize: ".78rem", color: COLORS.textFaint }}>Загрузка...</div>
           )}
-          {apiLessons?.map((l, i) => (
-            <div
-              key={l.id}
-              className={`sidebar-lesson${String(l.id) === topicId ? " active" : ""}`}
-              onClick={() => navigate(`/courses/${courseId}/${l.id}`, { state: { courseName: stateCourseName, categoryName: stateCategoryName, categoryCode: stateCategoryCode } })}
-            >
-              <span style={{ fontSize: ".6rem", fontWeight: 800, width: "16px", flexShrink: 0, textAlign: "right" }}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              {l.title}
-            </div>
-          ))}
+          <div className={`s-lesson-list${searchFading ? " fading" : ""}`}>
+            {!searchFading && displayedLessons.length === 0 && searchQuery && (
+              <div style={{ padding: ".6rem 1.25rem", fontSize: ".75rem", color: COLORS.textFaint, fontStyle: "italic" }}>Ничего не найдено</div>
+            )}
+            {displayedLessons.map(l => {
+              const origIdx = (apiLessons ?? []).findIndex(a => a.id === l.id);
+              return (
+                <div
+                  key={l.id}
+                  className={`sidebar-lesson${String(l.id) === topicId ? " active" : ""}`}
+                  onClick={() => navigate(`/courses/${courseId}/${l.id}`, { state: { courseName: stateCourseName, categoryName: stateCategoryName, categoryCode: stateCategoryCode } })}
+                >
+                  <span style={{ fontSize: ".6rem", fontWeight: 800, width: "16px", flexShrink: 0, textAlign: "right" }}>
+                    {String(origIdx + 1).padStart(2, "0")}
+                  </span>
+                  {l.title}
+                </div>
+              );
+            })}
+          </div>
         </aside>
 
         {/* ── Основной контент ── */}
@@ -886,10 +1075,10 @@ export default function TopicPage() {
 
         {/* ── TOC — содержание темы ── */}
         <aside className="topic-toc">
-          {tocItems.length > 0 && (
+          {filteredTocItems.length > 0 && (
             <>
               <div className="toc-title">Содержание</div>
-              {tocItems.map(item => (
+              {filteredTocItems.map(item => (
                 <div
                   key={item.id}
                   className={`toc-item${activeId === item.id ? " active" : ""}`}
