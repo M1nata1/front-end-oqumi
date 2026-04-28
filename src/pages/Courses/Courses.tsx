@@ -213,7 +213,7 @@ export default function Courses() {
 
         {/* Grid */}
         {!loading && (fading || displayed.length > 0) && (
-          <div className={`c-grid fade-up-4${fading ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem" }}>
+          <div className={`c-grid${fading ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem" }}>
             {displayed.map(cat => {
               const { bg, bar } = catPalette(cat.code);
               const imgUrl      = mediaUrl(cat.image);
