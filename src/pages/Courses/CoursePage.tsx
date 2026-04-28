@@ -123,7 +123,7 @@ export default function CoursePage() {
       <link href={FONTS.googleUrl} rel="stylesheet" />
       <style>{`
         *{box-sizing:border-box;margin:0;padding:0}
-        .lesson-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-radius:9px;cursor:pointer;transition:background .15s;gap:1rem}
+        .lesson-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-radius:9px;cursor:pointer;transition:background .15s;gap:1rem;animation:rowIn .22s ease both}
         .lesson-row:hover{background:rgba(255,255,255,0.04)}
         .lesson-arrow{color:${COLORS.textFaint};font-size:.85rem;transition:transform .15s,color .15s;flex-shrink:0}
         .lesson-row:hover .lesson-arrow{transform:translateX(3px);color:${COLORS.accent}}
@@ -133,7 +133,8 @@ export default function CoursePage() {
         .c-search:focus{border-color:rgba(255,255,255,0.22)}
         .c-search::placeholder{color:${COLORS.textFaint}}
         .lesson-list{transition:opacity .15s ease,transform .15s ease}
-        .lesson-list.fading{opacity:0;transform:translateY(4px)}
+        .lesson-list.fading{opacity:0 !important;transform:translateY(4px) !important}
+        @keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
       `}</style>
 
       <DashboardNav />

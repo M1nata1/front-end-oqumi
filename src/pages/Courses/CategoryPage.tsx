@@ -203,6 +203,7 @@ export default function CategoryPage() {
         .m-grid{transition:opacity .15s ease,transform .15s ease}
         .m-grid.fading{opacity:0 !important;transform:translateY(4px) !important}
         @keyframes cardIn{from{opacity:0;transform:translateY(6px) scale(0.97)}to{opacity:1;transform:none}}
+        .m-card{animation:cardIn .25s ease both}
         .lesson-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
         .lesson-scroll::-webkit-scrollbar{width:4px}
         .lesson-scroll::-webkit-scrollbar-track{background:transparent}
@@ -261,7 +262,7 @@ export default function CategoryPage() {
 
         {/* Grid */}
         {(fading || displayed.length > 0) && (
-          <div className={`m-grid fade-up-4${fading ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", alignItems: "start" }}>
+          <div className={`m-grid${fading ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", alignItems: "start" }}>
             {displayed.map((mod: ApiCourse) => {
               const { bg, bar } = slugPalette(mod.slug);
               const imgUrl      = mediaUrl(mod.image);
@@ -271,7 +272,7 @@ export default function CategoryPage() {
               const progress    = lessons.length > 0 ? visitedInMod / lessons.length : 0;
 
               return (
-                <div key={mod.slug} style={{
+                <div key={mod.slug} className="m-card" style={{
                   background: COLORS.bgCard,
                   border: `1px solid ${COLORS.border}`,
                   borderRadius: "16px",
