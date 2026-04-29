@@ -968,24 +968,6 @@ export default function ExamSessionPage() {
         {/* ── Sidebar ── */}
         <div className="exam-sidebar-wrap" style={{ position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: ".75rem" }}>
 
-          {/* Subject tabs */}
-          <div style={{ display: "flex", flexDirection: "column", gap: ".3rem" }}>
-            {examData.subjects.map((s, i) => {
-              const color = subjectColor(i);
-              const isAct = activeTab === i;
-              return (
-                <button
-                  key={s.name}
-                  className={`sub-tab${isAct ? " active" : ""}`}
-                  style={{ borderColor: isAct ? color + "40" : "transparent", color: isAct ? color : undefined, background: isAct ? color + "0D" : undefined }}
-                  onClick={() => { setActiveTab(i); setCurrent(subjectStart[i]); }}
-                >
-                  {s.name}
-                </button>
-              );
-            })}
-          </div>
-
           {/* Question grid */}
           <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "12px", padding: ".9rem" }}>
             <div style={{ fontSize: ".62rem", fontWeight: 700, color: COLORS.textFaint, textTransform: "uppercase", letterSpacing: ".09em", marginBottom: ".7rem" }}>
@@ -1022,15 +1004,6 @@ export default function ExamSessionPage() {
             </div>
           </div>
 
-          {/* Total counter */}
-          <div style={{ background: COLORS.bgCard, border: `1px solid ${COLORS.border}`, borderRadius: "10px", padding: ".7rem 1rem", textAlign: "center" }}>
-            <div className="num" style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: "1.1rem", color: COLORS.textPrimary }}>
-              {answeredCount}<span style={{ fontWeight: 400, fontSize: ".75rem", color: COLORS.textFaint }}>/{flatQ.length}</span>
-            </div>
-            <div style={{ fontSize: ".62rem", color: COLORS.textFaint, marginTop: ".2rem", textTransform: "uppercase", letterSpacing: ".07em" }}>
-              отмечено
-            </div>
-          </div>
         </div>
 
       </div>
