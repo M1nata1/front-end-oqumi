@@ -289,6 +289,8 @@ export default function ExamSessionPage() {
   const [timeLeft,    setTimeLeft]    = useState(0);
   const [activeTab,   setActiveTab]   = useState(0);
   const [resultTab,   setResultTab]   = useState(0);
+  const [displayedTab, setDisplayedTab] = useState(0);
+  const [cardsPhase,   setCardsPhase]   = useState<"idle" | "out">("idle");
   const timerRef    = useRef<number | null>(null);
   const fetched     = useRef(false);
   const answersRef  = useRef<Record<number, number[]>>({});
@@ -393,6 +395,14 @@ export default function ExamSessionPage() {
     });
   };
 
+  // ── Tab switch with animation ───────────────────────────────
+  function switchResultTab(i: number) {
+    if (i === displayedTab) { setResultTab(i); return; }
+    setResultTab(i);
+    setCardsPhase("out");
+    setTimeout(() => { setDisplayedTab(i); setCardsPhase("idle"); }, 200);
+  }
+
   // ── Submit ──────────────────────────────────────────────────
   const submitExam = async () => {
     if (!examData) return;
@@ -465,7 +475,7 @@ export default function ExamSessionPage() {
 
   // ─── Result phase ──────────────────────────────────────────
   if (phase === "result" && checkResult) {
-    const tabSub   = checkResult.subjects[resultTab];
+    const tabSub   = checkResult.subjects[displayedTab];
     const pct      = checkResult.total_score_sum > 0
       ? Math.round((checkResult.total_get_score / checkResult.total_score_sum) * 100)
       : 0;
@@ -518,6 +528,11 @@ export default function ExamSessionPage() {
             display:inline-flex;align-items:center;padding:.25rem .7rem;
             border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.04em
           }
+
+          @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+          .cards-wrap{transition:opacity .2s ease,transform .2s ease}
+          .cards-wrap.out{opacity:0 !important;transform:translateY(8px) !important}
+          .q-row-anim{animation:cardIn .32s ease both}
         `}</style>
 
         {/* Nav */}
@@ -652,7 +667,7 @@ export default function ExamSessionPage() {
                 const correct = s.problems.filter(p => p.is_correct).length;
                 const color   = subjectColor(i);
                 return (
-                  <button key={s.name} className={`r-tab${resultTab === i ? " active" : ""}`} onClick={() => setResultTab(i)}>
+                  <button key={s.name} className={`r-tab${resultTab === i ? " active" : ""}`} onClick={() => switchResultTab(i)}>
                     <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: color, display: "inline-block", flexShrink: 0 }} />
                     {s.name}
                     <span style={{
@@ -669,13 +684,13 @@ export default function ExamSessionPage() {
 
             {/* Question rows */}
             {tabSub && (
-              <div className="fu4">
+              <div className={`cards-wrap${cardsPhase === "out" ? " out" : ""}`}>
                 {tabSub.problems.map((p, i) => {
                   const orig     = examData.subjects.find(s => s.name === tabSub.name)?.problems.find(pr => pr.id === p.id);
                   const skipped  = !p.selected || p.selected.length === 0;
                   const rowClass = p.is_correct ? "correct" : skipped ? "skipped" : "wrong";
                   return (
-                    <div key={p.id} className={`q-row ${rowClass}`}>
+                    <div key={p.id} className={`q-row ${rowClass} q-row-anim`} style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}>
 
                       {/* Index badge */}
                       <div style={{
