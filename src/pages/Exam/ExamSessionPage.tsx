@@ -293,9 +293,11 @@ export default function ExamSessionPage() {
   const [cardsPhase,   setCardsPhase]   = useState<"idle" | "out">("idle");
   const [resultSearch,    setResultSearch]    = useState("");
   const [displayedSearch, setDisplayedSearch] = useState("");
-  const timerRef    = useRef<number | null>(null);
-  const fetched     = useRef(false);
-  const answersRef  = useRef<Record<number, number[]>>({});
+  const timerRef      = useRef<number | null>(null);
+  const fetched       = useRef(false);
+  const answersRef    = useRef<Record<number, number[]>>({});
+  const submittingRef = useRef(false);
+  const submitExamRef = useRef<() => Promise<void>>(async () => {});
 
   // ── Fetch exam ──────────────────────────────────────────────
   useEffect(() => {
@@ -358,7 +360,7 @@ export default function ExamSessionPage() {
     const initial = timeLeft;
     timerRef.current = window.setInterval(() => {
       const next = initial - Math.floor((Date.now() - start) / 1000);
-      if (next <= 0) { setTimeLeft(0); submitExam(); }
+      if (next <= 0) { setTimeLeft(0); void submitExamRef.current(); }
       else setTimeLeft(next);
     }, 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
@@ -445,12 +447,21 @@ export default function ExamSessionPage() {
 
   // ── Submit ──────────────────────────────────────────────────
   const submitExam = async () => {
-    if (!examData) return;
+    if (!examData || submittingRef.current) return;
+    submittingRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
     clearSession();
     setPhase("checking");
 
     const snapshot = answersRef.current;
+    const fallback: CheckResult = {
+      total_get_score: 0,
+      total_score_sum: examData.total_score_sum,
+      subjects: examData.subjects.map(s => ({
+        name: s.name, total_score_get: 0,
+        problems: s.problems.map(p => ({ id: p.id, correct: [], selected: snapshot[p.id] ?? null, explanation: null, is_correct: false })),
+      })),
+    };
     const payload = examData.subjects.map(s => ({
       name: s.name,
       problems: s.problems.map(p => ({
@@ -468,22 +479,21 @@ export default function ExamSessionPage() {
         },
         body: JSON.stringify(payload),
       });
-      const data: CheckResult = res.ok ? await res.json() : {
-        total_get_score: 0,
-        total_score_sum: examData.total_score_sum,
-        subjects: examData.subjects.map(s => ({
-          name: s.name, total_score_get: 0,
-          problems: s.problems.map(p => ({ id: p.id, correct: [], selected: snapshot[p.id] ?? null, explanation: null, is_correct: false })),
-        })),
-      };
+      const data: CheckResult = res.ok ? await res.json() : fallback;
       setCheckResult(data);
       setResultTab(0);
+      setDisplayedTab(0);
       setPhase("result");
       saveResult({ checkResult: data, examData });
     } catch {
+      setCheckResult(fallback);
+      setResultTab(0);
+      setDisplayedTab(0);
       setPhase("result");
+      saveResult({ checkResult: fallback, examData });
     }
   };
+  submitExamRef.current = submitExam;
 
   // ─── Loading ───────────────────────────────────────────────
   if (phase === "loading") {
@@ -495,7 +505,7 @@ export default function ExamSessionPage() {
           @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
           .skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:8px}
         `}</style>
-        <nav style={{ padding: ".9rem 2rem", background: `${COLORS.bgPage}EC`, backdropFilter: "blur(14px)", borderBottom: `1px solid ${COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <nav style={{ padding: ".9rem 2rem", background: `${COLORS.bgPage}EC`, backdropFilter: "blur(14px)", borderBottom: `1px solid ${COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
           <div className="skel" style={{ width: "100px", height: "20px" }} />
           <div className="skel" style={{ width: "80px", height: "32px", borderRadius: "8px" }} />
         </nav>
@@ -949,7 +959,7 @@ export default function ExamSessionPage() {
         background: `${COLORS.bgPage}F2`, backdropFilter: "blur(18px)",
         borderBottom: `1px solid ${COLORS.border}`,
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        position: "sticky", top: 0, zIndex: 200, gap: "1.5rem",
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, gap: "1.5rem",
       }}>
         {/* Logo */}
         <div style={{ fontFamily: FONTS.display, fontSize: "1.28rem", fontWeight: 800, color: COLORS.textBody, flexShrink: 0 }}>
@@ -1019,7 +1029,7 @@ export default function ExamSessionPage() {
       </nav>
 
       {/* ── Body ── */}
-      <div className="exam-grid" style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", display: "grid", gridTemplateColumns: "1fr 248px", gap: "1.25rem", alignItems: "start" }}>
+      <div className="exam-grid" style={{ maxWidth: "1160px", margin: "0 auto", padding: "1.25rem 1.5rem", paddingTop: "calc(76px + 1.25rem)", display: "grid", gridTemplateColumns: "1fr 248px", gap: "1.25rem", alignItems: "start" }}>
 
         {/* ── Question area ── */}
         {q && (
