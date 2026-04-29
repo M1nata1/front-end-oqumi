@@ -1,6 +1,6 @@
 // src/pages/Dashboard/DashboardNav.tsx
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Fragment } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { BRAND, COLORS, FONTS, COPY } from "./dashboard.config";
@@ -51,13 +51,14 @@ export default function DashboardNav() {
   const initial = (user?.name ?? "?")[0].toUpperCase();
 
   return (
+    <Fragment>
     <nav style={{
       padding: ".9rem 2.5rem",
       background: `${COLORS.bgPage}EC`,
       backdropFilter: "blur(14px)",
       borderBottom: `1px solid ${COLORS.border}`,
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      position: "sticky", top: 0, zIndex: 100,
+      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
     }}>
       <div
         onClick={() => navigate("/courses")}
@@ -167,5 +168,7 @@ export default function DashboardNav() {
         </div>
       </div>
     </nav>
+    <div aria-hidden style={{ height: "57px", flexShrink: 0 }} />
+    </Fragment>
   );
 }
