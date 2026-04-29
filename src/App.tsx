@@ -8,6 +8,7 @@ import ErrorBoundary  from "@/components/ErrorBoundary";
 import Landing    from "@/pages/Landing/Landing";
 import Auth       from "@/pages/Auth/Auth";
 import FAQ        from "@/pages/FAQ/FAQ";
+import Policy     from "@/pages/Policy/Policy";
 import TrialExam  from "@/pages/Exam/TrialExam";
 import ExamPage        from "@/pages/Exam/ExamPage";
 import ExamSessionPage from "@/pages/Exam/ExamSessionPage";
@@ -39,7 +40,7 @@ export default function App() {
         {/* ── Полностью публичные (без проверки авторизации) ── */}
         <Route path="/faq"        element={<FAQ />} />
         <Route path="/exam/trial" element={<TrialExam />} />
-        {/* <Route path="/policy"  element={<Policy />} /> */}
+        <Route path="/policy"  element={<Policy />} />
 
         {/* ── Публичные, авторизованный → /dashboard ── */}
         <Route element={<PublicRoute />}>
