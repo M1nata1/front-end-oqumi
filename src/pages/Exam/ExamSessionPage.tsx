@@ -429,10 +429,12 @@ export default function ExamSessionPage() {
 
   // ── Tab switch with animation ───────────────────────────────
   function switchResultTab(i: number) {
-    if (i === displayedTab) { setResultTab(i); return; }
+    const hasSearch = displayedSearch.trim().length > 0;
+    setResultSearch("");
     setResultTab(i);
+    if (i === displayedTab && !hasSearch) return;
     setCardsPhase("out");
-    setTimeout(() => { setDisplayedTab(i); setCardsPhase("idle"); }, 200);
+    setTimeout(() => { setDisplayedTab(i); setDisplayedSearch(""); setCardsPhase("idle"); }, 200);
   }
 
   function handleResultSearch(q: string) {
