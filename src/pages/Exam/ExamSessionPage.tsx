@@ -291,6 +291,8 @@ export default function ExamSessionPage() {
   const [resultTab,   setResultTab]   = useState(0);
   const [displayedTab, setDisplayedTab] = useState(0);
   const [cardsPhase,   setCardsPhase]   = useState<"idle" | "out">("idle");
+  const [resultSearch,    setResultSearch]    = useState("");
+  const [displayedSearch, setDisplayedSearch] = useState("");
   const timerRef    = useRef<number | null>(null);
   const fetched     = useRef(false);
   const answersRef  = useRef<Record<number, number[]>>({});
@@ -395,12 +397,50 @@ export default function ExamSessionPage() {
     });
   };
 
+  // ── All problems flat list (for cross-subject search) ──────
+  const allCheckProblems = useMemo(() => {
+    if (!checkResult || !examData) return [];
+    return checkResult.subjects.flatMap((s, si) =>
+      s.problems.map((p, li) => ({
+        problem: p,
+        subject: s,
+        subjectIdx: si,
+        orig: examData.subjects.find(es => es.name === s.name)?.problems.find(pr => pr.id === p.id),
+        localIdx: li,
+      }))
+    );
+  }, [checkResult, examData]);
+
+  const filteredProblems = useMemo(() => {
+    if (!displayedSearch.trim()) return null;
+    const q = displayedSearch.toLowerCase();
+    return allCheckProblems.filter(item => {
+      const text = item.orig ? problemText(item.orig.content) : `Вопрос ${item.problem.id}`;
+      return text.toLowerCase().includes(q);
+    });
+  }, [displayedSearch, allCheckProblems]);
+
+  // Sync result tab highlight to first search result's subject
+  useEffect(() => {
+    if (filteredProblems && filteredProblems.length > 0) {
+      setResultTab(filteredProblems[0].subjectIdx);
+    }
+  }, [filteredProblems]);
+
   // ── Tab switch with animation ───────────────────────────────
   function switchResultTab(i: number) {
-    if (i === displayedTab) { setResultTab(i); return; }
+    const hasSearch = displayedSearch.trim().length > 0;
+    setResultSearch("");
     setResultTab(i);
+    if (i === displayedTab && !hasSearch) return;
     setCardsPhase("out");
-    setTimeout(() => { setDisplayedTab(i); setCardsPhase("idle"); }, 200);
+    setTimeout(() => { setDisplayedTab(i); setDisplayedSearch(""); setCardsPhase("idle"); }, 200);
+  }
+
+  function handleResultSearch(q: string) {
+    setResultSearch(q);
+    setCardsPhase("out");
+    setTimeout(() => { setDisplayedSearch(q); setCardsPhase("idle"); }, 200);
   }
 
   // ── Submit ──────────────────────────────────────────────────
@@ -533,6 +573,15 @@ export default function ExamSessionPage() {
           .cards-wrap{transition:opacity .2s ease,transform .2s ease}
           .cards-wrap.out{opacity:0 !important;transform:translateY(8px) !important}
           .q-row-anim{animation:cardIn .32s ease both}
+
+          .r-search{
+            width:100%;background:${COLORS.bgCard};border:1px solid ${COLORS.border};
+            border-radius:10px;padding:.7rem 1rem .7rem 2.6rem;
+            color:${COLORS.textPrimary};font-family:${FONTS.body};font-size:.85rem;
+            outline:none;transition:border-color .2s;
+          }
+          .r-search:focus{border-color:rgba(255,255,255,0.18)}
+          .r-search::placeholder{color:${COLORS.textFaint}}
         `}</style>
 
         {/* Nav */}
@@ -682,76 +731,154 @@ export default function ExamSessionPage() {
               })}
             </div>
 
+            {/* Search */}
+            <div style={{ position: "relative", marginBottom: "1.25rem" }}>
+              <svg style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", opacity: .4, pointerEvents: "none" }} width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <circle cx="8.5" cy="8.5" r="5.5" stroke="#FAFAFF" strokeWidth="1.6"/>
+                <path d="M13 13l3.5 3.5" stroke="#FAFAFF" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+              <input
+                className="r-search"
+                type="text"
+                placeholder="Поиск по вопросам всех предметов..."
+                value={resultSearch}
+                onChange={e => handleResultSearch(e.target.value)}
+                onKeyDown={e => { if (e.key === "Escape") handleResultSearch(""); }}
+              />
+              {resultSearch && (
+                <div style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", fontSize: ".72rem", color: COLORS.textFaint, pointerEvents: "none" }}>
+                  {filteredProblems?.length ?? 0} / {allCheckProblems.length}
+                </div>
+              )}
+            </div>
+
             {/* Question rows */}
-            {tabSub && (
+            {(tabSub || filteredProblems !== null) && (
               <div className={`cards-wrap${cardsPhase === "out" ? " out" : ""}`}>
-                {tabSub.problems.map((p, i) => {
-                  const orig     = examData.subjects.find(s => s.name === tabSub.name)?.problems.find(pr => pr.id === p.id);
-                  const skipped  = !p.selected || p.selected.length === 0;
-                  const rowClass = p.is_correct ? "correct" : skipped ? "skipped" : "wrong";
-                  return (
-                    <div key={p.id} className={`q-row ${rowClass} q-row-anim`} style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}>
-
-                      {/* Index badge */}
-                      <div style={{
-                        flexShrink: 0, width: "28px", height: "28px", borderRadius: "8px",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        background: p.is_correct ? "rgba(74,222,128,0.12)" : skipped ? "rgba(255,255,255,0.05)" : "rgba(255,58,58,0.1)",
-                        border: `1px solid ${p.is_correct ? "rgba(74,222,128,0.25)" : skipped ? "rgba(255,255,255,0.08)" : "rgba(255,58,58,0.22)"}`,
-                      }}>
-                        <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: ".65rem", color: p.is_correct ? "#4ADE80" : skipped ? COLORS.textFaint : COLORS.accent }}>
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
+                {filteredProblems !== null
+                  ? filteredProblems.length === 0
+                    ? (
+                      <div style={{ textAlign: "center", padding: "2.5rem", color: COLORS.textFaint, fontSize: ".85rem" }}>
+                        Ничего не найдено
                       </div>
-
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: ".86rem", fontWeight: 600, color: COLORS.textPrimary, marginBottom: ".45rem", lineHeight: 1.55 }}>
-                          {orig ? problemText(orig.content) : `Вопрос ${p.id}`}
-                        </p>
-
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem .9rem" }}>
-                          {orig && p.correct.length > 0 && (
-                            <span style={{ fontSize: ".75rem", color: "#4ADE80", display: "flex", alignItems: "center", gap: ".3rem" }}>
-                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#4ADE80" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                              {p.correct.map(ci => orig.options[ci]).filter(Boolean).join(", ")}
-                            </span>
-                          )}
-                          {!p.is_correct && !skipped && p.selected && orig && (
-                            <span style={{ fontSize: ".75rem", color: "#FF6B6B", display: "flex", alignItems: "center", gap: ".3rem" }}>
-                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                              {p.selected.map(si => orig.options[si]).filter(Boolean).join(", ")}
-                            </span>
-                          )}
-                          {skipped && (
-                            <span style={{ fontSize: ".75rem", color: COLORS.textFaint }}>Пропущен</span>
-                          )}
-                        </div>
-
-                        {p.explanation && (
-                          <div style={{ marginTop: ".5rem", padding: ".5rem .75rem", background: "rgba(255,255,255,0.03)", borderRadius: "8px", borderLeft: `3px solid ${COLORS.border}` }}>
-                            <p style={{ fontSize: ".74rem", color: COLORS.textMuted, lineHeight: 1.6 }}>
-                              {p.explanation}
-                            </p>
+                    )
+                    : filteredProblems.map(({ problem: p, subject: subj, subjectIdx: subIdx, orig, localIdx }, i) => {
+                        const skipped  = !p.selected || p.selected.length === 0;
+                        const rowClass = p.is_correct ? "correct" : skipped ? "skipped" : "wrong";
+                        const color    = subjectColor(subIdx);
+                        return (
+                          <div key={p.id} className={`q-row ${rowClass} q-row-anim`} style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}>
+                            <div style={{
+                              flexShrink: 0, width: "28px", height: "28px", borderRadius: "8px",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              background: p.is_correct ? "rgba(74,222,128,0.12)" : skipped ? "rgba(255,255,255,0.05)" : "rgba(255,58,58,0.1)",
+                              border: `1px solid ${p.is_correct ? "rgba(74,222,128,0.25)" : skipped ? "rgba(255,255,255,0.08)" : "rgba(255,58,58,0.22)"}`,
+                            }}>
+                              <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: ".65rem", color: p.is_correct ? "#4ADE80" : skipped ? COLORS.textFaint : COLORS.accent }}>
+                                {String(localIdx + 1).padStart(2, "0")}
+                              </span>
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: ".3rem", marginBottom: ".35rem", fontSize: ".63rem", fontWeight: 700, color, textTransform: "uppercase" as const, letterSpacing: ".07em" }}>
+                                <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: color, display: "inline-block", flexShrink: 0 }} />
+                                {subj.name}
+                              </span>
+                              <p style={{ fontSize: ".86rem", fontWeight: 600, color: COLORS.textPrimary, marginBottom: ".45rem", lineHeight: 1.55 }}>
+                                {orig ? problemText(orig.content) : `Вопрос ${p.id}`}
+                              </p>
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem .9rem" }}>
+                                {orig && p.correct.length > 0 && (
+                                  <span style={{ fontSize: ".75rem", color: "#4ADE80", display: "flex", alignItems: "center", gap: ".3rem" }}>
+                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#4ADE80" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                    {p.correct.map(ci => orig.options[ci]).filter(Boolean).join(", ")}
+                                  </span>
+                                )}
+                                {!p.is_correct && !skipped && p.selected && orig && (
+                                  <span style={{ fontSize: ".75rem", color: "#FF6B6B", display: "flex", alignItems: "center", gap: ".3rem" }}>
+                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                                    {p.selected.map(optIdx => orig.options[optIdx]).filter(Boolean).join(", ")}
+                                  </span>
+                                )}
+                                {skipped && <span style={{ fontSize: ".75rem", color: COLORS.textFaint }}>Пропущен</span>}
+                              </div>
+                              {p.explanation && (
+                                <div style={{ marginTop: ".5rem", padding: ".5rem .75rem", background: "rgba(255,255,255,0.03)", borderRadius: "8px", borderLeft: `3px solid ${COLORS.border}` }}>
+                                  <p style={{ fontSize: ".74rem", color: COLORS.textMuted, lineHeight: 1.6 }}>{p.explanation}</p>
+                                </div>
+                              )}
+                            </div>
+                            <div style={{
+                              flexShrink: 0, width: "22px", height: "22px", borderRadius: "50%",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              background: p.is_correct ? "rgba(74,222,128,0.15)" : skipped ? "rgba(255,255,255,0.04)" : "rgba(255,58,58,0.12)",
+                            }}>
+                              {p.is_correct
+                                ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#4ADE80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                : skipped
+                                  ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v4M5 7.5v.5" stroke="#7878A8" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                                  : <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                              }
+                            </div>
                           </div>
-                        )}
-                      </div>
-
-                      {/* Status icon */}
-                      <div style={{
-                        flexShrink: 0, width: "22px", height: "22px", borderRadius: "50%",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        background: p.is_correct ? "rgba(74,222,128,0.15)" : skipped ? "rgba(255,255,255,0.04)" : "rgba(255,58,58,0.12)",
-                      }}>
-                        {p.is_correct
-                          ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#4ADE80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                          : skipped
-                            ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v4M5 7.5v.5" stroke="#7878A8" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                            : <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                        }
-                      </div>
-                    </div>
-                  );
-                })}
+                        );
+                      })
+                  : tabSub?.problems.map((p, i) => {
+                      const orig     = examData.subjects.find(s => s.name === tabSub.name)?.problems.find(pr => pr.id === p.id);
+                      const skipped  = !p.selected || p.selected.length === 0;
+                      const rowClass = p.is_correct ? "correct" : skipped ? "skipped" : "wrong";
+                      return (
+                        <div key={p.id} className={`q-row ${rowClass} q-row-anim`} style={{ animationDelay: `${Math.min(i * 30, 300)}ms` }}>
+                          <div style={{
+                            flexShrink: 0, width: "28px", height: "28px", borderRadius: "8px",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            background: p.is_correct ? "rgba(74,222,128,0.12)" : skipped ? "rgba(255,255,255,0.05)" : "rgba(255,58,58,0.1)",
+                            border: `1px solid ${p.is_correct ? "rgba(74,222,128,0.25)" : skipped ? "rgba(255,255,255,0.08)" : "rgba(255,58,58,0.22)"}`,
+                          }}>
+                            <span style={{ fontFamily: FONTS.display, fontWeight: 800, fontSize: ".65rem", color: p.is_correct ? "#4ADE80" : skipped ? COLORS.textFaint : COLORS.accent }}>
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: ".86rem", fontWeight: 600, color: COLORS.textPrimary, marginBottom: ".45rem", lineHeight: 1.55 }}>
+                              {orig ? problemText(orig.content) : `Вопрос ${p.id}`}
+                            </p>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem .9rem" }}>
+                              {orig && p.correct.length > 0 && (
+                                <span style={{ fontSize: ".75rem", color: "#4ADE80", display: "flex", alignItems: "center", gap: ".3rem" }}>
+                                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#4ADE80" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                  {p.correct.map(ci => orig.options[ci]).filter(Boolean).join(", ")}
+                                </span>
+                              )}
+                              {!p.is_correct && !skipped && p.selected && orig && (
+                                <span style={{ fontSize: ".75rem", color: "#FF6B6B", display: "flex", alignItems: "center", gap: ".3rem" }}>
+                                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                                  {p.selected.map(si => orig.options[si]).filter(Boolean).join(", ")}
+                                </span>
+                              )}
+                              {skipped && <span style={{ fontSize: ".75rem", color: COLORS.textFaint }}>Пропущен</span>}
+                            </div>
+                            {p.explanation && (
+                              <div style={{ marginTop: ".5rem", padding: ".5rem .75rem", background: "rgba(255,255,255,0.03)", borderRadius: "8px", borderLeft: `3px solid ${COLORS.border}` }}>
+                                <p style={{ fontSize: ".74rem", color: COLORS.textMuted, lineHeight: 1.6 }}>{p.explanation}</p>
+                              </div>
+                            )}
+                          </div>
+                          <div style={{
+                            flexShrink: 0, width: "22px", height: "22px", borderRadius: "50%",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            background: p.is_correct ? "rgba(74,222,128,0.15)" : skipped ? "rgba(255,255,255,0.04)" : "rgba(255,58,58,0.12)",
+                          }}>
+                            {p.is_correct
+                              ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#4ADE80" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              : skipped
+                                ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v4M5 7.5v.5" stroke="#7878A8" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                                : <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="#FF6B6B" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                            }
+                          </div>
+                        </div>
+                      );
+                    })
+                }
               </div>
             )}
           </div>
