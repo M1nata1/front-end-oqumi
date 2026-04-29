@@ -44,7 +44,15 @@ export default function ExamPage() {
   const [search,           setSearch]           = useState("");
   const [fadingProfile,    setFadingProfile]    = useState(false);
   const [displayedProfile, setDisplayedProfile] = useState<ApiSubject[]>([]);
+  const [profileGridMinH,  setProfileGridMinH]  = useState(0);
+  const profileGridRef = useRef<HTMLDivElement>(null);
   const fetched = useRef(false);
+
+  useEffect(() => {
+    if (profileGridRef.current && profile.length > 0) {
+      setProfileGridMinH(profileGridRef.current.offsetHeight);
+    }
+  }, [profile.length]);
 
   useEffect(() => {
     if (fetched.current) return;
@@ -301,7 +309,7 @@ export default function ExamPage() {
               Профильный предмет — выберите один
             </p>
 
-            <div className={`profile-grid${fadingProfile ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
+            <div ref={profileGridRef} className={`profile-grid${fadingProfile ? " fading" : ""}`} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem", minHeight: search ? profileGridMinH : undefined }}>
               {displayedProfile.map((sub, i) => {
                 const color   = subjectColor(mandatory.length + i);
                 const isSel   = selectedSlug === sub.slug;
